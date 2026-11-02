@@ -1,4 +1,4 @@
-const CACHE='talatlim-2.1.0-idfix';
+const CACHE='talatlim-3.0.0';
 const ROOT=new URL('./',self.location.href).href;
 const ASSETS=['./','./index.html','./manifest.webmanifest'].map(p=>new URL(p,ROOT).href);
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
