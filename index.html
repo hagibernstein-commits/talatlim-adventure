@@ -71,6 +71,18 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
 .pick{display:flex;flex-direction:column;gap:10px}
 .pick .card{display:flex;align-items:center;gap:10px;text-align:right;padding:8px 12px;font-size:15px}
 .pick .card canvas{width:84px;height:84px;flex:none}
+
+#app.walk #stage{width:100%;height:100dvh;aspect-ratio:auto;max-height:100dvh}
+#app.walk #bottom{flex:0}
+#stage #mapctrl{z-index:6;pointer-events:none}
+#stage #mapctrl>*{pointer-events:auto}
+#dpad{left:18px;top:auto;bottom:18px;transform:none;width:116px;height:116px;border:2px solid #ffffff70;background:radial-gradient(circle,#ffffff30,#13291dcc);box-shadow:0 4px 15px #0005}
+#dpad i{left:32px;top:32px;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#eaf4d0,#8ac878);border:2px solid #fff9;box-shadow:0 3px 6px #0005;will-change:transform}
+#abtn{right:20px;top:auto;bottom:40px;transform:none;width:64px;height:64px;border-width:2px;font-size:15px;box-shadow:0 3px 0 #a8420e}
+#abtn:active{transform:translateY(2px)}
+#stickhint{position:absolute;bottom:3px;left:22px;font-size:11px;opacity:.75;pointer-events:none!important}
+input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;font:18px system-ui;background:#f7ffef;color:#183220;user-select:text;touch-action:auto}
+@media(max-height:600px){#app.walk #stage{width:100%}#dpad{width:96px;height:96px;left:12px;bottom:10px}#dpad i{left:22px;top:22px}#abtn{bottom:25px}}
 </style>
 </head>
 <body>
@@ -83,7 +95,7 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
  </div>
  <div id="bottom">
   <div id="mapctrl">
-   <div id="dpad"><i class="u">▲</i><i class="l">◀</i><i class="r">▶</i><i class="d">▼</i></div>
+   <div id="dpad" role="slider" aria-label="ג׳ויסטיק לתנועה"><i></i></div><span id="stickhint">גררו כדי ללכת</span>
    <button id="abtn">בדיקה</button>
   </div>
   <div id="bui"><div id="msg"></div><div id="menu"></div></div>
@@ -96,7 +108,7 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
 <script>
 (()=>{
 'use strict';
-const VER='1.0.1';
+const VER='2.0.0';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -127,6 +139,16 @@ const SP=[
  {n:'ניצוצון',t:'spark',b:[42,62,38,70],cr:.45,xp:75,f:'כדור אנרגיה סקרן עם עין אחת גדולה. מסתובב סביב אנשים ומציץ.',h:'B, C'},
  {n:'סלעון',t:'earth',b:[65,55,75,25],cr:.55,xp:70,f:'איטי אבל חזק. הצב הזה סוחב הר קטן על הגב ולא מתלונן.',h:'C'},
  {n:'חולית',t:'earth',b:[55,60,50,50],cr:.6,xp:60,f:'חופר מנהרות מהר מאוד. אוהב לאסוף אבנים נוצצות.',h:'A'}];
+const EVO_NAMES=['להבאר','גחלדור','טיפלג','צדפז','עלעד','פטריער','ברקיע','ניצוסטר','סלעד','חולבר'];
+const EVOL={};
+for(let i=0;i<10;i++){const a=SP[i];a.evo=10+i;a.at=12+(i%2)*2;EVOL[i]=a.evo;SP.push({...a,n:EVO_NAMES[i],b:a.b.map((v,k)=>v+(k===0?24:22)),cr:a.cr*.65,xp:a.xp+45,evo:null,base:i,f:'הצורה המפותחת של '+a.n+'. הניסיון חיזק את גופו ואת הכוח המיוחד שלו.',h:a.h})}
+SP.push(
+ {n:'בועמון',t:'water',b:[62,53,56,48],cr:.58,xp:72,f:'מגדל בועות צבעוניות ומחביא בהן אוצרות קטנים.',h:'B'},
+ {n:'קוציץ',t:'plant',b:[58,65,58,38],cr:.56,xp:75,f:'יצור קוצים עגול. פורח רק ליד חברים שהוא סומך עליהם.',h:'A'},
+ {n:'גיצפר',t:'fire',b:[44,64,42,74],cr:.48,xp:80,f:'ציפור גיצים קטנה שמשאירה שובל חם באוויר.',h:'C'},
+ {n:'תדרון',t:'spark',b:[48,56,52,72],cr:.5,xp:78,f:'אוזניו קולטות מנגינות רחוקות ומשדרות אותן בניצוצות.',h:'B'},
+ {n:'גבישון',t:'earth',b:[72,58,74,22],cr:.42,xp:88,f:'גבישים צומחים על גבו בכל יום הולדת. שומר על הגבעות.',h:'C'});
+ZONES.A.sp.push(21,21);ZONES.B.sp.push(20,23);ZONES.C.sp.push(22,24);
 const STARTERS=[0,2,4];
 const need=l=>4*l*l+10;
 const hpOf=(sp,l)=>Math.floor(SP[sp].b[0]*l/25)+l+12;
@@ -181,14 +203,21 @@ const DR=[
  E(c,-13,-17,4.5,4.5,'#c19f5c');E(c,13,-17,4.5,4.5,'#c19f5c');E(c,0,-6,16,13,'#e2c78c');
  [-1,1].forEach(s=>{E(c,s*23,12,6.5,9,'#c19f5c',s*.4);poly(c,[s*20,18,s*21,26,s*24,19],'#fff8e8');poly(c,[s*24,19,s*26,26,s*28,18],'#fff8e8');poly(c,[s*17,16,s*17,24,s*20,18],'#fff8e8')});
  E(c,0,0,5.5,4.2,'#f08aa0');E(c,-2,-1,1.5,1,'#ffd0d8');eye(c,-8,-9,3,0);eye(c,8,-9,3,0);smile(c,0,3,3.5,'#6a4a20')}];
+for(let i=0;i<10;i++){const base=DR[i];DR.push((c,t)=>{c.save();c.scale(1.12,1.12);base(c,t);c.restore();const col=TY[SP[i].t].c;for(const q of [-1,1]){poly(c,[q*14,-22,q*24,-38,q*26,-18],col)}E(c,0,8,7,5,'#fff5');poly(c,[-5,7,0,1,5,7,0,13],'#ffe58b')})}
+DR.push(
+(c,t)=>{E(c,0,6,23,21,'#51d7dd');for(let i=0;i<4;i++){const a=t+i*1.6;E(c,Math.cos(a)*25,Math.sin(a)*24-8,5+i,5+i,'#bdf8ff99')}eye(c,-8,3,4);eye(c,8,3,4);smile(c,0,11,5)},
+(c,t)=>{for(let i=0;i<12;i++){const a=i*Math.PI/6;poly(c,[Math.cos(a)*19,Math.sin(a)*19,Math.cos(a)*31,Math.sin(a)*31,Math.cos(a+.2)*19,Math.sin(a+.2)*19],'#e0d58c')}E(c,0,2,22,23,'#52b87a');E(c,0,-22,9,5,'#ff9cc5');eye(c,-7,0,4);eye(c,7,0,4);smile(c,0,9,4)},
+(c,t)=>{const w=Math.sin(t*4)*6;poly(c,[-9,4,-35,-10-w,-28,15],'#f49d57');poly(c,[9,4,35,-10-w,28,15],'#f49d57');E(c,0,7,14,23,'#a93e62');E(c,0,-12,13,12,'#df6780');poly(c,[-4,-23,0,-36,5,-23],'#ffd473');eye(c,-5,-13,3);eye(c,5,-13,3);poly(c,[-3,-6,0,1,4,-6],'#ffd473')},
+(c,t)=>{E(c,-20,-19,7,15,'#9477eb',-.5);E(c,20,-19,7,15,'#9477eb',.5);E(c,0,6,24,22,'#6253bc');eye(c,-9,1,5);eye(c,9,1,5);E(c,0,12,7,4,'#68e1dd');for(let i=0;i<3;i++)E(c,-9+i*9,23,2,2,'#ffe77d')},
+(c,t)=>{E(c,0,16,27,14,'#638b99');for(let i=0;i<5;i++){const x=-22+i*11;poly(c,[x-6,8,x,-29+(i%2)*13,x+8,8],'#86e4db');poly(c,[x,8,x,-29+(i%2)*13,x+8,8],'#4bb2c1')}eye(c,-8,13,4);eye(c,8,13,4);smile(c,0,20,4)});
 function drawMon(c,sp,x,y,size,t,alpha){c.save();c.translate(x,y);const k=size/64;c.scale(k,k);if(alpha!=null)c.globalAlpha=alpha;DR[sp](c,t||0);c.restore()}
 function monCanvas(sp,px,sil){const cv=document.createElement('canvas');cv.width=cv.height=px*2;const c=cv.getContext('2d');drawMon(c,sp,px,px*1.02,px*2*.9,0.5);if(sil){c.globalCompositeOperation='source-in';c.fillStyle='#0b1410';c.fillRect(0,0,px*2,px*2)}return cv}
 /* ---------- מצב ושמירה ---------- */
 const KEY='talatlim_v1';
 let S=null;
-function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false}}
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&Array.isArray(j.party)){return Object.assign(newState(),j)}}catch(e){}return null}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false,version:2,defeated:{},badges:0}}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&Array.isArray(j.party)){const n=Object.assign(newState(),j);n.version=2;n.defeated=n.defeated||{};n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}}catch(e){}return null}
+function save(){S.version=2;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 S=load()||newState();
 /* ---------- סאונד ---------- */
 let AC=null;
@@ -204,7 +233,7 @@ const SFX={
  pick:()=>tone(700,.07,'square',.05),throw:()=>tone(300,.4,'triangle',.06,700),bump:()=>tone(110,.06,'square',.04),buy:()=>{tone(900,.06,'square',.05);tone(1200,.08,'square',.05,0,.07)}};
 const sfx=n=>{try{SFX[n]()}catch(e){}};
 /* ---------- עולם ---------- */
-const W=40,H=32,TS=32,VW=11,VH=9;
+const W=40,H=32,TS=32,VW=11;let VH=15;
 const M=[];
 (function build(){
  let sd=12345;const r=()=>{sd=(sd*1664525+1013904223)>>>0;return sd/4294967296};
@@ -232,6 +261,12 @@ const M=[];
  function rnd2(a,b){return a+Math.floor(r()*(b-a+1))}
  // עצים בתוך אגם אזור B
 })();
+const TRAINERS=[
+ {id:'noa',n:'נועה שומרת האחו',x:18,y:21,team:[[21,8],[4,9]],reward:65,txt:'טלטלים מתחזקים כשמתאמנים יחד. מוכנים לקרב?'},
+ {id:'gal',n:'גל חוקר החוף',x:27,y:17,team:[[20,11],[23,12]],reward:100,txt:'הגלים לימדו אותי לא לוותר!'},
+ {id:'boss',n:'צור אלוף הגבעות',x:18,y:10,team:[[8,13],[22,14],[18,16]],reward:220,boss:true,txt:'ברוכים הבאים לאתגר הגבעות! שלושה טלטלים, תג אחד. נועה וגל יכינו אתכם לקרב.'}
+];
+TRAINERS.forEach(n=>{M[n.y][n.x]=1;for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]])M[n.y+dy][n.x+dx]=1});
 const SOLID=new Set([2,3,4,6,7,8,9,13]);
 const isTall=v=>v>=10&&v<=12;
 const zoneAt=(x,y)=>y>=22?'A':x>=22?'B':'C';
@@ -262,7 +297,8 @@ const cv=$('#cv'),cx=cv.getContext('2d');
 let mode='title'; // title | map | trans | battle | menu
 let P={x:S.x,y:S.y,dir:S.dir||'up',px:S.x,py:S.y,moving:false,mt:0,from:null,to:null};
 const DIRS={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
-let held=null,tapA=false,region='';
+let held=null,tapA=false,region='';let analogPower=1;
+function mapLayout(on){$('#app').classList.toggle('walk',on);cv.height=on?Math.round(704*$('#stage').clientHeight/$('#stage').clientWidth):576;VH=cv.height/64;if(on)$('#stage').appendChild($('#mapctrl'));else $('#bottom').prepend($('#mapctrl'))}
 const STEP=.17;
 function drawPlayer(c,x,y,dir,ph,mvg){const cxp=x+16,by=y+28,bob=mvg?Math.abs(Math.sin(ph*Math.PI))*1.6:0,lg=mvg?Math.sin(ph*Math.PI*2)*3:0;
  E(c,cxp,by+1,8,3,'rgba(0,0,0,.25)');
@@ -277,22 +313,23 @@ function drawPlayer(c,x,y,dir,ph,mvg){const cxp=x+16,by=y+28,bob=mvg?Math.abs(Ma
 function drawMap(ts){
  const c=cx;c.setTransform(2,0,0,2,0,0);
  let camx=P.px*TS+16-VW*TS/2,camy=P.py*TS+16-VH*TS/2;camx=Math.round(clamp(camx,0,W*TS-VW*TS)*2)/2;camy=Math.round(clamp(camy,0,H*TS-VH*TS)*2)/2;
- c.fillStyle='#000';c.fillRect(0,0,352,288);
+ c.fillStyle='#000';c.fillRect(0,0,352,cv.height/2);
  const x0=Math.floor(camx/TS),y0=Math.floor(camy/TS),wf=Math.floor(ts/500)%2;
  for(let y=y0;y<=y0+VH;y++)for(let x=x0;x<=x0+VW;x++){if(x<0||y<0||x>=W||y>=H)continue;const t=M[y][x];let a=ATL[t];let im;
   if(t===2)im=a[wf];else if(t===0)im=a[(x*7+y*3)%3];else if(isTall(t))im=a[(Math.floor(ts/450)+x+y)%2];else im=a[0];
   c.drawImage(im,x*TS-camx,y*TS-camy,TS,TS)}
  const sx=P.px*TS-camx,sy=P.py*TS-camy;
+ TRAINERS.forEach(n=>{const x=n.x*TS-camx,y=n.y*TS-camy;if(x< -32||y< -32||x>352||y>cv.height/2)return;drawPlayer(c,x,y,'down',0,false);E(c,x+16,y+5,7,4,n.boss?'#ffd23f':'#9b68dc');c.fillStyle='#fff';c.font='bold 10px system-ui';c.textAlign='center';c.fillText(S.defeated[n.id]?'✓':n.boss?'★':'!',x+16,y-2)});
  drawPlayer(c,sx,sy,P.dir,P.moving?P.mt:0,P.moving);
  const tx=Math.round(P.px),ty=Math.round(P.py);const tv=M[ty]&&M[ty][tx];
  if(isTall(tv)){const im=ATL[tv][(Math.floor(ts/450)+tx+ty)%2];c.drawImage(im,0,28,64,36,tx*TS-camx,ty*TS-camy+14,TS,18)}
 }
-function solidAt(x,y){return x<0||y<0||x>=W||y>=H||SOLID.has(M[y][x])}
+function solidAt(x,y){return x<0||y<0||x>=W||y>=H||SOLID.has(M[y][x])||TRAINERS.some(n=>n.x===x&&n.y===y)}
 function tryMove(d){if(P.moving||mode!=='map')return;P.dir=d;const v=DIRS[d],nx=P.x+v[0],ny=P.y+v[1];if(solidAt(nx,ny)){if(!P.bump||performance.now()-P.bump>400){P.bump=performance.now();sfx('bump')}return}
  P.moving=true;P.mt=0;P.from={x:P.x,y:P.y};P.to={x:nx,y:ny}}
 function updateMap(dt){
  if(mode!=='map')return;
- if(P.moving){P.mt+=dt/STEP;const k=Math.min(P.mt,1);P.px=P.from.x+(P.to.x-P.from.x)*k;P.py=P.from.y+(P.to.y-P.from.y)*k;
+ if(P.moving){P.mt+=dt/(STEP/(.55+.45*analogPower));const k=Math.min(P.mt,1);P.px=P.from.x+(P.to.x-P.from.x)*k;P.py=P.from.y+(P.to.y-P.from.y)*k;
   if(P.mt>=1){P.x=P.to.x;P.y=P.to.y;P.px=P.x;P.py=P.y;P.moving=false;S.x=P.x;S.y=P.y;S.dir=P.dir;stepDone()}}
  if(!P.moving&&mode==='map'&&held)tryMove(held);
  if(tapA){tapA=false;if(mode==='map'&&!P.moving)interact()}
@@ -304,13 +341,16 @@ function stepDone(){
  const v=M[P.y][P.x];if(isTall(v)&&Math.random()<.15){held=null;dpadOff();startWild()}
 }
 function interact(){const d=DIRS[P.dir],x=P.x+d[0],y=P.y+d[1];if(solidAt(x,y)||true){const v=M[y]&&M[y][x];
- if(v===8||v===7||v===6||v===13){hutMenu()}
- else if(v===9){toast('🪧 עשב גבוה = טלטלים פראיים! ריפוי בבקתה האדומה. צפון: גבעות הגחלים, מזרח: חוף הברכה',4500)}
+ const npc=TRAINERS.find(n=>n.x===x&&n.y===y);if(npc){trainerMenu(npc)}
+ else if(v===8||v===7||v===6||v===13){hutMenu()}
+ else if(v===9){toast('🪧 עשב גבוה = טלטלים פראיים! ריפוי בבקתה האדומה. מאמנים: נועה בדרך מערבה, גל בחוף. האלוף בגבעות בצפון־מערב',4500)}
  else toast('אין כאן כלום...',1000)}}
 /* ---------- קרב ---------- */
 let B=null;
 const msgEl=$('#msg'),menuEl=$('#menu'),bui=$('#bui'),mapctrl=$('#mapctrl'),pe=$('#pe'),pp=$('#pp');
-const nm=m=>SP[m.sp].n;
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nm=m=>m.nick?esc(m.nick):SP[m.sp].n;
+const statusName=m=>m.status==='sleep'?'💤 שינה':m.status==='burn'?'🔥 כוויה':'';
 const cur=()=>S.party[B.pi];
 const alive=()=>S.party.filter(m=>m.hp>0).length;
 let skipRes=null;
@@ -320,8 +360,8 @@ function choose(opts){return new Promise(r=>{menuEl.innerHTML='';menuEl.style.di
 function anim(ms,fn){return new Promise(r=>{const t0=performance.now();(function f(n){const p=Math.min(1,(n-t0)/ms);fn(p);if(p<1)requestAnimationFrame(f);else r()})(t0)})}
 const hpCls=p=>p>.5?'':p>.2?'m':'l';
 function panels(){if(!B)return;const e=B.e,p=cur();
- pe.innerHTML=`<b>${nm(e)}</b> <span style="opacity:.7;font-size:11px">פראי</span><span class="lv">רמה ${e.lv}</span><div class="bar"><div class="fill ${hpCls(e.hp/maxHp(e))}" style="width:${Math.max(0,e.hp/maxHp(e)*100)}%"></div></div>`;
- pp.innerHTML=`<b>${nm(p)}</b> ${chip(SP[p.sp].t)}<span class="lv">רמה ${p.lv}</span><div class="bar"><div class="fill ${hpCls(p.hp/maxHp(p))}" style="width:${Math.max(0,p.hp/maxHp(p)*100)}%"></div></div><div style="font-size:12px;margin-top:2px">${Math.max(0,p.hp)}/${maxHp(p)}</div><div class="bar xpb"><div class="fill" style="width:${p.xp/need(p.lv)*100}%"></div></div>`}
+ pe.innerHTML=`<b>${nm(e)}</b> <span style="opacity:.7;font-size:11px">${B.trainer?B.trainer.n:'פראי'} ${statusName(e)}</span><span class="lv">רמה ${e.lv}</span><div class="bar"><div class="fill ${hpCls(e.hp/maxHp(e))}" style="width:${Math.max(0,e.hp/maxHp(e)*100)}%"></div></div>`;
+ pp.innerHTML=`<b>${nm(p)}</b> ${chip(SP[p.sp].t)} ${statusName(p)}<span class="lv">רמה ${p.lv}</span><div class="bar"><div class="fill ${hpCls(p.hp/maxHp(p))}" style="width:${Math.max(0,p.hp/maxHp(p)*100)}%"></div></div><div style="font-size:12px;margin-top:2px">${Math.max(0,p.hp)}/${maxHp(p)}</div><div class="bar xpb"><div class="fill" style="width:${p.xp/need(p.lv)*100}%"></div></div>`}
 function hud(){$('#hs').textContent=`⚪ ${S.balls}   🧪 ${S.pots}   🪙 ${S.coins}`}
 /* אפקטים */
 function newB(e){const z=zoneAt(P.x,P.y);return{e,z,pi:S.party.findIndex(m=>m.hp>0),eo:{x:0,y:0},po:{x:0,y:0},es:1,ps:1,ea:1,pa:1,ball:null,proj:null,fx:[],flash:{e:0,p:0},t:0}}
@@ -335,14 +375,16 @@ async function projectile(fromP,mv){const a=fromP?PP():EP(),d=fromP?EP():PP(),co
 async function lunge(isP){const o=isP?B.po:B.eo,dx=isP?30:-30,dy=isP?-18:14;await anim(130,p=>{o.x=dx*p;o.y=dy*p});await anim(130,p=>{o.x=dx*(1-p);o.y=dy*(1-p)})}
 async function hitFx(isP){const o=isP?B.po:B.eo;const f=isP?'p':'e';const q=isP?PP():EP();burst(q.x,q.y,'#fff',10,90);await anim(380,p=>{o.x=Math.sin(p*40)*5*(1-p);B.flash[f]=Math.floor(p*8)%2?0:1});o.x=0;B.flash[f]=0}
 async function faintAnim(isP){const o=isP?B.po:B.eo;sfx('faint');await anim(600,p=>{o.y=p*40;if(isP)B.pa=1-p;else B.ea=1-p})}
-function calc(a,d,mv){const atk=stOf(a.sp,a.lv,1)*(1+.5*(a.bst||0)),def=stOf(d.sp,d.lv,2),stab=SP[a.sp].t===mv.t?1.25:1,eff=(EFF[mv.t]&&EFF[mv.t][SP[d.sp].t])||1,crit=Math.random()<1/12,rr=.85+Math.random()*.15;
+function calc(a,d,mv){const atk=stOf(a.sp,a.lv,1)*(a.status==='burn'?.8:1)*(1+.5*(a.bst||0)),def=stOf(d.sp,d.lv,2),stab=SP[a.sp].t===mv.t?1.25:1,eff=(EFF[mv.t]&&EFF[mv.t][SP[d.sp].t])||1,crit=Math.random()<1/12,rr=.85+Math.random()*.15;
  return{dmg:Math.max(1,Math.floor(((2*a.lv/5+2)*mv.p*atk/def/50+2)*stab*eff*(crit?1.5:1)*rr)),eff,crit}}
 async function useMove(a,d,mvk,isP){const mv=MV[mvk];
+ if(a.status==='sleep'){a.turns=(a.turns||1)-1;if(a.turns>0){await say(`${nm(a)} ישן ולא יכול לתקוף!`,900);return}a.status=null;panels();await say(`${nm(a)} התעורר!`,800)}
  await say(`${nm(a)}${isP?'':' הפראי'} השתמש ב${mv.n}!`,900);
  if(mvk==='buff'){sfx('buff');a.bst=Math.min((a.bst||0)+1,3);const q=isP?PP():EP();burst(q.x,q.y,'#ffd23f',16,50);await sleep(400);await say(`ההתקפה של ${nm(a)} עלתה!`,900);return}
  await lunge(isP);sfx('atk');
  if(Math.random()*100>=mv.a){sfx('miss');await say('ההתקפה החטיאה!',800);return}
  await projectile(isP,mv);sfx('hit');const r=calc(a,d,mv);if(!isP)r.dmg=Math.max(1,Math.floor(r.dmg*.85));d.hp=Math.max(0,d.hp-r.dmg);panels();await hitFx(!isP);
+ if(d.hp>0&&!d.status&&((mv.t==='fire'&&Math.random()<.2)||(mv.t==='plant'&&Math.random()<.2))){d.status=mv.t==='fire'?'burn':'sleep';d.turns=2;panels();await say(`${nm(d)} ${d.status==='burn'?'נכווה!':'נרדם מאבקת העלים!'}`,1000)}
  if(r.crit)await say('מכה קריטית!',700);
  if(r.eff>1)await say('זה סופר יעיל!',800);else if(r.eff<1)await say('זה לא ממש יעיל...',800)}
 function aiMove(e,p){const mvs=movesFor(e.sp,e.lv);if(!e.bst&&mvs.includes('buff')&&Math.random()<.15)return'buff';
@@ -352,12 +394,12 @@ const spd=m=>stOf(m.sp,m.lv,3);
 async function giveXp(m,amt){await say(`${nm(m)} קיבל ${amt} נקודות ניסיון!`,900);m.xp+=amt;
  while(m.xp>=need(m.lv)&&m.lv<50){m.xp-=need(m.lv);const om=maxHp(m),old=movesFor(m.sp,m.lv);m.lv++;m.hp+=maxHp(m)-om;sfx('lvl');panels();await say(`${nm(m)} עלה לרמה ${m.lv}!`,1100);
   for(const x of movesFor(m.sp,m.lv).filter(x=>!old.includes(x)))await say(`${nm(m)} למד את ${MV[x].n}!`,1100)}
- panels()}
+ await evolve(m);panels()}
 async function startWild(){
- mode='trans';sfx('enc');
+ mapLayout(false);mode='trans';sfx('enc');
  const z=zoneAt(P.x,P.y),zn=ZONES[z],sp=pick(zn.sp);let lv=rnd(zn.lv[0],zn.lv[1]);
  const e=mkMon(sp,lv);await transition(true);
- B=newB(e);S.seen[sp]=1;S.party.forEach(m=>m.bst=0);
+ B=newB(e);S.seen[sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null});
  mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display='block';pp.style.display='block';panels();mode='battle';
  await transition(false);
  sfx('pick');await say(`${nm(e)} פראי הופיע!`,1100);
@@ -375,10 +417,10 @@ async function getAction(){
  while(true){const p=cur();msgEl.textContent=`מה ${nm(p)} יעשה?`;
   const k=await choose([{k:'fight',h:'⚔️ תקיפה'},{k:'ball',h:`⚪ כדור לכידה<small>נשארו ${S.balls}</small>`},{k:'pot',h:`🧪 שיקוי<small>נשארו ${S.pots} · +35 חיים</small>`},{k:'swap',h:'🔁 החלפה'},{k:'run',h:'🏃 בריחה',span:1,cls:'sec'}]);
   if(k==='fight'){const mv=await choose(movesFor(p.sp,p.lv).map(m=>({k:m,h:`${MV[m].n}${chip(MV[m].t)}<small>${MV[m].p?'עוצמה '+MV[m].p:'מחזק התקפה'}</small>`})).concat([{k:'back',h:'↩ חזרה',cls:'sec',span:1}]));if(mv==='back')continue;return{k:'move',m:mv}}
-  if(k==='ball'){if(S.balls<=0){await say('נגמרו הכדורים!',900);continue}return{k:'ball'}}
+  if(k==='ball'){if(B.trainer){await say('אי אפשר ללכוד טלטל של מאמן!',1000);continue}if(S.balls<=0){await say('נגמרו הכדורים!',900);continue}return{k:'ball'}}
   if(k==='pot'){if(S.pots<=0){await say('נגמרו השיקויים!',900);continue}if(p.hp>=maxHp(p)){await say('החיים כבר מלאים!',900);continue}return{k:'pot'}}
   if(k==='swap'){const i=await partyMenu(false);if(i==='back')continue;return{k:'swap',i}}
-  if(k==='run')return{k:'run'}}}
+  if(k==='run'){if(B.trainer){await say('בקרב מאמנים נלחמים עד הסוף. אפשר להחליף או לרפא!',1100);continue}return{k:'run'}}}}
 async function partyMenu(forced){msgEl.textContent='מי ייכנס לקרב?';
  const o=S.party.map((m,i)=>({k:i,h:`${nm(m)} ${chip(SP[m.sp].t)}<small>רמה ${m.lv} · ${m.hp}/${maxHp(m)}</small>`,dis:m.hp<=0||i===B.pi}));if(!forced)o.push({k:'back',h:'↩ חזרה',cls:'sec',span:1});return choose(o)}
 async function doSwap(i){await say(`חזור, ${nm(cur())}!`,700);await anim(250,p=>{B.ps=1-p;B.pa=1-p});B.pi=i;panels();B.po={x:0,y:0};await anim(250,p=>{B.ps=p;B.pa=p});B.ps=1;B.pa=1;await say(`קדימה, ${nm(cur())}!`,800)}
@@ -389,14 +431,15 @@ async function runTurn(act){
   else if(act.k==='pot'){S.pots--;hud();sfx('heal');A.hp=Math.min(maxHp(A),A.hp+35);panels();burst(PP().x,PP().y,'#7cff9a',16,50);await say(`${nm(A)} התרפא!`,900)}
   else if(act.k==='ball'){if(await throwBall())return'end'}
   else if(act.k==='run'){const ch=clamp(.5+(spd(A)-spd(Em))/80,.3,.95);if(Math.random()<ch){sfx('run');await say('ברחת בהצלחה!',900);B.fled=true;return'end'}await say('לא הצלחת לברוח!',900)}
-  await useMove(Em,cur(),em,false);if(cur().hp<=0)return await playerDown();return'cont'}
+  await useMove(Em,cur(),em,false);if(cur().hp<=0)return await playerDown();return await statusTick()}
  const pFirst=spd(A)>spd(Em)||(spd(A)===spd(Em)&&Math.random()<.5);
  const seq=pFirst?[[A,Em,act.m,true],[Em,A,em,false]]:[[Em,A,em,false],[A,Em,act.m,true]];
  for(const [a,d,m,isP] of seq){if(a.hp<=0)break;await useMove(a,d,m,isP);if(d.hp<=0){return isP?await enemyDown():await playerDown()}}
- return'cont'}
-async function enemyDown(){const e=B.e;await faintAnim(false);await say(`${nm(e)} הפראי הובס!`,1000);
+ return await statusTick()}
+async function enemyDown(){const e=B.e;await faintAnim(false);await say(`${nm(e)} הובס!`,1000);
  const coins=e.lv*2+rnd(0,4);S.coins+=coins;hud();
  const xp=Math.floor(SP[e.sp].xp*e.lv/5);const p=cur();if(p.hp>0)await giveXp(p,xp);
+ if(B.trainer){B.ti++;if(B.ti<B.trainer.team.length){B.e=mkMon(...B.trainer.team[B.ti]);S.seen[B.e.sp]=1;B.eo={x:0,y:0};B.ea=1;B.es=1;panels();await say(`${B.trainer.n} שלח את ${nm(B.e)}!`,1200);return'cont'}S.defeated[B.trainer.id]=true;S.coins+=B.trainer.reward;hud();if(B.trainer.boss){S.badges=1;await say('ניצחת את אלוף הגבעות! קיבלת את תג הגביש! 🏅',2200)}else await say(`ניצחת את ${B.trainer.n}! בונוס ${B.trainer.reward} מטבעות!`,1600);save()}
  if(Math.random()<.35){S.balls++;hud();await say('מצאת כדור לכידה!',900)}
  await say(`קיבלת ${coins} מטבעות 🪙`,800);return'end'}
 async function playerDown(){await faintAnim(true);await say(`${nm(cur())} התעלף...`,1000);
@@ -410,15 +453,15 @@ async function throwBall(){S.balls--;hud();const e=B.e;await say('זורק כד�
  for(let i=0;i<3;i++){await sleep(350);sfx('tick');await anim(420,p=>{B.ball={x:d.x,y:d.y+22,r:12.5,s:1,rot:Math.sin(p*6.283)*.5*(1-p*.4)}});if(Math.random()<sh)k++;else break}
  if(k===3){sfx('ok');burst(d.x,d.y+10,'#ffd23f',24,70);await say(`${nm(e)} נתפס! 🎉`,1300);
   S.caught[e.sp]=1;e.hp=Math.max(1,e.hp);e.bst=0;let where;if(S.party.length<6){S.party.push(e);where='הצטרף לצוות שלך'}else{S.box.push(e);where='נשלח לקופסה'}
-  save();await say(`${nm(e)} ${where}!`,1100);B.caught=true;B.ball=null;return true}
+  save();await say(`${nm(e)} ${where}!`,1100);await evolve(e);B.caught=true;B.ball=null;return true}
  B.ball=null;B.ea=1;await anim(300,p=>{B.es=p});B.es=1;
  await say(['הוא יצא מיד מהכדור!','כמעט! הוא יצא מהכדור!','איזה קרוב! אבל הוא יצא!'][k],1200);return false}
 async function endBattle(){
  const lost=B&&B.lost;mode='trans';await transition(true);
- S.party.forEach(m=>{m.bst=0});
+ S.party.forEach(m=>{m.bst=0;m.status=null});
  if(lost){S.coins=Math.floor(S.coins/2);S.party.forEach(m=>m.hp=maxHp(m));P.x=23;P.y=20;P.px=23;P.py=20;P.dir='up';S.x=23;S.y=20}
  B=null;bui.style.display='none';menuEl.style.display='none';mapctrl.style.display='block';$('#hud').style.display='flex';pe.style.display='none';pp.style.display='none';hud();save();
- mode='map';await transition(false);
+ mapLayout(true);mode='map';await transition(false);
  if(lost)toast('התעוררת בבקתת הריפוי. איבדת חצי מהמטבעות.',3500)}
 /* ציור קרב */
 function drawBattle(ts){const c=cx;c.setTransform(2,0,0,2,0,0);const t=ts/1000,z=ZONES[B.z].bg;
@@ -438,19 +481,29 @@ function drawBattle(ts){const c=cx;c.setTransform(2,0,0,2,0,0);const t=ts/1000,z
 function shade(h){const n=parseInt(h.slice(1),16);const r=(n>>16)*.8|0,g=(n>>8&255)*.8|0,b=(n&255)*.8|0;return'rgb('+r+','+g+','+b+')'}
 function drawBall(c,b){c.save();c.translate(b.x,b.y);if(b.rot)c.rotate(b.rot);const r=Math.max(2,b.r||12);E(c,0,0,r,r,'#4a3ad0');E(c,-r*.3,-r*.35,r*.35,r*.25,'rgba(255,255,255,.5)');c.strokeStyle='#ffd23f';c.lineWidth=2;c.beginPath();c.arc(0,0,r,0,7);c.stroke();
  poly(c,[0,-r*.5,r*.15,-r*.12,r*.5,-r*.1,r*.2,r*.12,r*.3,r*.5,0,r*.28,-r*.3,r*.5,-r*.2,r*.12,-r*.5,-r*.1,-r*.15,-r*.12],'#ffd23f');c.restore()}
+async function statusTick(){
+ for(const [m,isP] of [[B.e,false],[cur(),true]]){if(m.hp>0&&m.status==='burn'){m.hp=Math.max(0,m.hp-Math.max(1,Math.floor(maxHp(m)/12)));panels();await say(`${nm(m)} נפגע מהכוויה!`,850);if(m.hp<=0)return isP?await playerDown():await enemyDown()}}return'cont'
+}
+async function evolve(m){const old=SP[m.sp];if(old.evo==null||m.lv<old.at)return;const was=m.sp,prior=maxHp(m);menuEl.style.display='none';await say(`מה קורה? ${old.n} מתחיל להתפתח! ✨`,1400);const x=document.createElement('div');x.style.cssText='position:absolute;inset:0;z-index:16;background:radial-gradient(circle,#53768a,#141c3dee);display:flex;flex-direction:column;align-items:center;justify-content:center';const art=monCanvas(was,90);x.appendChild(art);const label=document.createElement('h2');label.textContent='✨ התפתחות! ✨';x.appendChild(label);$('#stage').appendChild(x);sfx('lvl');await anim(1500,p=>{art.style.transform=`scale(${1+Math.sin(p*16)*.12}) rotate(${Math.sin(p*10)*7}deg)`;art.style.filter=`brightness(${1+Math.sin(p*Math.PI)*3})`});m.sp=old.evo;m.hp=Math.min(maxHp(m),m.hp+maxHp(m)-prior);S.seen[m.sp]=1;S.caught[m.sp]=1;art.replaceWith(monCanvas(m.sp,100));label.textContent=SP[m.sp].n;sfx('ok');save();await sleep(1100);x.remove();await say(`${old.n} התפתח ל${SP[m.sp].n}! הכוח והחיים עלו!`,1700)
+}
+function trainerMenu(n){if(mode!=='map')return;mode='menu';modal(`<h2>${n.boss?'🏅':'⚔️'} ${n.n}</h2><p>${n.txt}</p><p>${S.defeated[n.id]?'כבר ניצחת! אפשר להתאמן שוב.':n.boss?'רמות 13–16 · פרס: תג הגביש':'פרס: '+n.reward+' מטבעות'}</p><button class="btn grn" id="tf" style="width:100%">לקרב!</button><button class="btn sec" id="tc" style="width:100%;margin-top:10px">לא עכשיו</button>`,b=>{b.querySelector('#tc').onclick=()=>{closeModal();mode='map'};b.querySelector('#tf').onclick=()=>{closeModal();startTrainer(n)}})}
+async function startTrainer(n){dpadOff();tapA=false;mapLayout(false);mode='trans';sfx('enc');await transition(true);B=newB(mkMon(...n.team[0]));B.trainer=n;B.ti=0;S.seen[B.e.sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null});mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display=pp.style.display='block';panels();mode='battle';await transition(false);await say(`${n.n} מאתגר אותך!`,1300);battleLoop()}
+function nickname(m){modal(`<h2>שם חיבה ל${SP[m.sp].n}</h2><input class="nick" id="nick" maxlength="16" placeholder="השם החדש (עד 16 תווים)" value="${esc(m.nick||'')}"><p class="flav">שדה ריק מחזיר את שם הטלטל המקורי.</p><button class="btn grn" id="ns" style="width:100%">שמירה</button><button class="btn sec" id="nc" style="width:100%;margin-top:8px">ביטול</button>`,b=>{b.querySelector('#ns').onclick=()=>{m.nick=b.querySelector('#nick').value.trim().slice(0,16);save();monDetail(m);collTab(cT)};b.querySelector('#nc').onclick=()=>monDetail(m)})}
 /* ---------- מסכים ---------- */
 function showScr(id){$('#'+id).style.display='block'}
 function hideScr(id){$('#'+id).style.display='none'}
-function modal(html,after){const m=$('#modal');$('#mbox').innerHTML=html;m.style.display='flex';m.scrollTop=0;if(after)after($('#mbox'))}
+let modalReady=0;
+function modal(html,after){modalReady=performance.now()+350;dpadOff();tapA=false;const m=$('#modal');$('#mbox').innerHTML=html;m.style.display='flex';m.scrollTop=0;if(after)after($('#mbox'))}
 function closeModal(){$('#modal').style.display='none'}
 const pbar=(p,cls)=>`<div class="bar"><div class="fill ${cls||hpCls(p)}" style="width:${clamp(p,0,1)*100}%;transition:none"></div></div>`;
+document.addEventListener('click',e=>{if($('#modal').style.display==='flex'&&performance.now()<modalReady){e.preventDefault();e.stopImmediatePropagation()}},true);
 function hutMenu(){if(mode!=='map')return;mode='menu';
  const draw=()=>modal(`<h2>🏥 בקתת הריפוי</h2><div style="margin-bottom:10px">🪙 ${S.coins} מטבעות · ⚪ ${S.balls} כדורים · 🧪 ${S.pots} שיקויים</div>
  <div style="display:grid;gap:8px"><button class="btn grn" id="h1">💚 ריפוי מלא לכל הצוות (חינם)</button>
  <button class="btn" id="h2" ${S.coins<10?'disabled':''}>⚪ קנה כדור לכידה<small>10 🪙</small></button>
  <button class="btn" id="h3" ${S.coins<15?'disabled':''}>🧪 קנה שיקוי<small>15 🪙</small></button>
  <button class="btn sec" id="h4">סגור</button></div>`,b=>{
-  b.querySelector('#h1').onclick=()=>{sfx('heal');S.party.forEach(m=>m.hp=maxHp(m));save();toast('הצוות שלך התרפא! 💚');draw()};
+  b.querySelector('#h1').onclick=()=>{sfx('heal');S.party.forEach(m=>{m.hp=maxHp(m);m.status=null});save();toast('הצוות שלך התרפא! 💚');draw()};
   b.querySelector('#h2').onclick=()=>{if(S.coins>=10){S.coins-=10;S.balls++;sfx('buy');hud();save();draw()}};
   b.querySelector('#h3').onclick=()=>{if(S.coins>=15){S.coins-=15;S.pots++;sfx('buy');hud();save();draw()}};
   b.querySelector('#h4').onclick=()=>{closeModal();mode='map'}});
@@ -458,24 +511,24 @@ function hutMenu(){if(mode!=='map')return;mode='menu';
 function monCard(m,i,onclick){const d=document.createElement('div');d.className='card';d.appendChild(monCanvas(m.sp,36));d.insertAdjacentHTML('beforeend',`<div><b>${nm(m)}</b></div><div style="font-size:12px">רמה ${m.lv} ${chip(SP[m.sp].t)}</div>${pbar(m.hp/maxHp(m))}`);if(i!=null&&i>=0)d.insertAdjacentHTML('afterbegin',`<span class="badge">צוות ${i+1}</span>`);d.onclick=onclick;return d}
 function statRow(l,v,mx){return`<div class="row"><span class="l">${l}</span>${pbar(v/mx,'')}<span class="v">${v}</span></div>`}
 function monDetail(m){const sp=SP[m.sp],inP=S.party.includes(m);
- modal(`<div id="mc"></div><h2 style="margin:6px 0">${sp.n} ${chip(sp.t)}</h2><div>רמה ${m.lv} · חיים ${m.hp}/${maxHp(m)}</div>
+ modal(`<div id="mc"></div><h2 style="margin:6px 0">${nm(m)} ${chip(sp.t)}</h2><div>${m.nick?sp.n+' · ':''}רמה ${m.lv} · חיים ${m.hp}/${maxHp(m)}</div>
  ${statRow('חיים',maxHp(m),90)}${statRow('התקפה',stOf(m.sp,m.lv,1),40)}${statRow('הגנה',stOf(m.sp,m.lv,2),40)}${statRow('מהירות',stOf(m.sp,m.lv,3),40)}
  <div class="row"><span class="l">ניסיון</span>${pbar(m.xp/need(m.lv),'')}<span class="v" style="width:60px;font-size:11px">${m.xp}/${need(m.lv)}</span></div>
  ${movesFor(m.sp,m.lv).map(k=>`<div class="mv"><span>${MV[k].n}</span>${chip(MV[k].t)}<span>${MV[k].p?'עוצמה '+MV[k].p:'חיזוק'}</span></div>`).join('')}
- <div class="flav">${sp.f}</div>
+ <div class="flav">${sp.f}</div>${sp.evo!=null?`<div class="flav">✨ מתפתח ל${SP[sp.evo].n} ברמה ${sp.at}</div>`:''}
  <div style="display:grid;gap:8px"><button class="btn grn" id="d1" ${S.party[0]===m?'disabled':''}>⭐ הפוך למוביל בקרב</button>
- <button class="btn" id="d2" ${(!inP&&S.party.length>=6)||(inP&&S.party.length<=1)?'disabled':''}>${inP?'📦 העבר לקופסה':'👥 העבר לצוות'}</button><button class="btn sec" id="d3">סגור</button></div>`,b=>{
+ <button class="btn" id="d2" ${(!inP&&S.party.length>=6)||(inP&&S.party.length<=1)?'disabled':''}>${inP?'📦 העבר לקופסה':'👥 העבר לצוות'}</button><button class="btn" id="dn">✏️ שם חיבה</button><button class="btn sec" id="d3">סגור</button></div>`,b=>{
   b.querySelector('#mc').appendChild(monCanvas(m.sp,70));
   b.querySelector('#d1').onclick=()=>{let from=S.party.indexOf(m);if(from<0){if(S.party.length>=6)return;S.box.splice(S.box.indexOf(m),1);S.party.unshift(m)}else{S.party.splice(from,1);S.party.unshift(m)}save();closeModal();collTab(cT)};
   b.querySelector('#d2').onclick=()=>{if(inP){S.party.splice(S.party.indexOf(m),1);S.box.push(m)}else{S.box.splice(S.box.indexOf(m),1);S.party.push(m)}save();closeModal();collTab(cT)};
-  b.querySelector('#d3').onclick=closeModal})}
+  b.querySelector('#dn').onclick=()=>nickname(m);b.querySelector('#d3').onclick=closeModal})}
 function spDetail(i){const sp=SP[i],c=S.caught[i];modal(`<div id="mc"></div><h2 style="margin:6px 0">${sp.n} ${chip(sp.t)}</h2>
  ${statRow('חיים',sp.b[0],90)}${statRow('התקפה',sp.b[1],90)}${statRow('הגנה',sp.b[2],90)}${statRow('מהירות',sp.b[3],90)}
- <div class="flav">${sp.f}</div><div class="flav">📍 נמצא ב: ${sp.h.split(', ').map(z=>ZONES[z].n).join(', ')}</div><button class="btn sec" id="d3" style="width:100%">סגור</button>`,b=>{b.querySelector('#mc').appendChild(monCanvas(i,70));b.querySelector('#d3').onclick=closeModal})}
+ <div class="flav">${sp.f}</div>${sp.evo!=null?`<div class="flav">✨ מתפתח ל${SP[sp.evo].n} ברמה ${sp.at}</div>`:''}<div class="flav">📍 נמצא ב: ${sp.h.split(', ').map(z=>ZONES[z].n).join(', ')}</div><button class="btn sec" id="d3" style="width:100%">סגור</button>`,b=>{b.querySelector('#mc').appendChild(monCanvas(i,70));b.querySelector('#d3').onclick=closeModal})}
 let cT=0;
 function openColl(){mode='menu';hideScr('mnu');showScr('coll');collTab(0)}
 function collTab(t){cT=t;const el=$('#coll');el.scrollTop=0;const n=Object.keys(S.caught).length;
- el.innerHTML=`<div class="top"><h2>האוסף שלי · ${n}/${SP.length}</h2><button class="x" id="cx">✕</button></div>
+ el.innerHTML=`<div class="top"><h2>האוסף שלי · ${n}/${SP.length} ${S.badges?'🏅':''}</h2><button class="x" id="cx">✕</button></div>
  <div class="tabs"><button class="btn ${t==0?'cur':'sec'}" data-t="0">הטלטלים שלי</button><button class="btn ${t==1?'cur':'sec'}" data-t="1">אנציקלופדיה</button><button class="btn ${t==2?'cur':'sec'}" data-t="2">טבלת סוגים</button></div><div id="cb"></div>`;
  el.querySelector('#cx').onclick=()=>{hideScr('coll');mode='map'};
  el.querySelectorAll('.tabs .btn').forEach(b=>b.onclick=()=>collTab(+b.dataset.t));
@@ -486,7 +539,7 @@ function collTab(t){cT=t;const el=$('#coll');el.scrollTop=0;const n=Object.keys(
   d.appendChild(monCanvas(i,36,!s));d.insertAdjacentHTML('beforeend',`<div><b>${s?sp.n:'???'}</b></div><div style="font-size:12px">${c?'✅ נתפס':s?'👁 נראה':'לא ידוע'}</div>`);if(s)d.onclick=()=>spDetail(i);g.appendChild(d)});cb.appendChild(g)}
  if(t===2){const ts=['fire','water','plant','spark','earth'];cb.innerHTML=ts.map(a=>{const st=ts.filter(d=>(EFF[a][d]||1)>1),wk=ts.filter(d=>(EFF[a][d]||1)<1);return`<div class="card" style="margin:6px 0;text-align:right;font-size:15px">${chip(a)}<div style="margin:6px 0">💪 חזק נגד: ${st.map(chip).join(' ')||'—'}</div><div>🛡 חלש נגד: ${wk.map(chip).join(' ')||'—'}</div></div>`}).join('')+'<div class="flav">טלטל מאותו סוג של המכה מקבל בונוס. התחזקות מעלה את ההתקפה למשך הקרב.</div>'}}
 function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.innerHTML=`<div class="top"><h2>תפריט</h2><button class="x" id="mx">✕</button></div>
- <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
+ <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
  el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
  el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};
  let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? כל ההתקדמות תימחק. לחץ שוב';return}localStorage.removeItem(KEY);location.reload()}}
@@ -502,18 +555,20 @@ function showTitle(){mode='title';const el=$('#title');el.style.display='block';
 function starterPick(){const el=$('#title');el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
  STARTERS.forEach(i=>{const sp=SP[i],d=document.createElement('div');d.className='card';d.appendChild(monCanvas(i,42));d.insertAdjacentHTML('beforeend',`<div><b style="font-size:19px">${sp.n}</b> ${chip(sp.t)}<div class="flav" style="margin:4px 0 0">${sp.f}</div></div>`);
   d.onclick=()=>{sfx('ok');const m=mkMon(i,6);S.party=[m];S.box=[];S.caught[i]=1;S.seen[i]=1;S.started=true;S.x=23;S.y=21;S.dir='up';P.x=P.px=23;P.y=P.py=21;P.dir='up';save();el.style.display='none';startMap(true)};pk.appendChild(d)})}
-function startMap(first){mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! התקרב לשלט שליד הדרך 🪧',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
+function startMap(first){mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! גרור את הג׳ויסטיק. בדיקה ליד דלת או מאמן 🎮',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
 /* ---------- קלט ---------- */
 const dp=$('#dpad');let dpId=null;
-function dpadOff(){held=null;dpId=null;dp.querySelectorAll('i').forEach(i=>i.classList.remove('on'))}
-function dpUpdate(e){const r=dp.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2);let d=null;if(Math.hypot(dx,dy)>r.width*.1){d=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up')}held=d;dp.querySelectorAll('i').forEach(i=>i.classList.toggle('on',i.classList.contains({up:'u',down:'d',left:'l',right:'r'}[d]||'-')))}
-dp.addEventListener('pointerdown',e=>{ac();dpId=e.pointerId;try{dp.setPointerCapture(e.pointerId)}catch(_){}dpUpdate(e);e.preventDefault()});
+function dpadOff(){held=null;dpId=null;analogPower=1;dp.querySelector('i').style.transform='translate(0,0)'}
+function dpUpdate(e){if(mode!=='map')return;const r=dp.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),len=Math.hypot(dx,dy),radius=r.width*.3,k=len>radius?radius/len:1;dp.querySelector('i').style.transform=`translate(${dx*k}px,${dy*k}px)`;analogPower=clamp(len/radius,0,1);if(len<r.width*.12){held=null;return}held=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up')}
+dp.addEventListener('pointerdown',e=>{if(mode!=='map')return;ac();dpId=e.pointerId;dp.setPointerCapture(e.pointerId);dpUpdate(e);e.preventDefault()});
 dp.addEventListener('pointermove',e=>{if(e.pointerId===dpId)dpUpdate(e)});
 ['pointerup','pointercancel','lostpointercapture'].forEach(n=>dp.addEventListener(n,e=>{if(e.pointerId===dpId)dpadOff()}));
-$('#abtn').addEventListener('pointerdown',e=>{ac();tapA=true;e.preventDefault()});
+// Act only on release, never on pointerdown. A newly opened dialog cannot inherit this pointer's release.
+$('#abtn').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();ac();if(mode==='map')tapA=true});
+addEventListener('blur',dpadOff);addEventListener('resize',()=>{if($('#app').classList.contains('walk'))mapLayout(true)});
 $('#bmenu').onclick=()=>{ac();openMenu()};$('#bmute').onclick=()=>{ac();toggleMute()};
 const KD={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'};
-addEventListener('keydown',e=>{const d=KD[e.key];if(d){held=d;e.preventDefault()}else if(e.key==='Enter'||e.key===' '||e.key==='z'){tapA=true;e.preventDefault()}else if(e.key==='Escape'||e.key==='m')openMenu()});
+addEventListener('keydown',e=>{if(e.target.matches('input,textarea'))return;const d=KD[e.key];if(d){held=d;e.preventDefault()}else if(e.key==='Enter'||e.key===' '||e.key==='z'){tapA=true;e.preventDefault()}else if(e.key==='Escape'||e.key==='m')openMenu()});
 addEventListener('keyup',e=>{if(KD[e.key]&&held===KD[e.key])held=null});
 document.addEventListener('visibilitychange',()=>{if(document.hidden)save()});
 addEventListener('contextmenu',e=>e.preventDefault());
@@ -523,11 +578,8 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;
  try{updateMap(dt);if(B&&(mode==='battle'||mode==='trans'))drawBattle(ts);else if(mode!=='title')drawMap(ts);else{cx.setTransform(1,0,0,1,0,0);cx.fillStyle='#0e1a12';cx.fillRect(0,0,704,576)}
  if(mode==='trans'||TR)drawTrans(cx)}catch(err){console.error(err)}
  requestAnimationFrame(frame)}
-window.__g={get S(){return S},get B(){return B},P,startWild,openColl,hutMenu,openMenu,get mode(){return mode},M,say,SP};
+window.__g={get S(){return S},get B(){return B},P,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP};
 hud();showTitle();
-const qs=location.hash;
-if(qs.includes('dbg')){S=newState();const m=mkMon(0,6);S.party=[m,mkMon(2,5)];S.started=true;S.caught[0]=1;S.caught[2]=1;S.seen[0]=1;S.seen[2]=1;$('#title').style.display='none';startMap();
- if(qs.includes('battle')){P.x=P.px=5;P.y=P.py=5;setTimeout(startWild,100)}if(qs.includes('coll'))setTimeout(openColl,100)}
 requestAnimationFrame(frame);
 })();
 </script>
