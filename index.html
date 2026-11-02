@@ -108,7 +108,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='2.0.0';
+const VER='2.0.1';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -379,7 +379,7 @@ function calc(a,d,mv){const atk=stOf(a.sp,a.lv,1)*(a.status==='burn'?.8:1)*(1+.5
  return{dmg:Math.max(1,Math.floor(((2*a.lv/5+2)*mv.p*atk/def/50+2)*stab*eff*(crit?1.5:1)*rr)),eff,crit}}
 async function useMove(a,d,mvk,isP){const mv=MV[mvk];
  if(a.status==='sleep'){a.turns=(a.turns||1)-1;if(a.turns>0){await say(`${nm(a)} ישן ולא יכול לתקוף!`,900);return}a.status=null;panels();await say(`${nm(a)} התעורר!`,800)}
- await say(`${nm(a)}${isP?'':' הפראי'} השתמש ב${mv.n}!`,900);
+ await say(`${nm(a)}${isP||B.trainer?'':' הפראי'} השתמש ב${mv.n}!`,900);
  if(mvk==='buff'){sfx('buff');a.bst=Math.min((a.bst||0)+1,3);const q=isP?PP():EP();burst(q.x,q.y,'#ffd23f',16,50);await sleep(400);await say(`ההתקפה של ${nm(a)} עלתה!`,900);return}
  await lunge(isP);sfx('atk');
  if(Math.random()*100>=mv.a){sfx('miss');await say('ההתקפה החטיאה!',800);return}
@@ -542,7 +542,7 @@ function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.inn
  <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
  el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
  el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};
- let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? כל ההתקדמות תימחק. לחץ שוב';return}localStorage.removeItem(KEY);location.reload()}}
+ let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? כל ההתקדמות תימחק. לחץ שוב';return}S=newState();save();location.reload()}}
 function openMenuRefresh(){hideScr('mnu');mode='map';openMenu()}
 function toggleMute(){S.snd=!S.snd;$('#bmute').textContent=S.snd?'🔊':'🔇';save();if(S.snd)sfx('pick')}
 /* ---------- כותרת ובחירת מתחיל ---------- */
