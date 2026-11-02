@@ -96,7 +96,7 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
 <script>
 (()=>{
 'use strict';
-const VER='1.0.0';
+const VER='1.0.1';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -342,7 +342,7 @@ async function useMove(a,d,mvk,isP){const mv=MV[mvk];
  if(mvk==='buff'){sfx('buff');a.bst=Math.min((a.bst||0)+1,3);const q=isP?PP():EP();burst(q.x,q.y,'#ffd23f',16,50);await sleep(400);await say(`ההתקפה של ${nm(a)} עלתה!`,900);return}
  await lunge(isP);sfx('atk');
  if(Math.random()*100>=mv.a){sfx('miss');await say('ההתקפה החטיאה!',800);return}
- await projectile(isP,mv);sfx('hit');const r=calc(a,d,mv);d.hp=Math.max(0,d.hp-r.dmg);panels();await hitFx(!isP);
+ await projectile(isP,mv);sfx('hit');const r=calc(a,d,mv);if(!isP)r.dmg=Math.max(1,Math.floor(r.dmg*.85));d.hp=Math.max(0,d.hp-r.dmg);panels();await hitFx(!isP);
  if(r.crit)await say('מכה קריטית!',700);
  if(r.eff>1)await say('זה סופר יעיל!',800);else if(r.eff<1)await say('זה לא ממש יעיל...',800)}
 function aiMove(e,p){const mvs=movesFor(e.sp,e.lv);if(!e.bst&&mvs.includes('buff')&&Math.random()<.15)return'buff';
@@ -501,7 +501,7 @@ function showTitle(){mode='title';const el=$('#title');el.style.display='block';
  const t2=el.querySelector('#t2');if(t2){let sure=false;t2.onclick=()=>{if(!sure){sure=true;t2.textContent='בטוח? ההתקדמות תימחק. לחץ שוב';return}S=newState();save();starterPick()}}}
 function starterPick(){const el=$('#title');el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
  STARTERS.forEach(i=>{const sp=SP[i],d=document.createElement('div');d.className='card';d.appendChild(monCanvas(i,42));d.insertAdjacentHTML('beforeend',`<div><b style="font-size:19px">${sp.n}</b> ${chip(sp.t)}<div class="flav" style="margin:4px 0 0">${sp.f}</div></div>`);
-  d.onclick=()=>{sfx('ok');const m=mkMon(i,5);S.party=[m];S.box=[];S.caught[i]=1;S.seen[i]=1;S.started=true;S.x=23;S.y=21;S.dir='up';P.x=P.px=23;P.y=P.py=21;P.dir='up';save();el.style.display='none';startMap(true)};pk.appendChild(d)})}
+  d.onclick=()=>{sfx('ok');const m=mkMon(i,6);S.party=[m];S.box=[];S.caught[i]=1;S.seen[i]=1;S.started=true;S.x=23;S.y=21;S.dir='up';P.x=P.px=23;P.y=P.py=21;P.dir='up';save();el.style.display='none';startMap(true)};pk.appendChild(d)})}
 function startMap(first){mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! התקרב לשלט שליד הדרך 🪧',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
 /* ---------- קלט ---------- */
 const dp=$('#dpad');let dpId=null;
