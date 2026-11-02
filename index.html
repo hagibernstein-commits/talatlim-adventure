@@ -4,6 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#16241a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
+<meta name="mobile-web-app-capable" content="yes">
 <title>הרפתקת הטלטלים</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%236a4cf0'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23ffd83a'/%3E%3C/svg%3E">
 <style>
@@ -54,7 +57,7 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
 .card canvas{width:72px;height:72px}
 .card .bar{margin:4px 8px 0}
 .badge{position:absolute;top:4px;right:6px;background:#ffd23f;color:#3a2200;border-radius:10px;font-size:11px;font-weight:800;padding:0 6px}
-.modal{position:absolute;inset:0;z-index:30;background:#000a;display:none;align-items:center;justify-content:center;padding:14px;touch-action:pan-y}
+.modal{position:absolute;inset:0;z-index:50;background:#000a;display:none;align-items:center;justify-content:center;padding:14px;touch-action:pan-y}
 .mbox{background:linear-gradient(#27493a,#162a20);border:3px solid #ffffff44;border-radius:18px;padding:14px;width:100%;max-height:100%;overflow-y:auto;text-align:center}
 .mbox .row{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:14px;text-align:right}
 .mbox .row span.l{width:62px}
@@ -108,7 +111,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='2.0.1';
+const VER='2.1.0';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -216,9 +219,13 @@ function monCanvas(sp,px,sil){const cv=document.createElement('canvas');cv.width
 const KEY='talatlim_v1';
 let S=null;
 function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false,version:2,defeated:{},badges:0}}
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&Array.isArray(j.party)){const n=Object.assign(newState(),j);n.version=2;n.defeated=n.defeated||{};n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}}catch(e){}return null}
-function save(){S.version=2;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-S=load()||newState();
+const PROFILE_KEY='talatlim_profiles_v1';
+let profiles={version:1,active:null,players:[]};
+function migrateState(j){if(!j||!Array.isArray(j.party))return newState();const n=Object.assign(newState(),j);n.version=2;n.defeated=n.defeated||{};n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}
+function loadProfiles(){try{const j=JSON.parse(localStorage.getItem(PROFILE_KEY));if(j&&Array.isArray(j.players))profiles=j;else{const old=JSON.parse(localStorage.getItem(KEY));if(old&&old.started&&Array.isArray(old.party)){profiles.players=[{id:'original',name:'השחקן הראשון',state:migrateState(old)}];profiles.active='original';localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles))}}}catch(e){} }
+function activePlayer(){return profiles.players.find(p=>p.id===profiles.active)}
+function save(){S.version=2;const p=activePlayer();if(p){p.state=S;try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles))}catch(e){toast('אין מספיק מקום לשמירה במכשיר. ההתקדמות נשארת פתוחה במשחק',5000)}}}
+loadProfiles();S=activePlayer()?migrateState(activePlayer().state):newState();
 /* ---------- סאונד ---------- */
 let AC=null;
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
@@ -538,18 +545,32 @@ function collTab(t){cT=t;const el=$('#coll');el.scrollTop=0;const n=Object.keys(
  if(t===1){const g=document.createElement('div');g.className='grid';SP.forEach((sp,i)=>{const d=document.createElement('div');d.className='card';const c=S.caught[i],s=S.seen[i]||c;
   d.appendChild(monCanvas(i,36,!s));d.insertAdjacentHTML('beforeend',`<div><b>${s?sp.n:'???'}</b></div><div style="font-size:12px">${c?'✅ נתפס':s?'👁 נראה':'לא ידוע'}</div>`);if(s)d.onclick=()=>spDetail(i);g.appendChild(d)});cb.appendChild(g)}
  if(t===2){const ts=['fire','water','plant','spark','earth'];cb.innerHTML=ts.map(a=>{const st=ts.filter(d=>(EFF[a][d]||1)>1),wk=ts.filter(d=>(EFF[a][d]||1)<1);return`<div class="card" style="margin:6px 0;text-align:right;font-size:15px">${chip(a)}<div style="margin:6px 0">💪 חזק נגד: ${st.map(chip).join(' ')||'—'}</div><div>🛡 חלש נגד: ${wk.map(chip).join(' ')||'—'}</div></div>`}).join('')+'<div class="flav">טלטל מאותו סוג של המכה מקבל בונוס. התחזקות מעלה את ההתקפה למשך הקרב.</div>'}}
-function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.innerHTML=`<div class="top"><h2>תפריט</h2><button class="x" id="mx">✕</button></div>
- <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
- el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
+function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.innerHTML=`<div class="top"><h2>תפריט · ${esc(activePlayer()?.name||'')}</h2><button class="x" id="mx">✕</button></div>
+ <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi">📲 התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
+ el.querySelector('#mp').onclick=()=>{save();hideScr('mnu');showProfiles()};el.querySelector('#mr').onclick=()=>playerName(activePlayer());el.querySelector('#mi').onclick=installGame;el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
  el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};
- let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? כל ההתקדמות תימחק. לחץ שוב';return}S=newState();save();location.reload()}}
+ let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? רק ההתקדמות של השחקן הזה תימחק. לחץ שוב';return}S=newState();save();location.reload()}}
 function openMenuRefresh(){hideScr('mnu');mode='map';openMenu()}
 function toggleMute(){S.snd=!S.snd;$('#bmute').textContent=S.snd?'🔊':'🔇';save();if(S.snd)sfx('pick')}
+/* ---------- התקנה ועבודה ללא אינטרנט ---------- */
+let installPrompt=null;
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installPrompt=e;const b=$('#installTitle');if(b)b.textContent='📲 התקנת האפליקציה'});
+addEventListener('appinstalled',()=>{installPrompt=null;toast('האפליקציה הותקנה! חפשו את טלטלים במסך הבית',4500)});
+async function installGame(){
+ if(standalone()){toast('האפליקציה כבר פועלת במצב מותקן ✓',3000);return}
+ if(installPrompt){const p=installPrompt;installPrompt=null;await p.prompt();const choice=await p.userChoice;if(choice.outcome==='accepted')toast('ההתקנה אושרה. חפשו טלטלים במסך הבית',4500);return}
+ modal('<h2>📲 התקנת הטלטלים</h2><p class="flav">ב־Chrome לחצו על שלוש הנקודות ⋮ ובחרו ״הוספה למסך הבית״ ואז ״התקנה״.</p><p class="flav">אם כתוב שהמשחק כבר מותקן: חפשו ״טלטלים״ או ״הרפתקת הטלטלים״ ברשימת האפליקציות. במסך הבית אפשר להחליק למעלה כדי לפתוח את הרשימה.</p><p class="flav">אין אפשרות התקנה? ודאו שפתחתם את הקישור ב־Chrome עצמו, ולא בתוך WhatsApp. המתינו כמה שניות ונסו שוב.</p><p class="flav">אחרי פתיחה ראשונה עם אינטרנט, המשחק זמין גם ללא חיבור. ההתקדמות נשמרת במכשיר הזה.</p><button class="btn sec" id="ic" style="width:100%">הבנתי</button>',b=>b.querySelector('#ic').onclick=closeModal)
+}
+if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').then(reg=>{reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)toast('עדכון חדש מוכן. ייטען בפתיחה הבאה',4500)})})}).catch(()=>{});
+/* ---------- שחקנים במכשיר ---------- */
+function showProfiles(){mode='title';dpadOff();tapA=false;closeModal();hideScr('mnu');hideScr('coll');const el=$('#title');el.style.display='block';el.innerHTML='<h1>מי משחק היום?</h1><p>לכל שחקן הרפתקה ושמירה משלו במכשיר הזה</p><div id="players" style="display:grid;gap:10px"></div><button class="btn grn" id="newPlayer">➕ יצירת שחקן חדש</button><button class="btn sec" id="profileInstall">📲 התקנה בטלפון</button><p style="font-size:13px">השמות וההתקדמות נשמרים רק במכשיר הזה. אין צורך בסיסמה.</p>';const box=el.querySelector('#players');profiles.players.forEach((p,i)=>{const b=document.createElement('button');b.className='btn';b.style.cssText='min-height:76px;width:90%;font-size:22px';b.textContent=['🌿','🔥','💧','⚡','💎'][i%5]+' '+p.name;const small=document.createElement('small');small.textContent=p.state.started?`צוות: ${p.state.party.length} טלטלים · ${p.state.badges?'🏅 תג הגביש':'המסע ממשיך'}`:'הרפתקה חדשה';b.appendChild(small);b.onclick=()=>{profiles.active=p.id;S=migrateState(p.state);P={x:S.x,y:S.y,dir:S.dir||'up',px:S.x,py:S.y,moving:false,mt:0,from:null,to:null};save();showTitle()};box.appendChild(b)});el.querySelector('#newPlayer').onclick=()=>playerName();el.querySelector('#profileInstall').onclick=installGame}
+function playerName(player){modal(`<h2>${player?'שינוי שם':'שחקן חדש'}</h2><p>מה השם הפרטי שלך?</p><input class="nick" id="playerName" maxlength="16" placeholder="השם שלי" value="${esc(player?.name||'')}"><div id="nameError" style="color:#ffd080;min-height:24px"></div><button class="btn grn" id="createPlayer" style="width:100%">${player?'שמירת שם':'מתחילים הרפתקה!'}</button><button class="btn sec" id="cancelPlayer" style="width:100%;margin-top:8px">חזרה</button>`,b=>{b.querySelector('#cancelPlayer').onclick=closeModal;b.querySelector('#createPlayer').onclick=()=>{const name=b.querySelector('#playerName').value.trim().slice(0,16);if(!name){b.querySelector('#nameError').textContent='צריך לכתוב שם כדי להתחיל';return}if(profiles.players.some(p=>p!==player&&p.name===name)){b.querySelector('#nameError').textContent='יש כבר שחקן בשם הזה. הוסיפו סימן או אות';return}if(player){player.name=name;save();closeModal();openMenuRefresh()}else{save();const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,state:newState()};profiles.players.push(p);profiles.active=p.id;S=p.state;P={x:S.x,y:S.y,dir:'up',px:S.x,py:S.y,moving:false,mt:0};save();closeModal();showTitle()}}})}
 /* ---------- כותרת ובחירת מתחיל ---------- */
 function showTitle(){mode='title';const el=$('#title');el.style.display='block';
- el.innerHTML=`<h1>הרפתקת הטלטלים</h1><p>תפסו, אמנו וגלו את כל הטלטלים!</p><div id="tmons"></div>
- ${S.started?'<button class="btn grn" id="t1">▶ המשך משחק</button><button class="btn sec" id="t2">משחק חדש</button>':'<button class="btn grn" id="t1">▶ התחל הרפתקה</button>'}`;
- const tm=el.querySelector('#tmons');[0,2,4,6,7,8].forEach(i=>tm.appendChild(monCanvas(i,39)));
+ el.innerHTML=`<h1>הרפתקת הטלטלים</h1><p>שלום ${esc(activePlayer()?.name||'')}! תפסו, אמנו וגלו!</p><button class="btn sec" id="pickProfile">👥 החלפת שחקן</button><div id="tmons"></div>
+ <button class="btn sec" id="installTitle">📲 התקנה בטלפון</button>${S.started?'<button class="btn grn" id="t1">▶ המשך משחק</button><button class="btn sec" id="t2">משחק חדש</button>':'<button class="btn grn" id="t1">▶ התחל הרפתקה</button>'}`;
+ el.querySelector('#pickProfile').onclick=()=>{save();showProfiles()};el.querySelector('#installTitle').onclick=installGame;const tm=el.querySelector('#tmons');[0,2,4,6,7,8].forEach(i=>tm.appendChild(monCanvas(i,39)));
  el.querySelector('#t1').onclick=()=>{ac();sfx('pick');if(S.started){el.style.display='none';startMap()}else starterPick()};
  const t2=el.querySelector('#t2');if(t2){let sure=false;t2.onclick=()=>{if(!sure){sure=true;t2.textContent='בטוח? ההתקדמות תימחק. לחץ שוב';return}S=newState();save();starterPick()}}}
 function starterPick(){const el=$('#title');el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
@@ -579,7 +600,7 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;
  if(mode==='trans'||TR)drawTrans(cx)}catch(err){console.error(err)}
  requestAnimationFrame(frame)}
 window.__g={get S(){return S},get B(){return B},P,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP};
-hud();showTitle();
+hud();showProfiles();
 requestAnimationFrame(frame);
 })();
 </script>
