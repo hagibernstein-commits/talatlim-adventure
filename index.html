@@ -111,7 +111,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='2.1.0';
+const VER='3.0.0';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -152,6 +152,15 @@ SP.push(
  {n:'תדרון',t:'spark',b:[48,56,52,72],cr:.5,xp:78,f:'אוזניו קולטות מנגינות רחוקות ומשדרות אותן בניצוצות.',h:'B'},
  {n:'גבישון',t:'earth',b:[72,58,74,22],cr:.42,xp:88,f:'גבישים צומחים על גבו בכל יום הולדת. שומר על הגבעות.',h:'C'});
 ZONES.A.sp.push(21,21);ZONES.B.sp.push(20,23);ZONES.C.sp.push(22,24);
+ZONES.D={n:'מערות הקרח',sp:[25,25,26,27],night:[25,26,27,29,29],lv:[14,19],bg:['#192c5e','#b7dcf8','#638cbd']};
+ZONES.A.night=[5,5,7,28,28];ZONES.B.night=[3,23,28,29];ZONES.C.night=[1,24,29,29];
+SP.push(
+ {n:'פתיתון',t:'water',b:[66,69,62,58],cr:.4,xp:100,f:'גור מערות מכוסה פתיתי קרח. המים סביבו קופאים לרגע כשהוא קופץ.',h:'D'},
+ {n:'כפורן',t:'earth',b:[85,77,86,30],cr:.3,xp:120,f:'שומר הקרח העתיק. הגבישים שעל גבו מצלצלים כמו פעמונים.',h:'D'},
+ {n:'זוהרור',t:'spark',b:[58,80,54,92],cr:.28,xp:125,f:'דרקון זוהר צפוני זעיר, שנמצא רק במעמקי המערות הקפואות.',h:'D'},
+ {n:'ירחף',t:'plant',b:[57,63,55,85],cr:.4,xp:94,f:'פרפר ירח שפותח כנפיים רק בלילה. נמצא באחו ובחוף אחרי השקיעה.',h:'A, B'},
+ {n:'לילפז',t:'spark',b:[60,76,58,82],cr:.32,xp:110,f:'שועל כוכבים שמופיע רק בלילה. אור זנבו מוביל מטיילים הביתה.',h:'B, C, D'});
+const isNight=()=>((S?.clock||0)%600)>=360;
 const STARTERS=[0,2,4];
 const need=l=>4*l*l+10;
 const hpOf=(sp,l)=>Math.floor(SP[sp].b[0]*l/25)+l+12;
@@ -213,18 +222,26 @@ DR.push(
 (c,t)=>{const w=Math.sin(t*4)*6;poly(c,[-9,4,-35,-10-w,-28,15],'#f49d57');poly(c,[9,4,35,-10-w,28,15],'#f49d57');E(c,0,7,14,23,'#a93e62');E(c,0,-12,13,12,'#df6780');poly(c,[-4,-23,0,-36,5,-23],'#ffd473');eye(c,-5,-13,3);eye(c,5,-13,3);poly(c,[-3,-6,0,1,4,-6],'#ffd473')},
 (c,t)=>{E(c,-20,-19,7,15,'#9477eb',-.5);E(c,20,-19,7,15,'#9477eb',.5);E(c,0,6,24,22,'#6253bc');eye(c,-9,1,5);eye(c,9,1,5);E(c,0,12,7,4,'#68e1dd');for(let i=0;i<3;i++)E(c,-9+i*9,23,2,2,'#ffe77d')},
 (c,t)=>{E(c,0,16,27,14,'#638b99');for(let i=0;i<5;i++){const x=-22+i*11;poly(c,[x-6,8,x,-29+(i%2)*13,x+8,8],'#86e4db');poly(c,[x,8,x,-29+(i%2)*13,x+8,8],'#4bb2c1')}eye(c,-8,13,4);eye(c,8,13,4);smile(c,0,20,4)});
+DR.push(
+(c,t)=>{E(c,0,10,23,20,'#a6eaff');E(c,-14,29,8,4,'#6ab5ef');E(c,14,29,8,4,'#6ab5ef');poly(c,[-18,-6,-23,-29,-4,-15],'#d5f8ff');poly(c,[18,-6,23,-29,4,-15],'#d5f8ff');E(c,0,-8,20,17,'#c6f4ff');eye(c,-8,-8,4);eye(c,8,-8,4);smile(c,0,1,5);poly(c,[0,-30,4,-21,0,-17,-4,-21],'#fff')},
+(c,t)=>{E(c,0,12,28,20,'#607ca7');for(let i=0;i<5;i++){let x=i*11-22;poly(c,[x-7,7,x,-32+(i%2)*12,x+8,7],'#b6eeff');poly(c,[x,7,x,-32+(i%2)*12,x+8,7],'#80bde5')}eye(c,-9,12,4);eye(c,9,12,4);smile(c,0,21,5)},
+(c,t)=>{let w=Math.sin(t*4)*7;poly(c,[-10,0,-36,-23-w,-28,19],'#82ebd7');poly(c,[10,0,36,-23-w,28,19],'#b3a2ff');E(c,0,8,14,22,'#8aa9ed');E(c,0,-15,15,13,'#b4eeff');poly(c,[-5,-23,0,-37,5,-23],'#ffedab');eye(c,-6,-15,3.5);eye(c,6,-15,3.5);smile(c,0,-6,4)},
+(c,t)=>{let w=3+Math.sin(t*3)*4;E(c,-17,-5,16+w,25,'#aaa0e9',-.5);E(c,17,-5,16+w,25,'#aaa0e9',.5);E(c,-21,-8,7,10,'#fff4ad');E(c,21,-8,7,10,'#fff4ad');E(c,0,8,8,23,'#46597b');eye(c,-4,-7,2.5);eye(c,4,-7,2.5);E(c,0,8,4,5,'#ffd96c')},
+(c,t)=>{E(c,23,13,15,18,'#c3b3ff',-.5);E(c,25,9,7,12,'#fff1b3',-.5);E(c,0,13,19,17,'#7769b4');poly(c,[-18,-9,-19,-33,-3,-16],'#e1d4ff');poly(c,[18,-9,19,-33,3,-16],'#e1d4ff');E(c,0,-7,18,15,'#a99bd9');eye(c,-7,-7,4);eye(c,7,-7,4);smile(c,0,1,4);poly(c,[0,-24,3,-18,0,-12,-3,-18],'#fff5ba')});
+function drawVariant(c,m,x,y,size,t,alpha){c.save();if(m.shiny)c.filter='hue-rotate(145deg) saturate(1.7)';drawMon(c,m.sp,x,y,size,t,alpha);c.restore();if(m.shiny){for(let i=0;i<4;i++){const a=t*1.8+i*Math.PI/2,xx=x+Math.cos(a)*size*.48,yy=y+Math.sin(a)*size*.45;c.fillStyle='#fff5a0';c.font='bold '+Math.max(10,size*.16)+'px system-ui';c.textAlign='center';c.fillText('✦',xx,yy)}}}
+function variantCanvas(m,px){const c=document.createElement('canvas');c.width=c.height=px*2;drawVariant(c.getContext('2d'),m,px,px*1.02,px*1.8,.5);return c}
 function drawMon(c,sp,x,y,size,t,alpha){c.save();c.translate(x,y);const k=size/64;c.scale(k,k);if(alpha!=null)c.globalAlpha=alpha;DR[sp](c,t||0);c.restore()}
 function monCanvas(sp,px,sil){const cv=document.createElement('canvas');cv.width=cv.height=px*2;const c=cv.getContext('2d');drawMon(c,sp,px,px*1.02,px*2*.9,0.5);if(sil){c.globalCompositeOperation='source-in';c.fillStyle='#0b1410';c.fillRect(0,0,px*2,px*2)}return cv}
 /* ---------- מצב ושמירה ---------- */
 const KEY='talatlim_v1';
 let S=null;
-function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false,version:2,defeated:{},badges:0}}
+function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false,version:3,defeated:{},badges:0,quests:{},gymBadges:[],clock:0}}
 const PROFILE_KEY='talatlim_profiles_v1';
 let profiles={version:1,active:null,players:[]};
-function migrateState(j){if(!j||!Array.isArray(j.party))return newState();const n=Object.assign(newState(),j);n.version=2;n.defeated=n.defeated||{};n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}
+function migrateState(j){if(!j||!Array.isArray(j.party))return newState();const n=Object.assign(newState(),j);n.version=3;n.defeated=n.defeated||{};n.quests=n.quests||{};n.gymBadges=n.gymBadges||[];n.clock=Number(n.clock)||0;n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}
 function loadProfiles(){try{const j=JSON.parse(localStorage.getItem(PROFILE_KEY));if(j&&Array.isArray(j.players))profiles=j;else{const old=JSON.parse(localStorage.getItem(KEY));if(old&&old.started&&Array.isArray(old.party)){profiles.players=[{id:'original',name:'השחקן הראשון',state:migrateState(old)}];profiles.active='original';localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles))}}}catch(e){} }
 function activePlayer(){return profiles.players.find(p=>p.id===profiles.active)}
-function save(){S.version=2;const p=activePlayer();if(p){p.state=S;try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles))}catch(e){toast('אין מספיק מקום לשמירה במכשיר. ההתקדמות נשארת פתוחה במשחק',5000)}}}
+function save(){S.version=3;const p=activePlayer();if(p){p.state=S;try{localStorage.setItem(PROFILE_KEY,JSON.stringify(profiles))}catch(e){toast('אין מספיק מקום לשמירה במכשיר. ההתקדמות נשארת פתוחה במשחק',5000)}}}
 loadProfiles();S=activePlayer()?migrateState(activePlayer().state):newState();
 /* ---------- סאונד ---------- */
 let AC=null;
@@ -240,7 +257,7 @@ const SFX={
  pick:()=>tone(700,.07,'square',.05),throw:()=>tone(300,.4,'triangle',.06,700),bump:()=>tone(110,.06,'square',.04),buy:()=>{tone(900,.06,'square',.05);tone(1200,.08,'square',.05,0,.07)}};
 const sfx=n=>{try{SFX[n]()}catch(e){}};
 /* ---------- עולם ---------- */
-const W=40,H=32,TS=32,VW=11;let VH=15;
+const W=56,H=32,TS=32,VW=11;let VH=15;
 const M=[];
 (function build(){
  let sd=12345;const r=()=>{sd=(sd*1664525+1013904223)>>>0;return sd/4294967296};
@@ -274,9 +291,29 @@ const TRAINERS=[
  {id:'boss',n:'צור אלוף הגבעות',x:18,y:10,team:[[8,13],[22,14],[18,16]],reward:220,boss:true,txt:'ברוכים הבאים לאתגר הגבעות! שלושה טלטלים, תג אחד. נועה וגל יכינו אתכם לקרב.'}
 ];
 TRAINERS.forEach(n=>{M[n.y][n.x]=1;for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]])M[n.y+dy][n.x+dx]=1});
-const SOLID=new Set([2,3,4,6,7,8,9,13]);
-const isTall=v=>v>=10&&v<=12;
-const zoneAt=(x,y)=>y>=22?'A':x>=22?'B':'C';
+// הרחבת המפה: כל השטח המקורי נשאר באותן קואורדינטות.
+for(let y=2;y<30;y++)for(let x=39;x<54;x++)M[y][x]=14;
+for(let y=2;y<30;y++){M[y][39]=15;M[y][53]=15}
+for(let x=39;x<54;x++){M[2][x]=15;M[29][x]=15}
+for(let x=36;x<53;x++)M[21][x]=1;
+for(let y=4;y<28;y++)M[y][46]=1;
+for(const [x,y] of [[41,5],[43,8],[50,5],[51,12],[42,15],[49,17],[43,26],[51,25]])M[y][x]=15;
+TRAINERS.push(
+{id:'gym1',n:'יערה · היכל העלים',badge:'תג העלה',x:12,y:24,team:[[14,18],[21,19],[15,20]],reward:180,gym:1,requires:'boss',txt:'ההיכל הראשון! בחרו צוות מאוזן, לא רק טלטל חזק אחד.'},
+{id:'gym2',n:'אדווה · היכל הגלים',badge:'תג הגל',x:36,y:16,team:[[12,21],[20,22],[13,23]],reward:240,gym:2,requires:'gym1',txt:'מי ששולט בסוגי המכות יעבור את הגלים.'},
+{id:'gym3',n:'נבו · היכל הקרח',badge:'תג הכפור',x:46,y:7,team:[[25,24],[27,25],[26,26]],reward:300,gym:3,requires:'gym2',txt:'הקור לא עוצר אלופים. שלושה שומרי מערות מחכים לכם.'},
+{id:'champion',n:'אוריון · אלוף הזוהר',badge:'כתר הטלטלים',x:46,y:25,team:[[16,28],[10,29],[26,30],[27,32]],reward:500,gym:4,requires:'gym3',boss:true,txt:'הגמר הגדול! ארבעה טלטלים. השתמשו בהחלפות, שיקויים והתאמות סוגים.'});
+const QUESTS=[
+{id:'water',n:'מיה חוקרת הטיפות',x:25,y:21,goal:'הראו לי טלטל מים בצוות או בקופסה.',reward:40,balls:5,test:()=>allMons().some(m=>SP[m.sp].t==='water')},
+{id:'explore',n:'עידו חוקר הטבע',x:21,y:23,goal:'אספו לפחות חמישה סוגי טלטלים שונים.',reward:80,balls:8,test:()=>Object.keys(S.caught).length>=5},
+{id:'night',n:'לונה שומרת הלילה',x:32,y:18,goal:'תפסו ירחף או לילפז שמופיעים רק בלילה.',reward:120,balls:10,test:()=>allMons().some(m=>[28,29].includes(m.sp))},
+{id:'ice',n:'שלג חוקר המערות',x:41,y:21,goal:'תפסו שני מינים שונים ממערות הקרח: פתיתון, כפורן או זוהרור.',reward:180,balls:12,test:()=>[25,26,27].filter(i=>S.caught[i]).length>=2},
+{id:'shiny',n:'נוגה אוספת הנצנצים',x:49,y:10,goal:'מצאו ותפסו טלטל בוהק אחד. זה אתגר נדיר במיוחד!',reward:400,balls:20,test:()=>allMons().some(m=>m.shiny)}];
+TRAINERS.concat(QUESTS).forEach(n=>{M[n.y][n.x]=1;for(const [dx,dy] of [[0,1],[0,-1],[1,0],[-1,0]])M[n.y+dy][n.x+dx]=1});
+const allMons=()=>S.party.concat(S.box);
+const SOLID=new Set([2,3,4,6,7,8,9,13,15]);
+const isTall=v=>v>=10&&v<=12||v===14;
+const zoneAt=(x,y)=>x>=39?'D':y>=22?'A':x>=22?'B':'C';
 /* ---------- אטלס אריחים ---------- */
 function mkT(fn){const cv=document.createElement('canvas');cv.width=cv.height=TS*2;const c=cv.getContext('2d');c.scale(2,2);fn(c);return cv}
 function seeded(s){return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -299,6 +336,8 @@ const ATL={};
  ATL[9]=[mkT(c=>{grassBase(c,1);c.fillStyle='#7a4a22';c.fillRect(14,14,4,16);c.fillStyle='#c89a5a';c.fillRect(5,6,22,13);c.strokeStyle='#7a4a22';c.lineWidth=1.5;c.strokeRect(5,6,22,13);c.fillStyle='#7a4a22';c.fillRect(9,10,14,1.5);c.fillRect(9,14,10,1.5)})];
  ATL[10]=[tallT('A',0),tallT('A',1)];ATL[11]=[tallT('B',0),tallT('B',1)];ATL[12]=[tallT('C',0),tallT('C',1)];
 })();
+ATL[14]=[0,1].map(f=>mkT(c=>{c.fillStyle='#87aed8';c.fillRect(0,0,32,32);for(let i=0;i<5;i++){let x=i*7+2;poly(c,[x-4,30,x+(f?1:-1),9+i%3*4,x+4,30],'#c9efff');poly(c,[x,30,x+(f?1:-1),9+i%3*4,x+4,30],'#a0d6fa')}E(c,8,6,1.5,1.5,'#fff')}));
+ATL[15]=[mkT(c=>{c.fillStyle='#5473a5';c.fillRect(0,0,32,32);poly(c,[0,32,7,0,18,5,26,0,32,32],'#c8edff');poly(c,[15,32,18,5,26,0,32,32],'#8dbde4')})];
 /* ---------- קנבס ---------- */
 const cv=$('#cv'),cx=cv.getContext('2d');
 let mode='title'; // title | map | trans | battle | menu
@@ -327,15 +366,17 @@ function drawMap(ts){
   c.drawImage(im,x*TS-camx,y*TS-camy,TS,TS)}
  const sx=P.px*TS-camx,sy=P.py*TS-camy;
  TRAINERS.forEach(n=>{const x=n.x*TS-camx,y=n.y*TS-camy;if(x< -32||y< -32||x>352||y>cv.height/2)return;drawPlayer(c,x,y,'down',0,false);E(c,x+16,y+5,7,4,n.boss?'#ffd23f':'#9b68dc');c.fillStyle='#fff';c.font='bold 10px system-ui';c.textAlign='center';c.fillText(S.defeated[n.id]?'✓':n.boss?'★':'!',x+16,y-2)});
+ QUESTS.forEach(n=>{const x=n.x*TS-camx,y=n.y*TS-camy;if(x< -32||y< -32||x>352||y>cv.height/2)return;drawPlayer(c,x,y,'down',0,false);E(c,x+16,y+5,8,4,'#55d8c1');c.font='bold 14px system-ui';c.textAlign='center';c.fillStyle='#fff1a6';c.fillText(S.quests[n.id]===2?'✓':'?',x+16,y-3)});
  drawPlayer(c,sx,sy,P.dir,P.moving?P.mt:0,P.moving);
+ if(isNight()){c.fillStyle='#09174666';c.fillRect(0,0,352,cv.height/2);for(let i=0;i<18;i++){const x=(i*97+21)%352,y=(i*61+17)%(cv.height/2);E(c,x,y,1.1,1.1,'#fff9')}E(c,315,47,13,13,'#fff3b5');E(c,321,43,11,11,'#15233b')}
  const tx=Math.round(P.px),ty=Math.round(P.py);const tv=M[ty]&&M[ty][tx];
  if(isTall(tv)){const im=ATL[tv][(Math.floor(ts/450)+tx+ty)%2];c.drawImage(im,0,28,64,36,tx*TS-camx,ty*TS-camy+14,TS,18)}
 }
-function solidAt(x,y){return x<0||y<0||x>=W||y>=H||SOLID.has(M[y][x])||TRAINERS.some(n=>n.x===x&&n.y===y)}
+function solidAt(x,y){return x<0||y<0||x>=W||y>=H||SOLID.has(M[y][x])||TRAINERS.some(n=>n.x===x&&n.y===y)||QUESTS.some(n=>n.x===x&&n.y===y)}
 function tryMove(d){if(P.moving||mode!=='map')return;P.dir=d;const v=DIRS[d],nx=P.x+v[0],ny=P.y+v[1];if(solidAt(nx,ny)){if(!P.bump||performance.now()-P.bump>400){P.bump=performance.now();sfx('bump')}return}
  P.moving=true;P.mt=0;P.from={x:P.x,y:P.y};P.to={x:nx,y:ny}}
 function updateMap(dt){
- if(mode!=='map')return;
+ if(mode!=='map')return;const prior=isNight();S.clock=(S.clock||0)+dt;if(prior!==isNight()){toast(isNight()?'🌙 הלילה הגיע! טלטלי הלילה התעוררו':'☀️ בוקר טוב! טלטלי היום חזרו',4000)}hud();
  if(P.moving){P.mt+=dt/(STEP/(.55+.45*analogPower));const k=Math.min(P.mt,1);P.px=P.from.x+(P.to.x-P.from.x)*k;P.py=P.from.y+(P.to.y-P.from.y)*k;
   if(P.mt>=1){P.x=P.to.x;P.y=P.to.y;P.px=P.x;P.py=P.y;P.moving=false;S.x=P.x;S.y=P.y;S.dir=P.dir;stepDone()}}
  if(!P.moving&&mode==='map'&&held)tryMove(held);
@@ -348,15 +389,15 @@ function stepDone(){
  const v=M[P.y][P.x];if(isTall(v)&&Math.random()<.15){held=null;dpadOff();startWild()}
 }
 function interact(){const d=DIRS[P.dir],x=P.x+d[0],y=P.y+d[1];if(solidAt(x,y)||true){const v=M[y]&&M[y][x];
- const npc=TRAINERS.find(n=>n.x===x&&n.y===y);if(npc){trainerMenu(npc)}
+ const qnpc=QUESTS.find(n=>n.x===x&&n.y===y);if(qnpc){questMenu(qnpc);return}const npc=TRAINERS.find(n=>n.x===x&&n.y===y);if(npc){trainerMenu(npc)}
  else if(v===8||v===7||v===6||v===13){hutMenu()}
- else if(v===9){toast('🪧 עשב גבוה = טלטלים פראיים! ריפוי בבקתה האדומה. מאמנים: נועה בדרך מערבה, גל בחוף. האלוף בגבעות בצפון־מערב',4500)}
+ else if(v===9){toast('🪧 עשב גבוה = טלטלים פראיים! ריפוי בבקתה האדומה. מאמנים: נועה בדרך מערבה, גל בחוף. האלוף בגבעות בצפון־מערב. מערות הקרח במזרח מעבר לגשר',4500)}
  else toast('אין כאן כלום...',1000)}}
 /* ---------- קרב ---------- */
 let B=null;
 const msgEl=$('#msg'),menuEl=$('#menu'),bui=$('#bui'),mapctrl=$('#mapctrl'),pe=$('#pe'),pp=$('#pp');
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const nm=m=>m.nick?esc(m.nick):SP[m.sp].n;
+const nm=m=>(m.shiny?'✨ ':'')+(m.nick?esc(m.nick):SP[m.sp].n);
 const statusName=m=>m.status==='sleep'?'💤 שינה':m.status==='burn'?'🔥 כוויה':'';
 const cur=()=>S.party[B.pi];
 const alive=()=>S.party.filter(m=>m.hp>0).length;
@@ -369,7 +410,7 @@ const hpCls=p=>p>.5?'':p>.2?'m':'l';
 function panels(){if(!B)return;const e=B.e,p=cur();
  pe.innerHTML=`<b>${nm(e)}</b> <span style="opacity:.7;font-size:11px">${B.trainer?B.trainer.n:'פראי'} ${statusName(e)}</span><span class="lv">רמה ${e.lv}</span><div class="bar"><div class="fill ${hpCls(e.hp/maxHp(e))}" style="width:${Math.max(0,e.hp/maxHp(e)*100)}%"></div></div>`;
  pp.innerHTML=`<b>${nm(p)}</b> ${chip(SP[p.sp].t)} ${statusName(p)}<span class="lv">רמה ${p.lv}</span><div class="bar"><div class="fill ${hpCls(p.hp/maxHp(p))}" style="width:${Math.max(0,p.hp/maxHp(p)*100)}%"></div></div><div style="font-size:12px;margin-top:2px">${Math.max(0,p.hp)}/${maxHp(p)}</div><div class="bar xpb"><div class="fill" style="width:${p.xp/need(p.lv)*100}%"></div></div>`}
-function hud(){$('#hs').textContent=`⚪ ${S.balls}   🧪 ${S.pots}   🪙 ${S.coins}`}
+function hud(){const t=(isNight()?'🌙':'☀️')+' '+`⚪ ${S.balls}   🧪 ${S.pots}   🪙 ${S.coins}`;if($('#hs').textContent!==t)$('#hs').textContent=t}
 /* אפקטים */
 function newB(e){const z=zoneAt(P.x,P.y);return{e,z,pi:S.party.findIndex(m=>m.hp>0),eo:{x:0,y:0},po:{x:0,y:0},es:1,ps:1,ea:1,pa:1,ball:null,proj:null,fx:[],flash:{e:0,p:0},t:0}}
 function burst(x,y,col,n,sp){for(let i=0;i<n;i++){const a=Math.random()*6.283,v=(sp||60)*(.4+Math.random());B.fx.push({x,y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-20,l:.5+Math.random()*.3,m:.8,c:col,r:2+Math.random()*3})}}
@@ -404,12 +445,12 @@ async function giveXp(m,amt){await say(`${nm(m)} קיבל ${amt} נקודות נ
  await evolve(m);panels()}
 async function startWild(){
  mapLayout(false);mode='trans';sfx('enc');
- const z=zoneAt(P.x,P.y),zn=ZONES[z],sp=pick(zn.sp);let lv=rnd(zn.lv[0],zn.lv[1]);
- const e=mkMon(sp,lv);await transition(true);
+ const z=zoneAt(P.x,P.y),zn=ZONES[z],sp=pick(isNight()?zn.night:zn.sp);let lv=rnd(zn.lv[0],zn.lv[1]);
+ const e=mkMon(sp,lv);e.shiny=Math.random()<1/128;await transition(true);
  B=newB(e);S.seen[sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null});
  mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display='block';pp.style.display='block';panels();mode='battle';
  await transition(false);
- sfx('pick');await say(`${nm(e)} פראי הופיע!`,1100);
+ sfx('pick');await say(`${nm(e)} פראי הופיע!${e.shiny?' טלטל בוהק נדיר!':''}`,e.shiny?2200:1100);
  await say(`קדימה, ${nm(cur())}!`,900);
  battleLoop()}
 async function transition(cover){await anim(cover?900:500,p=>{TR={cover,p}});TR=null}
@@ -446,7 +487,7 @@ async function runTurn(act){
 async function enemyDown(){const e=B.e;await faintAnim(false);await say(`${nm(e)} הובס!`,1000);
  const coins=e.lv*2+rnd(0,4);S.coins+=coins;hud();
  const xp=Math.floor(SP[e.sp].xp*e.lv/5);const p=cur();if(p.hp>0)await giveXp(p,xp);
- if(B.trainer){B.ti++;if(B.ti<B.trainer.team.length){B.e=mkMon(...B.trainer.team[B.ti]);S.seen[B.e.sp]=1;B.eo={x:0,y:0};B.ea=1;B.es=1;panels();await say(`${B.trainer.n} שלח את ${nm(B.e)}!`,1200);return'cont'}S.defeated[B.trainer.id]=true;S.coins+=B.trainer.reward;hud();if(B.trainer.boss){S.badges=1;await say('ניצחת את אלוף הגבעות! קיבלת את תג הגביש! 🏅',2200)}else await say(`ניצחת את ${B.trainer.n}! בונוס ${B.trainer.reward} מטבעות!`,1600);save()}
+ if(B.trainer){B.ti++;if(B.ti<B.trainer.team.length){B.e=mkMon(...B.trainer.team[B.ti]);S.seen[B.e.sp]=1;B.eo={x:0,y:0};B.ea=1;B.es=1;panels();await say(`${B.trainer.n} שלח את ${nm(B.e)}!`,1200);return'cont'}const first=!S.defeated[B.trainer.id];S.defeated[B.trainer.id]=true;if(first)S.coins+=B.trainer.reward;if(B.trainer.gym&&first){S.gymBadges.push(B.trainer.id);await say('🏅 קיבלת את '+B.trainer.badge+'!',2000)}hud();if(B.trainer.boss&&!B.trainer.gym){S.badges=1;await say('ניצחת את אלוף הגבעות! קיבלת את תג הגביש! 🏅',2200)}else await say(`ניצחת את ${B.trainer.n}! בונוס ${B.trainer.reward} מטבעות!`,1600);save()}
  if(Math.random()<.35){S.balls++;hud();await say('מצאת כדור לכידה!',900)}
  await say(`קיבלת ${coins} מטבעות 🪙`,800);return'end'}
 async function playerDown(){await faintAnim(true);await say(`${nm(cur())} התעלף...`,1000);
@@ -459,7 +500,7 @@ async function throwBall(){S.balls--;hud();const e=B.e;await say('זורק כד�
  const pc=clamp((3*maxHp(e)-2*e.hp)/(3*maxHp(e))*SP[e.sp].cr,.03,.95),sh=Math.pow(pc,1/3);let k=0;
  for(let i=0;i<3;i++){await sleep(350);sfx('tick');await anim(420,p=>{B.ball={x:d.x,y:d.y+22,r:12.5,s:1,rot:Math.sin(p*6.283)*.5*(1-p*.4)}});if(Math.random()<sh)k++;else break}
  if(k===3){sfx('ok');burst(d.x,d.y+10,'#ffd23f',24,70);await say(`${nm(e)} נתפס! 🎉`,1300);
-  S.caught[e.sp]=1;e.hp=Math.max(1,e.hp);e.bst=0;let where;if(S.party.length<6){S.party.push(e);where='הצטרף לצוות שלך'}else{S.box.push(e);where='נשלח לקופסה'}
+  S.caught[e.sp]=1;if(e.shiny)S.shinyCaught=(S.shinyCaught||0)+1;S.captures=(S.captures||0)+1;e.hp=Math.max(1,e.hp);e.bst=0;let where;if(S.party.length<6){S.party.push(e);where='הצטרף לצוות שלך'}else{S.box.push(e);where='נשלח לקופסה'}
   save();await say(`${nm(e)} ${where}!`,1100);await evolve(e);B.caught=true;B.ball=null;return true}
  B.ball=null;B.ea=1;await anim(300,p=>{B.es=p});B.es=1;
  await say(['הוא יצא מיד מהכדור!','כמעט! הוא יצא מהכדור!','איזה קרוב! אבל הוא יצא!'][k],1200);return false}
@@ -475,9 +516,10 @@ function drawBattle(ts){const c=cx;c.setTransform(2,0,0,2,0,0);const t=ts/1000,z
  let g=c.createLinearGradient(0,0,0,288);g.addColorStop(0,z[0]);g.addColorStop(.5,z[1]);g.addColorStop(.5,z[2]);g.addColorStop(1,shade(z[2]));c.fillStyle=g;c.fillRect(0,0,352,288);
  for(let i=0;i<4;i++)E(c,40+i*100,120,60,18,'rgba(0,0,0,.06)');
  E(c,240,118,70,15,'rgba(0,0,0,.18)');E(c,240,116,60,12,'rgba(255,255,255,.15)');E(c,104,228,86,19,'rgba(0,0,0,.2)');E(c,104,226,74,15,'rgba(255,255,255,.15)');
+ if(isNight()){c.fillStyle='#0c144955';c.fillRect(0,0,352,288)}
  const eb=Math.sin(t*2.5)*2,pb=Math.sin(t*2.2+1)*2;
- if(B.ea>0&&!(B.flash.e)){drawMon(c,B.e.sp,240+B.eo.x,88+B.eo.y+eb,80*B.es,t,B.ea)}
- const p=cur();if(p&&B.pa>0&&!(B.flash.p)){drawMon(c,p.sp,104+B.po.x,184+B.po.y+pb,104*B.ps,t,B.pa)}
+ if(B.ea>0&&!(B.flash.e)){drawVariant(c,B.e,240+B.eo.x,88+B.eo.y+eb,80*B.es,t,B.ea)}
+ const p=cur();if(p&&B.pa>0&&!(B.flash.p)){drawVariant(c,p,104+B.po.x,184+B.po.y+pb,104*B.ps,t,B.pa)}
  if(B.ball)drawBall(c,B.ball);
  const pr=B.proj;if(pr){c.save();if(pr.k==='rock'){E(c,pr.x,pr.y,10,9,pr.col);E(c,pr.x-3,pr.y-3,4,3,'#d8b888')}
   else if(pr.k==='bolt'){c.strokeStyle=pr.col;c.lineWidth=5;c.lineJoin='round';c.beginPath();let x=pr.x,y=pr.y-140;c.moveTo(x,y);for(let i=1;i<=6;i++){x=pr.x+(i%2?10:-10)*(1-pr.p*.5);y=pr.y-140+i*(140/6)*Math.min(1,pr.p*2.2);c.lineTo(x,y)}c.stroke();c.strokeStyle='#fff';c.lineWidth=2;c.stroke()}
@@ -491,16 +533,16 @@ function drawBall(c,b){c.save();c.translate(b.x,b.y);if(b.rot)c.rotate(b.rot);co
 async function statusTick(){
  for(const [m,isP] of [[B.e,false],[cur(),true]]){if(m.hp>0&&m.status==='burn'){m.hp=Math.max(0,m.hp-Math.max(1,Math.floor(maxHp(m)/12)));panels();await say(`${nm(m)} נפגע מהכוויה!`,850);if(m.hp<=0)return isP?await playerDown():await enemyDown()}}return'cont'
 }
-async function evolve(m){const old=SP[m.sp];if(old.evo==null||m.lv<old.at)return;const was=m.sp,prior=maxHp(m);menuEl.style.display='none';await say(`מה קורה? ${old.n} מתחיל להתפתח! ✨`,1400);const x=document.createElement('div');x.style.cssText='position:absolute;inset:0;z-index:16;background:radial-gradient(circle,#53768a,#141c3dee);display:flex;flex-direction:column;align-items:center;justify-content:center';const art=monCanvas(was,90);x.appendChild(art);const label=document.createElement('h2');label.textContent='✨ התפתחות! ✨';x.appendChild(label);$('#stage').appendChild(x);sfx('lvl');await anim(1500,p=>{art.style.transform=`scale(${1+Math.sin(p*16)*.12}) rotate(${Math.sin(p*10)*7}deg)`;art.style.filter=`brightness(${1+Math.sin(p*Math.PI)*3})`});m.sp=old.evo;m.hp=Math.min(maxHp(m),m.hp+maxHp(m)-prior);S.seen[m.sp]=1;S.caught[m.sp]=1;art.replaceWith(monCanvas(m.sp,100));label.textContent=SP[m.sp].n;sfx('ok');save();await sleep(1100);x.remove();await say(`${old.n} התפתח ל${SP[m.sp].n}! הכוח והחיים עלו!`,1700)
+async function evolve(m){const old=SP[m.sp];if(old.evo==null||m.lv<old.at)return;const was=m.sp,prior=maxHp(m);menuEl.style.display='none';await say(`מה קורה? ${old.n} מתחיל להתפתח! ✨`,1400);const x=document.createElement('div');x.style.cssText='position:absolute;inset:0;z-index:16;background:radial-gradient(circle,#53768a,#141c3dee);display:flex;flex-direction:column;align-items:center;justify-content:center';const art=variantCanvas(m,90);x.appendChild(art);const label=document.createElement('h2');label.textContent='✨ התפתחות! ✨';x.appendChild(label);$('#stage').appendChild(x);sfx('lvl');await anim(1500,p=>{art.style.transform=`scale(${1+Math.sin(p*16)*.12}) rotate(${Math.sin(p*10)*7}deg)`;art.style.filter=`brightness(${1+Math.sin(p*Math.PI)*3})`});m.sp=old.evo;m.hp=Math.min(maxHp(m),m.hp+maxHp(m)-prior);S.seen[m.sp]=1;S.caught[m.sp]=1;art.replaceWith(variantCanvas(m,100));label.textContent=SP[m.sp].n;sfx('ok');save();await sleep(1100);x.remove();await say(`${old.n} התפתח ל${SP[m.sp].n}! הכוח והחיים עלו!`,1700)
 }
-function trainerMenu(n){if(mode!=='map')return;mode='menu';modal(`<h2>${n.boss?'🏅':'⚔️'} ${n.n}</h2><p>${n.txt}</p><p>${S.defeated[n.id]?'כבר ניצחת! אפשר להתאמן שוב.':n.boss?'רמות 13–16 · פרס: תג הגביש':'פרס: '+n.reward+' מטבעות'}</p><button class="btn grn" id="tf" style="width:100%">לקרב!</button><button class="btn sec" id="tc" style="width:100%;margin-top:10px">לא עכשיו</button>`,b=>{b.querySelector('#tc').onclick=()=>{closeModal();mode='map'};b.querySelector('#tf').onclick=()=>{closeModal();startTrainer(n)}})}
+function trainerMenu(n){if(mode!=='map')return;if(n.requires&&!S.defeated[n.requires]){toast('🔒 קודם זכו ב'+(TRAINERS.find(t=>t.id===n.requires)?.badge||'תג הגביש של צור'),4500);return}mode='menu';modal(`<h2>${n.gym?'🏟️':n.boss?'🏅':'⚔️'} ${n.n}</h2><p>${n.txt}</p><p>${S.defeated[n.id]?'כבר ניצחת! אפשר להתאמן שוב, ללא פרס מטבעות נוסף.':n.gym?'רמות '+n.team[0][1]+'–'+n.team[n.team.length-1][1]+' · פרס: '+n.badge:n.boss?'רמות 13–16 · פרס: תג הגביש':'פרס: '+n.reward+' מטבעות'}</p><button class="btn grn" id="tf" style="width:100%">לקרב!</button><button class="btn sec" id="tc" style="width:100%;margin-top:10px">לא עכשיו</button>`,b=>{b.querySelector('#tc').onclick=()=>{closeModal();mode='map'};b.querySelector('#tf').onclick=()=>{closeModal();startTrainer(n)}})}
 async function startTrainer(n){dpadOff();tapA=false;mapLayout(false);mode='trans';sfx('enc');await transition(true);B=newB(mkMon(...n.team[0]));B.trainer=n;B.ti=0;S.seen[B.e.sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null});mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display=pp.style.display='block';panels();mode='battle';await transition(false);await say(`${n.n} מאתגר אותך!`,1300);battleLoop()}
 function nickname(m){modal(`<h2>שם חיבה ל${SP[m.sp].n}</h2><input class="nick" id="nick" maxlength="16" placeholder="השם החדש (עד 16 תווים)" value="${esc(m.nick||'')}"><p class="flav">שדה ריק מחזיר את שם הטלטל המקורי.</p><button class="btn grn" id="ns" style="width:100%">שמירה</button><button class="btn sec" id="nc" style="width:100%;margin-top:8px">ביטול</button>`,b=>{b.querySelector('#ns').onclick=()=>{m.nick=b.querySelector('#nick').value.trim().slice(0,16);save();monDetail(m);collTab(cT)};b.querySelector('#nc').onclick=()=>monDetail(m)})}
 /* ---------- מסכים ---------- */
-function showScr(id){$('#'+id).style.display='block'}
+function showScr(id){const e=$('#'+id);e.style.display='block';e.scrollTop=0}
 function hideScr(id){$('#'+id).style.display='none'}
 let modalReady=0;
-function modal(html,after){modalReady=performance.now()+350;dpadOff();tapA=false;const m=$('#modal');$('#mbox').innerHTML=html;m.style.display='flex';m.scrollTop=0;if(after)after($('#mbox'))}
+function modal(html,after){modalReady=performance.now()+350;dpadOff();tapA=false;const m=$('#modal');$('#mbox').innerHTML=html;m.style.display='flex';m.scrollTop=0;$('#mbox').scrollTop=0;if(after)after($('#mbox'))}
 function closeModal(){$('#modal').style.display='none'}
 const pbar=(p,cls)=>`<div class="bar"><div class="fill ${cls||hpCls(p)}" style="width:${clamp(p,0,1)*100}%;transition:none"></div></div>`;
 document.addEventListener('click',e=>{if($('#modal').style.display==='flex'&&performance.now()<modalReady){e.preventDefault();e.stopImmediatePropagation()}},true);
@@ -515,7 +557,7 @@ function hutMenu(){if(mode!=='map')return;mode='menu';
   b.querySelector('#h3').onclick=()=>{if(S.coins>=15){S.coins-=15;S.pots++;sfx('buy');hud();save();draw()}};
   b.querySelector('#h4').onclick=()=>{closeModal();mode='map'}});
  draw()}
-function monCard(m,i,onclick){const d=document.createElement('div');d.className='card';d.appendChild(monCanvas(m.sp,36));d.insertAdjacentHTML('beforeend',`<div><b>${nm(m)}</b></div><div style="font-size:12px">רמה ${m.lv} ${chip(SP[m.sp].t)}</div>${pbar(m.hp/maxHp(m))}`);if(i!=null&&i>=0)d.insertAdjacentHTML('afterbegin',`<span class="badge">צוות ${i+1}</span>`);d.onclick=onclick;return d}
+function monCard(m,i,onclick){const d=document.createElement('div');d.className='card';d.appendChild(variantCanvas(m,36));d.insertAdjacentHTML('beforeend',`<div><b>${nm(m)}</b></div><div style="font-size:12px">רמה ${m.lv} ${chip(SP[m.sp].t)}</div>${pbar(m.hp/maxHp(m))}`);if(i!=null&&i>=0)d.insertAdjacentHTML('afterbegin',`<span class="badge">צוות ${i+1}</span>`);d.onclick=onclick;return d}
 function statRow(l,v,mx){return`<div class="row"><span class="l">${l}</span>${pbar(v/mx,'')}<span class="v">${v}</span></div>`}
 function monDetail(m){const sp=SP[m.sp],inP=S.party.includes(m);
  modal(`<div id="mc"></div><h2 style="margin:6px 0">${nm(m)} ${chip(sp.t)}</h2><div>${m.nick?sp.n+' · ':''}רמה ${m.lv} · חיים ${m.hp}/${maxHp(m)}</div>
@@ -525,7 +567,7 @@ function monDetail(m){const sp=SP[m.sp],inP=S.party.includes(m);
  <div class="flav">${sp.f}</div>${sp.evo!=null?`<div class="flav">✨ מתפתח ל${SP[sp.evo].n} ברמה ${sp.at}</div>`:''}
  <div style="display:grid;gap:8px"><button class="btn grn" id="d1" ${S.party[0]===m?'disabled':''}>⭐ הפוך למוביל בקרב</button>
  <button class="btn" id="d2" ${(!inP&&S.party.length>=6)||(inP&&S.party.length<=1)?'disabled':''}>${inP?'📦 העבר לקופסה':'👥 העבר לצוות'}</button><button class="btn" id="dn">✏️ שם חיבה</button><button class="btn sec" id="d3">סגור</button></div>`,b=>{
-  b.querySelector('#mc').appendChild(monCanvas(m.sp,70));
+  b.querySelector('#mc').appendChild(variantCanvas(m,70));
   b.querySelector('#d1').onclick=()=>{let from=S.party.indexOf(m);if(from<0){if(S.party.length>=6)return;S.box.splice(S.box.indexOf(m),1);S.party.unshift(m)}else{S.party.splice(from,1);S.party.unshift(m)}save();closeModal();collTab(cT)};
   b.querySelector('#d2').onclick=()=>{if(inP){S.party.splice(S.party.indexOf(m),1);S.box.push(m)}else{S.box.splice(S.box.indexOf(m),1);S.party.push(m)}save();closeModal();collTab(cT)};
   b.querySelector('#dn').onclick=()=>nickname(m);b.querySelector('#d3').onclick=closeModal})}
@@ -546,8 +588,8 @@ function collTab(t){cT=t;const el=$('#coll');el.scrollTop=0;const n=Object.keys(
   d.appendChild(monCanvas(i,36,!s));d.insertAdjacentHTML('beforeend',`<div><b>${s?sp.n:'???'}</b></div><div style="font-size:12px">${c?'✅ נתפס':s?'👁 נראה':'לא ידוע'}</div>`);if(s)d.onclick=()=>spDetail(i);g.appendChild(d)});cb.appendChild(g)}
  if(t===2){const ts=['fire','water','plant','spark','earth'];cb.innerHTML=ts.map(a=>{const st=ts.filter(d=>(EFF[a][d]||1)>1),wk=ts.filter(d=>(EFF[a][d]||1)<1);return`<div class="card" style="margin:6px 0;text-align:right;font-size:15px">${chip(a)}<div style="margin:6px 0">💪 חזק נגד: ${st.map(chip).join(' ')||'—'}</div><div>🛡 חלש נגד: ${wk.map(chip).join(' ')||'—'}</div></div>`}).join('')+'<div class="flav">טלטל מאותו סוג של המכה מקבל בונוס. התחזקות מעלה את ההתקפה למשך הקרב.</div>'}}
 function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.innerHTML=`<div class="top"><h2>תפריט · ${esc(activePlayer()?.name||'')}</h2><button class="x" id="mx">✕</button></div>
- <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi">📲 התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
- el.querySelector('#mp').onclick=()=>{save();hideScr('mnu');showProfiles()};el.querySelector('#mr').onclick=()=>playerName(activePlayer());el.querySelector('#mi').onclick=installGame;el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
+ <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq">📜 יומן משימות</button><button class="btn" id="mg">🏟️ מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh">🗺️ מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi">📲 התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
+ el.querySelector('#mq').onclick=questLog;el.querySelector('#mg').onclick=gymLog;el.querySelector('#mt').onclick=transferMenu;el.querySelector('#mh').onclick=guide;el.querySelector('#mp').onclick=()=>{save();hideScr('mnu');showProfiles()};el.querySelector('#mr').onclick=()=>playerName(activePlayer());el.querySelector('#mi').onclick=installGame;el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
  el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};
  let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? רק ההתקדמות של השחקן הזה תימחק. לחץ שוב';return}S=newState();save();location.reload()}}
 function openMenuRefresh(){hideScr('mnu');mode='map';openMenu()}
@@ -563,20 +605,31 @@ async function installGame(){
  modal('<h2>📲 התקנת הטלטלים</h2><p class="flav">ב־Chrome לחצו על שלוש הנקודות ⋮ ובחרו ״הוספה למסך הבית״ ואז ״התקנה״.</p><p class="flav">אם כתוב שהמשחק כבר מותקן: חפשו ״טלטלים״ או ״הרפתקת הטלטלים״ ברשימת האפליקציות. במסך הבית אפשר להחליק למעלה כדי לפתוח את הרשימה.</p><p class="flav">אין אפשרות התקנה? ודאו שפתחתם את הקישור ב־Chrome עצמו, ולא בתוך WhatsApp. המתינו כמה שניות ונסו שוב.</p><p class="flav">אחרי פתיחה ראשונה עם אינטרנט, המשחק זמין גם ללא חיבור. ההתקדמות נשמרת במכשיר הזה.</p><button class="btn sec" id="ic" style="width:100%">הבנתי</button>',b=>b.querySelector('#ic').onclick=closeModal)
 }
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').then(reg=>{reg.addEventListener('updatefound',()=>{const w=reg.installing;w&&w.addEventListener('statechange',()=>{if(w.state==='installed'&&navigator.serviceWorker.controller)toast('עדכון חדש מוכן. ייטען בפתיחה הבאה',4500)})})}).catch(()=>{});
+/* ---------- מסע חדש, משימות והעברה ---------- */
+function info(html){modal(html+'<button class="btn sec" id="infoClose" style="width:100%;margin-top:14px">חזרה</button>',b=>b.querySelector('#infoClose').onclick=()=>{closeModal();if(!$('#mnu').offsetParent&&mode!=='title')mode='map'})}
+function questMenu(q){if(mode!=='map')return;mode='menu';const phase=S.quests[q.id]||0,done=q.test();modal(`<h2>📜 ${q.n}</h2><p class="flav">${q.goal}</p><p>פרס: ${q.reward} מטבעות ו־${q.balls} כדורי לכידה</p><p>${phase===2?'✅ המשימה הושלמה. תודה על העזרה!':phase===1?(done?'🎉 עמדתם במשימה! הפרס מחכה לכם.':'המשימה פעילה. חזרו אליי כשתסיימו.'):'רוצים לעזור לי? טלטלים שכבר אספתם נחשבים גם הם. לא צריך למסור אותם.'}</p>${phase!==2?`<button class="btn grn" id="qa" style="width:100%" ${phase===1&&!done?'disabled':''}>${phase===0?'קבלת המשימה':'קבלת הפרס'}</button>`:''}<button class="btn sec" id="qc" style="width:100%;margin-top:10px">חזרה למפה</button>`,b=>{b.querySelector('#qc').onclick=()=>{closeModal();mode='map'};const a=b.querySelector('#qa');if(a)a.onclick=()=>{if(!phase){S.quests[q.id]=1;save();closeModal();mode='map';questMenu(q)}else if(q.test()){S.quests[q.id]=2;S.coins+=q.reward;S.balls+=q.balls;save();hud();sfx('ok');closeModal();mode='map';questMenu(q)}}})}
+function questLog(){info('<h2>📜 יומן המשימות</h2><p class="flav">גשו לדמויות עם סימן שאלה במפה, עמדו לצדן ולחצו בדיקה.</p>'+QUESTS.map(q=>`<div class="card" style="text-align:right;margin:8px 0;padding:12px"><b>${S.quests[q.id]===2?'✅':S.quests[q.id]===1?'📜':'❔'} ${q.n}</b><p>${q.goal}</p><small>${S.quests[q.id]===2?'הושלמה':S.quests[q.id]===1?(q.test()?'הפרס מוכן! חזרו לדמות':'בתהליך'):'טרם התקבלה'} · ${ZONES[zoneAt(q.x,q.y)].n} · ${q.reward} 🪙 + ${q.balls} כדורים</small></div>`).join(''))}
+function gymLog(){info('<h2>🏟️ מסע התגים</h2><p>קודם מנצחים את צור בגבעות וזוכים בתג הגביש, ואז פותחים את ההיכלים לפי הסדר.</p>'+TRAINERS.filter(n=>n.gym).map(n=>`<div class="card" style="text-align:right;margin:8px 0;padding:12px"><h3>${S.defeated[n.id]?'🏅':S.defeated[n.requires]?'⚔️':'🔒'} ${n.n}</h3><p>${n.badge} · רמות ${n.team[0][1]}–${n.team.at(-1)[1]}</p><small>${ZONES[zoneAt(n.x,n.y)].n} · ${n.gym===1?'דרום־מערב האחו':n.gym===2?'מזרח החוף':n.gym===3?'צפון המערות':'דרום המערות'}</small></div>`).join(''))}
+function guide(){info(`<h2>🗺️ מסע הקרח · גרסה ${VER}</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card">🔥 גבעות הגחלים<br>צפון־מערב</div><div class="card">🌊 חוף הברכה<br>צפון־מזרח</div><div class="card">🌿 אחו הפרחים<br>דרום</div><div class="card" style="background:#7aa9df44">❄️ מערות הקרח<br>מזרחה, מעבר לגשר</div></div><p class="flav">מהבקתה לכו מזרחה לאורך השביל עד הגשר. במערות מחכים שלושה מינים בלעדיים, היכל הקרח וגמר האליפות.</p><h3>☀️ יום ולילה 🌙</h3><p class="flav">כל מחזור הוא 10 דקות הליכה במפה: 6 דקות יום ו־4 דקות לילה. הקרבות והתפריטים עוצרים את השעון. אין צורך לשחק בשעות הלילה האמיתיות! ירחף ולילפז יוצאים רק בלילה.</p><p>עכשיו: ${isNight()?'לילה':'יום'} · השינוי הבא בעוד ${Math.ceil(((isNight()?600:360)-(S.clock||0)%600)/60)} דקות משחק.</p><h3>✨ בוהקים</h3><p class="flav">לכל מפגש פראי סיכוי של 1 מתוך 128 להיות בוהק. הצבע שונה וניצוצות מקיפים אותו. זה לא מובטח גם אחרי 128 מפגשים! צבעו נשמר בלכידה, בהתפתחות ובהעברה.</p><h3>📜 משימות ותגים</h3><p class="flav">דמויות עם ? נותנות משימות ופרסים. בתפריט יש יומן משימות ומסע תגים עם מיקומי ההיכלים. אפשר לרפא חינם בבקתה ולהתאמן לפני אתגר קשה.</p>`)}
+function checksum(t){let h=2166136261;for(let i=0;i<t.length;i++)h=Math.imul(h^t.charCodeAt(i),16777619);return(h>>>0).toString(36)}
+function exportCode(){save();const p=activePlayer();const text=JSON.stringify({v:3,name:p.name,state:S});const code=btoa(Array.from(new TextEncoder().encode(text),b=>String.fromCharCode(b)).join(''));return 'TL3.'+checksum(code)+'.'+code}
+function transferMenu(){const code=exportCode();modal(`<h2>📤 העברת שחקן וגיבוי</h2><p class="flav">זה הקוד של ${esc(activePlayer().name)}. הוא כולל את השם, הטלטלים, המשימות והתגים. העבירו את כל הקוד לטלפון השני. שם בחרו ״קליטת שחקן ממכשיר אחר״ במסך בחירת השחקנים.</p><textarea class="nick" id="exportCode" readonly rows="4" style="font-size:11px;direction:ltr;user-select:text;touch-action:auto"></textarea><button class="btn grn" id="copyCode" style="width:100%;margin-top:8px">העתקת הקוד</button><p id="copyMsg"></p><p class="flav">זו העתקה בטוחה, לא סנכרון. השחקן במכשיר המקורי לא נמחק. אחרי העברה המשיכו במכשיר אחד, וצרו קוד חדש בכל העברה. אפשר לשמור את הקוד גם כגיבוי. מי שמקבל אותו יכול להעתיק את הפרופיל, אז שתפו רק עם המשפחה.</p><button class="btn sec" id="transferClose" style="width:100%">חזרה</button>`,b=>{b.querySelector('#exportCode').value=code;b.querySelector('#copyCode').onclick=async()=>{const field=b.querySelector('#exportCode');field.focus();field.select();try{await navigator.clipboard.writeText(code);b.querySelector('#copyMsg').textContent='✅ הועתק! אפשר להדביק בהודעה למשפחה.'}catch(e){b.querySelector('#copyMsg').textContent='לחצו לחיצה ארוכה על הקוד ובחרו העתקה.'}};b.querySelector('#transferClose').onclick=closeModal})}
+function validatedImport(code){if(code.length>500000)throw Error();const a=code.trim().replace(/\s+/g,'').split('.');if(a.length!==3||a[0]!=='TL3'||checksum(a[2])!==a[1])throw Error();const j=JSON.parse(new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(a[2]),c=>c.charCodeAt(0))));if(j.v!==3||typeof j.name!=='string'||!j.name.trim()||!j.state)throw Error();const t=j.state;if(!Array.isArray(t.party)||t.party.length>6||!Array.isArray(t.box)||t.box.length>1000||t.started&&!t.party.length)throw Error();const n=newState();for(const k of ['balls','pots','coins','clock','captures','shinyCaught']){const v=t[k]??0;if(typeof v!=='number'||!Number.isFinite(v)||v<0||v>1e9)throw Error();n[k]=v}for(const key of ['party','box'])n[key]=t[key].map(m=>{if(!Number.isInteger(m.sp)||!SP[m.sp]||!Number.isInteger(m.lv)||m.lv<1||m.lv>50||!Number.isFinite(m.xp)||m.xp<0||!Number.isFinite(m.hp))throw Error();return{sp:m.sp,lv:m.lv,hp:clamp(Math.floor(m.hp),0,hpOf(m.sp,m.lv)),xp:Math.min(m.xp,need(50)),id:Date.now()+Math.random(),shiny:m.shiny===true,nick:String(m.nick||'').slice(0,16)}});for(const key of ['seen','caught']){n[key]={};for(let i=0;i<SP.length;i++)if(t[key]?.[i])n[key][i]=1}n.defeated={};TRAINERS.forEach(q=>{if(t.defeated?.[q.id]===true)n.defeated[q.id]=true});n.quests={};QUESTS.forEach(q=>{if([1,2].includes(t.quests?.[q.id]))n.quests[q.id]=t.quests[q.id]});n.gymBadges=TRAINERS.filter(q=>q.gym&&n.defeated[q.id]).map(q=>q.id);n.badges=t.badges?1:0;n.started=t.started===true;n.snd=t.snd!==false;n.x=Number.isInteger(t.x)&&t.x>=0&&t.x<W?t.x:23;n.y=Number.isInteger(t.y)&&t.y>=0&&t.y<H?t.y:21;if(SOLID.has(M[n.y][n.x])){n.x=23;n.y=21}n.dir=['up','down','left','right'].includes(t.dir)?t.dir:'up';return{name:j.name.trim().slice(0,16),state:n}}
+function importMenu(){modal('<h2>📥 קליטת שחקן</h2><p class="flav">במכשיר הישן: תפריט ← העברת שחקן וגיבוי ← העתקת הקוד. הדביקו כאן את הקוד המלא. שחקנים קיימים במכשיר הזה לא יימחקו ולא יוחלפו.</p><textarea class="nick" id="importCode" rows="5" placeholder="הדבקת הקוד כאן" style="direction:ltr;font-size:12px;user-select:text;touch-action:auto"></textarea><div id="importError" style="color:#ffd080;margin:8px"></div><button class="btn grn" id="importCheck" style="width:100%">בדיקת הקוד</button><button class="btn sec" id="importCancel" style="width:100%;margin-top:10px">ביטול</button>',b=>{b.querySelector('#importCancel').onclick=closeModal;b.querySelector('#importCheck').onclick=()=>{try{const j=validatedImport(b.querySelector('#importCode').value);modal(`<h2>לקלוט את ${esc(j.name)}?</h2><p>${j.state.party.length+j.state.box.length} טלטלים · ${Object.keys(j.state.caught).length} מינים · ${j.state.gymBadges.length} תגי אליפות</p><p class="flav">ייווצר שחקן נוסף. אף שמירה קיימת לא תוחלף.</p><button class="btn grn" id="importConfirm" style="width:100%">קליטת השחקן</button><button class="btn sec" id="importBack" style="width:100%;margin-top:10px">ביטול</button>`,c=>{c.querySelector('#importBack').onclick=closeModal;c.querySelector('#importConfirm').onclick=()=>{let name=j.name;let i=2;while(profiles.players.some(p=>p.name===name))name=j.name+' ('+i+++')';const player={id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),name,state:j.state};const next={...profiles,players:profiles.players.concat(player)};try{localStorage.setItem(PROFILE_KEY,JSON.stringify(next))}catch(e){c.querySelector('#importConfirm').textContent='אין מספיק מקום. לא בוצע שינוי.';return}profiles=next;closeModal();showProfiles();toast('✅ השחקן נקלט! בחרו בו כדי להמשיך',4000)}})}catch(e){b.querySelector('#importError').textContent='הקוד לא תקין או לא הועתק בשלמותו. העתיקו שוב מהמכשיר הישן.'}}})}
 /* ---------- שחקנים במכשיר ---------- */
-function showProfiles(){mode='title';dpadOff();tapA=false;closeModal();hideScr('mnu');hideScr('coll');const el=$('#title');el.style.display='block';el.innerHTML='<h1>מי משחק היום?</h1><p>לכל שחקן הרפתקה ושמירה משלו במכשיר הזה</p><div id="players" style="display:grid;gap:10px"></div><button class="btn grn" id="newPlayer">➕ יצירת שחקן חדש</button><button class="btn sec" id="profileInstall">📲 התקנה בטלפון</button><p style="font-size:13px">השמות וההתקדמות נשמרים רק במכשיר הזה. אין צורך בסיסמה.</p>';const box=el.querySelector('#players');profiles.players.forEach((p,i)=>{const b=document.createElement('button');b.className='btn';b.style.cssText='min-height:76px;width:90%;font-size:22px';b.textContent=['🌿','🔥','💧','⚡','💎'][i%5]+' '+p.name;const small=document.createElement('small');small.textContent=p.state.started?`צוות: ${p.state.party.length} טלטלים · ${p.state.badges?'🏅 תג הגביש':'המסע ממשיך'}`:'הרפתקה חדשה';b.appendChild(small);b.onclick=()=>{profiles.active=p.id;S=migrateState(p.state);P={x:S.x,y:S.y,dir:S.dir||'up',px:S.x,py:S.y,moving:false,mt:0,from:null,to:null};save();showTitle()};box.appendChild(b)});el.querySelector('#newPlayer').onclick=()=>playerName();el.querySelector('#profileInstall').onclick=installGame}
+function showProfiles(){mode='title';dpadOff();tapA=false;closeModal();hideScr('mnu');hideScr('coll');const el=$('#title');el.style.display='block';el.scrollTop=0;el.innerHTML='<h1>מי משחק היום?</h1><p>לכל שחקן הרפתקה ושמירה משלו במכשיר הזה</p><div id="players" style="display:grid;gap:10px"></div><button class="btn grn" id="newPlayer">➕ יצירת שחקן חדש</button><button class="btn sec" id="profileInstall">📲 התקנה בטלפון</button><button class="btn" id="importProfile">📥 קליטת שחקן ממכשיר אחר</button><p style="font-size:13px">השמות וההתקדמות נשמרים רק במכשיר הזה. אין צורך בסיסמה.</p>';const box=el.querySelector('#players');profiles.players.forEach((p,i)=>{const b=document.createElement('button');b.className='btn';b.style.cssText='min-height:76px;width:90%;font-size:22px';b.textContent=['🌿','🔥','💧','⚡','💎'][i%5]+' '+p.name;const small=document.createElement('small');small.textContent=p.state.started?`צוות: ${p.state.party.length} טלטלים · ${p.state.badges?'🏅 תג הגביש':'המסע ממשיך'}`:'הרפתקה חדשה';b.appendChild(small);b.onclick=()=>{profiles.active=p.id;S=migrateState(p.state);P={x:S.x,y:S.y,dir:S.dir||'up',px:S.x,py:S.y,moving:false,mt:0,from:null,to:null};save();showTitle()};box.appendChild(b)});el.querySelector('#newPlayer').onclick=()=>playerName();el.querySelector('#profileInstall').onclick=installGame;el.querySelector('#importProfile').onclick=importMenu;el.scrollTop=0}
 function playerName(player){modal(`<h2>${player?'שינוי שם':'שחקן חדש'}</h2><p>מה השם הפרטי שלך?</p><input class="nick" id="playerName" maxlength="16" placeholder="השם שלי" value="${esc(player?.name||'')}"><div id="nameError" style="color:#ffd080;min-height:24px"></div><button class="btn grn" id="createPlayer" style="width:100%">${player?'שמירת שם':'מתחילים הרפתקה!'}</button><button class="btn sec" id="cancelPlayer" style="width:100%;margin-top:8px">חזרה</button>`,b=>{b.querySelector('#cancelPlayer').onclick=closeModal;b.querySelector('#createPlayer').onclick=()=>{const name=b.querySelector('#playerName').value.trim().slice(0,16);if(!name){b.querySelector('#nameError').textContent='צריך לכתוב שם כדי להתחיל';return}if(profiles.players.some(p=>p!==player&&p.name===name)){b.querySelector('#nameError').textContent='יש כבר שחקן בשם הזה. הוסיפו סימן או אות';return}if(player){player.name=name;save();closeModal();openMenuRefresh()}else{save();const p={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),name,state:newState()};profiles.players.push(p);profiles.active=p.id;S=p.state;P={x:S.x,y:S.y,dir:'up',px:S.x,py:S.y,moving:false,mt:0};save();closeModal();showTitle()}}})}
 /* ---------- כותרת ובחירת מתחיל ---------- */
-function showTitle(){mode='title';const el=$('#title');el.style.display='block';
+function showTitle(){mode='title';const el=$('#title');el.style.display='block';el.scrollTop=0;
  el.innerHTML=`<h1>הרפתקת הטלטלים</h1><p>שלום ${esc(activePlayer()?.name||'')}! תפסו, אמנו וגלו!</p><button class="btn sec" id="pickProfile">👥 החלפת שחקן</button><div id="tmons"></div>
  <button class="btn sec" id="installTitle">📲 התקנה בטלפון</button>${S.started?'<button class="btn grn" id="t1">▶ המשך משחק</button><button class="btn sec" id="t2">משחק חדש</button>':'<button class="btn grn" id="t1">▶ התחל הרפתקה</button>'}`;
  el.querySelector('#pickProfile').onclick=()=>{save();showProfiles()};el.querySelector('#installTitle').onclick=installGame;const tm=el.querySelector('#tmons');[0,2,4,6,7,8].forEach(i=>tm.appendChild(monCanvas(i,39)));
  el.querySelector('#t1').onclick=()=>{ac();sfx('pick');if(S.started){el.style.display='none';startMap()}else starterPick()};
  const t2=el.querySelector('#t2');if(t2){let sure=false;t2.onclick=()=>{if(!sure){sure=true;t2.textContent='בטוח? ההתקדמות תימחק. לחץ שוב';return}S=newState();save();starterPick()}}}
-function starterPick(){const el=$('#title');el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
+function starterPick(){const el=$('#title');el.scrollTop=0;el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
  STARTERS.forEach(i=>{const sp=SP[i],d=document.createElement('div');d.className='card';d.appendChild(monCanvas(i,42));d.insertAdjacentHTML('beforeend',`<div><b style="font-size:19px">${sp.n}</b> ${chip(sp.t)}<div class="flav" style="margin:4px 0 0">${sp.f}</div></div>`);
   d.onclick=()=>{sfx('ok');const m=mkMon(i,6);S.party=[m];S.box=[];S.caught[i]=1;S.seen[i]=1;S.started=true;S.x=23;S.y=21;S.dir='up';P.x=P.px=23;P.y=P.py=21;P.dir='up';save();el.style.display='none';startMap(true)};pk.appendChild(d)})}
-function startMap(first){mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! גרור את הג׳ויסטיק. בדיקה ליד דלת או מאמן 🎮',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
+function startMap(first){mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! יומן המשימות ומפת המסע בתפריט.  גרור את הג׳ויסטיק. בדיקה ליד דלת או מאמן 🎮',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
 /* ---------- קלט ---------- */
 const dp=$('#dpad');let dpId=null;
 function dpadOff(){held=null;dpId=null;analogPower=1;dp.querySelector('i').style.transform='translate(0,0)'}
@@ -599,7 +652,7 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;
  try{updateMap(dt);if(B&&(mode==='battle'||mode==='trans'))drawBattle(ts);else if(mode!=='title')drawMap(ts);else{cx.setTransform(1,0,0,1,0,0);cx.fillStyle='#0e1a12';cx.fillRect(0,0,704,576)}
  if(mode==='trans'||TR)drawTrans(cx)}catch(err){console.error(err)}
  requestAnimationFrame(frame)}
-window.__g={get S(){return S},get B(){return B},P,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP};
+window.__g={get S(){return S},get B(){return B},get P(){return P},questMenu,QUESTS,trainerMenu,validatedImport,exportCode,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP};
 hud();showProfiles();
 requestAnimationFrame(frame);
 })();
