@@ -84,6 +84,11 @@ html,body{margin:0;height:100%;background:#0e1a12;color:#fff;font-family:system-
 #abtn{right:20px;top:auto;bottom:40px;transform:none;width:64px;height:64px;border-width:2px;font-size:15px;box-shadow:0 3px 0 #a8420e}
 #abtn:active{transform:translateY(2px)}
 #stickhint{position:absolute;bottom:3px;left:22px;font-size:11px;opacity:.75;pointer-events:none!important}
+#arrows{position:absolute;left:14px;bottom:16px;width:170px;height:170px;display:none}
+#arrows button{position:absolute;width:56px;height:56px;font-size:24px;line-height:1;color:#fff;background:#ffffff33;border:2px solid #ffffff80;border-radius:16px;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 3px 8px #0006}
+#arrows button.on{background:#ffd23f;color:#3a2200}
+#arrows .au{left:57px;top:0}#arrows .ad{left:57px;top:114px}#arrows .al{left:0;top:57px}#arrows .ar{left:114px;top:57px}
+@media(max-height:600px){#arrows{transform:scale(.82);transform-origin:bottom left;left:10px;bottom:8px}}
 input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;font:18px system-ui;background:#f7ffef;color:#183220;user-select:text;touch-action:auto}
 @media(max-height:600px){#app.walk #stage{width:100%}#dpad{width:96px;height:96px;left:12px;bottom:10px}#dpad i{left:22px;top:22px}#abtn{bottom:25px}}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -116,7 +121,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
  </div>
  <div id="bottom">
   <div id="mapctrl">
-   <div id="dpad" role="slider" aria-label="ג׳ויסטיק לתנועה"><i></i></div><span id="stickhint">גררו כדי ללכת</span>
+   <div id="dpad" role="slider" aria-label="ג׳ויסטיק לתנועה"><i></i></div><div id="arrows" aria-label="כפתורי חיצים לתנועה"><button class="au" data-d="up" aria-label="למעלה">▲</button><button class="al" data-d="left" aria-label="שמאלה">◀</button><button class="ar" data-d="right" aria-label="ימינה">▶</button><button class="ad" data-d="down" aria-label="למטה">▼</button></div><span id="stickhint">גררו כדי ללכת</span>
    <button id="abtn">בדיקה</button>
   </div>
   <div id="bui"><div id="msg"></div><div id="menu"></div></div>
@@ -129,7 +134,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='4.0.0';
+const VER='4.1.0';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -179,7 +184,7 @@ SP.push(
  {n:'ירחף',t:'plant',b:[57,63,55,85],cr:.4,xp:94,f:'פרפר ירח שפותח כנפיים רק בלילה. נמצא באחו ובחוף אחרי השקיעה.',h:'A, B'},
  {n:'לילפז',t:'spark',b:[60,76,58,82],cr:.32,xp:110,f:'שועל כוכבים שמופיע רק בלילה. אור זנבו מוביל מטיילים הביתה.',h:'B, C, D'});
 SP[9].h='A, E';
-ZONES.E={n:'הביצה הירוקה',sp:[30,31,32,33,30,32,39],night:[31,33,38,38],lv:[12,17],bg:['#7fd0c0','#c8ecc8','#3f8a5a']};
+ZONES.E={n:'הביצה הירוקה',sp:[30,31,32,33,30,32,39],night:[31,33,38,38],lv:[7,12],bg:['#7fd0c0','#c8ecc8','#3f8a5a']};
 ZONES.F={n:'הר הגעש',sp:[34,35,36,37,34,36],night:[35,37,38,38],lv:[18,24],bg:['#ffb080','#f0d0b0','#8a4a3a']};
 ZONES.B.sp.push(39);
 SP.push(
@@ -279,7 +284,7 @@ function monCanvas(sp,px,sil){const cv=document.createElement('canvas');cv.width
 /* ---------- מצב ושמירה ---------- */
 const KEY='talatlim_v1';
 let S=null;
-function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,started:false,version:3,defeated:{},badges:0,quests:{},gymBadges:[],clock:0,sparkles:{},lastCyc:0}}
+function newState(){return{party:[],box:[],seen:{},caught:{},balls:8,pots:3,coins:0,x:23,y:21,dir:'up',snd:true,ctrl:'arrows',started:false,version:3,defeated:{},badges:0,quests:{},gymBadges:[],clock:0,sparkles:{},lastCyc:0}}
 const PROFILE_KEY='talatlim_profiles_v1';
 let profiles={version:1,active:null,players:[]};
 function migrateState(j){if(!j||!Array.isArray(j.party))return newState();const n=Object.assign(newState(),j);n.version=3;n.defeated=n.defeated||{};n.quests=n.quests||{};n.gymBadges=n.gymBadges||[];n.clock=Number(n.clock)||0;n.party.concat(n.box||[]).forEach(m=>{m.status=null;m.bst=0;m.nick=String(m.nick||'').slice(0,16)});return n}
@@ -360,7 +365,7 @@ TRAINERS.push(
 {id:'gym3',n:'נבו · היכל הקרח',badge:'תג הכפור',x:46,y:7,team:[[25,24],[27,25],[26,26]],reward:300,gym:3,requires:'gym2',txt:'הקור לא עוצר אלופים. שלושה שומרי מערות מחכים לכם.'},
 {id:'champion',n:'אוריון · אלוף הזוהר',badge:'כתר הטלטלים',x:46,y:25,team:[[16,28],[10,29],[26,30],[27,32]],reward:500,gym:4,requires:'gym3',boss:true,txt:'הגמר הגדול! ארבעה טלטלים. השתמשו בהחלפות, שיקויים והתאמות סוגים.'});
 TRAINERS.push(
-{id:'swamp1',n:'בוצי שומר הביצה',x:12,y:36,team:[[30,14],[32,15],[33,16]],reward:150,txt:'הביצה מסתירה טלטלים שאי אפשר למצוא בשום מקום אחר!'},
+{id:'swamp1',n:'בוצי שומר הביצה',x:12,y:36,team:[[30,12],[32,13],[33,14]],reward:150,txt:'הביצה מסתירה טלטלים שאי אפשר למצוא בשום מקום אחר!'},
 {id:'volc1',n:'להט שומר הגעש',x:62,y:12,team:[[34,20],[36,22],[35,23]],reward:260,txt:'רק מאמנים אמיצים מטפסים אל הר הגעש!'});
 const QUESTS=[
 {id:'water',n:'מיה חוקרת הטיפות',x:25,y:21,goal:'הראו לי טלטל מים בצוות או בקופסה.',reward:40,balls:5,test:()=>allMons().some(m=>SP[m.sp].t==='water')},
@@ -413,7 +418,7 @@ let mode='title'; // title | map | trans | battle | menu
 let P={x:S.x,y:S.y,dir:S.dir||'up',px:S.x,py:S.y,moving:false,mt:0,from:null,to:null};
 const DIRS={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
 let held=null,tapA=false,region='';let analogPower=1;
-function mapLayout(on){$('#app').classList.toggle('walk',on);cv.height=on?Math.round(704*$('#stage').clientHeight/$('#stage').clientWidth):576;VH=cv.height/64;if(on)$('#stage').appendChild($('#mapctrl'));else $('#bottom').prepend($('#mapctrl'))}
+function mapLayout(on){$('#app').classList.toggle('walk',on);cv.height=on?Math.round(704*$('#stage').clientHeight/$('#stage').clientWidth):576;VH=cv.height/64;if(on){$('#stage').appendChild($('#mapctrl'));applyCtrl()}else $('#bottom').prepend($('#mapctrl'))}
 const STEP=.17;
 function drawPlayer(c,x,y,dir,ph,mvg){const cxp=x+16,by=y+28,bob=mvg?Math.abs(Math.sin(ph*Math.PI))*1.6:0,lg=mvg?Math.sin(ph*Math.PI*2)*3:0;
  E(c,cxp,by+1,8,3,'rgba(0,0,0,.25)');
@@ -464,7 +469,7 @@ function updateMap(dt){
 function toast(t,ms){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>e.style.display='none',ms||2200)}
 function checkSpot(){const i=SPOTS.findIndex(sp=>sp.x===P.x&&sp.y===P.y);if(i<0)return;S.sparkles=S.sparkles||{};if(S.sparkles[i]===spotCyc())return;S.sparkles[i]=spotCyc();const c=rnd(15,35);S.coins+=c;hud();sfx('ok');toast('✦ מצאת נקודת ניצוץ! +'+c+' מטבעות 🪙',3000);save()}
 function stepDone(){
- const z=zoneAt(P.x,P.y);if(z!==region){region=z;toast('📍 '+ZONES[z].n)}
+ const z=zoneAt(P.x,P.y);if(z!==region){region=z;const zn=ZONES[z],top=S.party.length?Math.max(...S.party.map(m=>m.lv)):0;toast('📍 '+zn.n+(zn.lv&&zn.lv[0]>top+2?` · ⚠️ הטלטלים הפראיים כאן ברמות ${zn.lv[0]}-${zn.lv[1]}!`:''),2800)}
  if(P.x%3===0)save();
  checkSpot();
  const v=M[P.y][P.x];if(isTall(v)&&Math.random()<.12){held=null;dpadOff();startWild()}
@@ -570,7 +575,7 @@ async function runTurn(act){
   if(act.k==='swap')await doSwap(act.i);
   else if(act.k==='pot'){S.pots--;hud();sfx('heal');A.hp=Math.min(maxHp(A),A.hp+35);panels();burst(PP().x,PP().y,'#7cff9a',16,50);await say(`${nm(A)} התרפא!`,900)}
   else if(act.k==='ball'){if(await throwBall())return'end'}
-  else if(act.k==='run'){const ch=clamp(.5+(spd(A)-spd(Em))/80,.3,.95);if(Math.random()<ch){sfx('run');await say('ברחת בהצלחה!',900);B.fled=true;return'end'}await say('לא הצלחת לברוח!',900)}
+  else if(act.k==='run'){B.runs=(B.runs||0)+1;const ch=clamp(.55+(spd(A)-spd(Em))/70+.25*(B.runs-1),.55,1);if(Math.random()<ch){sfx('run');await say('ברחת בהצלחה!',900);B.fled=true;return'end'}await say('לא הצלחת לברוח!',900)}
   await useMove(Em,cur(),em,false);if(cur().hp<=0)return await playerDown();return await statusTick()}
  const pFirst=spd(A)>spd(Em)||(spd(A)===spd(Em)&&Math.random()<.5);
  const seq=pFirst?[[A,Em,act.m,true],[Em,A,em,false]]:[[Em,A,em,false],[A,Em,act.m,true]];
@@ -647,7 +652,7 @@ function hutMenu(){if(mode!=='map')return;mode='menu';
  <button class="btn" id="h3" ${S.coins<15?'disabled':''}>🧪 קנה שיקוי<small>15 🪙</small></button>
  <button class="btn" id="h5" ${S.coins<100?'disabled':''}>✦ מילוי נקודות הניצוץ<small>100 🪙 · כל הנקודות חוזרות למפה עכשיו</small></button>
  <button class="btn sec" id="h4">סגור</button></div>`,b=>{
-  b.querySelector('#h1').onclick=()=>{sfx('heal');S.party.forEach(m=>{m.hp=maxHp(m);m.status=null});save();toast('הצוות שלך התרפא! 💚');draw()};
+  b.querySelector('#h1').onclick=()=>{if(!S.party.length)return;sfx('heal');S.party.forEach(m=>{m.hp=maxHp(m);m.status=null});save();closeModal();mode='map';toast('💚 כל הצוות התרפא במלואו! אפשר לחזור לבקתה בכל עת',3200)};
   b.querySelector('#h2').onclick=()=>{if(S.coins>=10){S.coins-=10;S.balls++;sfx('buy');hud();save();draw()}};
   b.querySelector('#h3').onclick=()=>{if(S.coins>=15){S.coins-=15;S.pots++;sfx('buy');hud();save();draw()}};
   b.querySelector('#h5').onclick=()=>{if(S.coins>=100){S.coins-=100;S.sparkles={};sfx('buy');hud();save();toast('✦ נקודות הניצוץ התמלאו! חפשו אותן במפה',3500);draw()}};
@@ -686,9 +691,9 @@ function collTab(t){cT=t;const el=$('#coll');el.scrollTop=0;const n=Object.keys(
   d.appendChild(monCanvas(i,36,!s));d.insertAdjacentHTML('beforeend',`<div><b>${s?sp.n:'???'}</b></div><div style="font-size:12px">${c?'✅ נתפס':s?'👁 נראה':'לא ידוע'}</div>`);if(s)d.onclick=()=>spDetail(i);g.appendChild(d)});cb.appendChild(g)}
  if(t===2){const ts=['fire','water','plant','spark','earth'];cb.innerHTML=ts.map(a=>{const st=ts.filter(d=>(EFF[a][d]||1)>1),wk=ts.filter(d=>(EFF[a][d]||1)<1);return`<div class="card" style="margin:6px 0;text-align:right;font-size:15px">${chip(a)}<div style="margin:6px 0">💪 חזק נגד: ${st.map(chip).join(' ')||'—'}</div><div>🛡 חלש נגד: ${wk.map(chip).join(' ')||'—'}</div></div>`}).join('')+'<div class="flav">טלטל מאותו סוג של המכה מקבל בונוס. התחזקות מעלה את ההתקפה למשך הקרב.</div>'}}
 function openMenu(){if(mode!=='map')return;mode='menu';const el=$('#mnu');el.innerHTML=`<div class="top"><h2>תפריט · ${esc(activePlayer()?.name||'')}</h2><button class="x" id="mx">✕</button></div>
- <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq">📜 יומן משימות</button><button class="btn" id="mg">🏟️ מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh">🗺️ מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi">📲 התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
+ <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq">📜 יומן משימות</button><button class="btn" id="mg">🏟️ מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh">🗺️ מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${S.snd?'פועל':'מושתק'}</button><button class="btn" id="mc">🎮 שליטה: ${S.ctrl==='stick'?'ג׳ויסטיק':'כפתורי חיצים'}</button><button class="btn sec" id="m3">🏅 ${S.badges?'תג הגביש':'אין תגים עדיין'} · 🎒 ⚪ ${S.balls} · 🧪 ${S.pots} · 🪙 ${S.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi">📲 התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${VER}</button></div>`;showScr('mnu');
  el.querySelector('#mq').onclick=questLog;el.querySelector('#mg').onclick=gymLog;el.querySelector('#mt').onclick=transferMenu;el.querySelector('#mh').onclick=guide;el.querySelector('#mp').onclick=()=>{save();hideScr('mnu');showProfiles()};el.querySelector('#mr').onclick=()=>playerName(activePlayer());el.querySelector('#mi').onclick=installGame;el.querySelector('#mx').onclick=()=>{hideScr('mnu');mode='map'};el.querySelector('#m1').onclick=openColl;
- el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};
+ el.querySelector('#m2').onclick=()=>{toggleMute();openMenuRefresh()};el.querySelector('#mc').onclick=()=>{S.ctrl=S.ctrl==='stick'?'arrows':'stick';save();openMenuRefresh()};
  let sure=false;el.querySelector('#m4').onclick=e=>{if(!sure){sure=true;e.target.textContent='בטוח? רק ההתקדמות של השחקן הזה תימחק. לחץ שוב';return}S=newState();save();location.reload()}}
 function openMenuRefresh(){hideScr('mnu');mode='map';openMenu()}
 function toggleMute(){S.snd=!S.snd;$('#bmute').textContent=S.snd?'🔊':'🔇';save();if(S.snd)sfx('pick')}
@@ -708,7 +713,7 @@ function info(html){modal(html+'<button class="btn sec" id="infoClose" style="wi
 function questMenu(q){if(mode!=='map')return;mode='menu';const phase=S.quests[q.id]||0,done=q.test();modal(`<h2>📜 ${q.n}</h2><p class="flav">${q.goal}</p><p>פרס: ${q.reward} מטבעות ו־${q.balls} כדורי לכידה</p><p>${phase===2?'✅ המשימה הושלמה. תודה על העזרה!':phase===1?(done?'🎉 עמדתם במשימה! הפרס מחכה לכם.':'המשימה פעילה. חזרו אליי כשתסיימו.'):'רוצים לעזור לי? טלטלים שכבר אספתם נחשבים גם הם. לא צריך למסור אותם.'}</p>${phase!==2?`<button class="btn grn" id="qa" style="width:100%" ${phase===1&&!done?'disabled':''}>${phase===0?'קבלת המשימה':'קבלת הפרס'}</button>`:''}<button class="btn sec" id="qc" style="width:100%;margin-top:10px">חזרה למפה</button>`,b=>{b.querySelector('#qc').onclick=()=>{closeModal();mode='map'};const a=b.querySelector('#qa');if(a)a.onclick=()=>{if(!phase){S.quests[q.id]=1;save();closeModal();mode='map';questMenu(q)}else if(q.test()){S.quests[q.id]=2;S.coins+=q.reward;S.balls+=q.balls;save();hud();sfx('ok');closeModal();mode='map';questMenu(q)}}})}
 function questLog(){info('<h2>📜 יומן המשימות</h2><p class="flav">גשו לדמויות עם סימן שאלה במפה, עמדו לצדן ולחצו בדיקה.</p>'+QUESTS.map(q=>`<div class="card" style="text-align:right;margin:8px 0;padding:12px"><b>${S.quests[q.id]===2?'✅':S.quests[q.id]===1?'📜':'❔'} ${q.n}</b><p>${q.goal}</p><small>${S.quests[q.id]===2?'הושלמה':S.quests[q.id]===1?(q.test()?'הפרס מוכן! חזרו לדמות':'בתהליך'):'טרם התקבלה'} · ${ZONES[zoneAt(q.x,q.y)].n} · ${q.reward} 🪙 + ${q.balls} כדורים</small></div>`).join(''))}
 function gymLog(){info('<h2>🏟️ מסע התגים</h2><p>קודם מנצחים את צור בגבעות וזוכים בתג הגביש, ואז פותחים את ההיכלים לפי הסדר.</p>'+TRAINERS.filter(n=>n.gym).map(n=>`<div class="card" style="text-align:right;margin:8px 0;padding:12px"><h3>${S.defeated[n.id]?'🏅':S.defeated[n.requires]?'⚔️':'🔒'} ${n.n}</h3><p>${n.badge} · רמות ${n.team[0][1]}–${n.team.at(-1)[1]}</p><small>${ZONES[zoneAt(n.x,n.y)].n} · ${n.gym===1?'דרום־מערב האחו':n.gym===2?'מזרח החוף':n.gym===3?'צפון המערות':'דרום המערות'}</small></div>`).join(''))}
-function guide(){info(`<h2>🗺️ מפת המסע · גרסה ${VER}</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card">🔥 גבעות הגחלים<br>צפון־מערב</div><div class="card">🌊 חוף הברכה<br>צפון־מזרח</div><div class="card">🌿 אחו הפרחים<br>דרום</div><div class="card" style="background:#7aa9df44">❄️ מערות הקרח<br>מזרחה, מעבר לגשר</div><div class="card" style="background:#4a8a5a44">🐸 הביצה הירוקה<br>דרומה מהאחו</div><div class="card" style="background:#e07a4a44">🌋 הר הגעש<br>מזרחה מהמערות</div></div><p class="flav">חדש בגרסה 4: שני אזורים חדשים, 10 טלטלים חדשים (40 בסך הכל!), משימות ומאמנים חדשים, ונקודות ניצוץ ✦ שנותנות מטבעות.</p><h3>🪙 דרכים להרוויח מטבעות</h3><p class="flav">✦ נקודות ניצוץ במפה (מתמלאות בכל מחזור יום־לילה) · ניצחון בקרבות פראיים · זהבית מביא פרס משולש · אימון חוזר מול מאמנים משלם 30% · שחרור טלטל מהקופסה · משימות · מילוי נקודות ניצוץ בבקתה תמורת 100 🪙</p><h3>📖 אנציקלופדיה בקרב</h3><p class="flav">בכל קרב אפשר לבחור ״מידע ואנציקלופדיה״ ולראות את סוג היריב, מה חזק ומה חלש נגדו, וכמה כל מכה שלכם תועיל מולו - בלי לבזבז תור!</p><h3>☀️ יום ולילה 🌙</h3><p class="flav">כל מחזור הוא 10 דקות הליכה במפה: 6 דקות יום ו־4 דקות לילה. הקרבות והתפריטים עוצרים את השעון. ירחף, לילפז וכוכבון יוצאים רק בלילה.</p><p>עכשיו: ${isNight()?'לילה':'יום'} · השינוי הבא בעוד ${Math.ceil(((isNight()?600:360)-(S.clock||0)%600)/60)} דקות משחק.</p><h3>✨ בוהקים</h3><p class="flav">לכל מפגש פראי סיכוי של 1 מתוך 128 להיות בוהק. הצבע שונה וניצוצות מקיפים אותו. זה לא מובטח גם אחרי 128 מפגשים! צבעו נשמר בלכידה, בהתפתחות ובהעברה.</p><h3>📜 משימות ותגים</h3><p class="flav">דמויות עם ? נותנות משימות ופרסים. בתפריט יש יומן משימות ומסע תגים עם מיקומי ההיכלים. אפשר לרפא חינם בבקתה ולהתאמן לפני אתגר קשה.</p>`)}
+function guide(){info(`<h2>🗺️ מפת המסע · גרסה ${VER}</h2><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><div class="card">🔥 גבעות הגחלים<br>צפון־מערב</div><div class="card">🌊 חוף הברכה<br>צפון־מזרח</div><div class="card">🌿 אחו הפרחים<br>דרום</div><div class="card" style="background:#7aa9df44">❄️ מערות הקרח<br>מזרחה, מעבר לגשר</div><div class="card" style="background:#4a8a5a44">🐸 הביצה הירוקה<br>דרומה מהאחו</div><div class="card" style="background:#e07a4a44">🌋 הר הגעש<br>מזרחה מהמערות</div></div><p class="flav">חדש בגרסה 4: שני אזורים חדשים, 10 טלטלים חדשים (40 בסך הכל!), משימות ומאמנים חדשים, ונקודות ניצוץ ✦ שנותנות מטבעות.</p><p class="flav">גרסה 4.1: כפתורי חיצים גדולים לליכה מדויקת (אפשר להחזיר ג׳ויסטיק מהתפריט), הביצה הירוקה מתאימה לשלב המוקדם של המסע, הבריחה מקרב קלה יותר, ומופיעה אזהרה בכניסה לאזור עם טלטלים פראיים חזקים.</p><h3>🪙 דרכים להרוויח מטבעות</h3><p class="flav">✦ נקודות ניצוץ במפה (מתמלאות בכל מחזור יום־לילה) · ניצחון בקרבות פראיים · זהבית מביא פרס משולש · אימון חוזר מול מאמנים משלם 30% · שחרור טלטל מהקופסה · משימות · מילוי נקודות ניצוץ בבקתה תמורת 100 🪙</p><h3>📖 אנציקלופדיה בקרב</h3><p class="flav">בכל קרב אפשר לבחור ״מידע ואנציקלופדיה״ ולראות את סוג היריב, מה חזק ומה חלש נגדו, וכמה כל מכה שלכם תועיל מולו - בלי לבזבז תור!</p><h3>☀️ יום ולילה 🌙</h3><p class="flav">כל מחזור הוא 10 דקות הליכה במפה: 6 דקות יום ו־4 דקות לילה. הקרבות והתפריטים עוצרים את השעון. ירחף, לילפז וכוכבון יוצאים רק בלילה.</p><p>עכשיו: ${isNight()?'לילה':'יום'} · השינוי הבא בעוד ${Math.ceil(((isNight()?600:360)-(S.clock||0)%600)/60)} דקות משחק.</p><h3>✨ בוהקים</h3><p class="flav">לכל מפגש פראי סיכוי של 1 מתוך 128 להיות בוהק. הצבע שונה וניצוצות מקיפים אותו. זה לא מובטח גם אחרי 128 מפגשים! צבעו נשמר בלכידה, בהתפתחות ובהעברה.</p><h3>📜 משימות ותגים</h3><p class="flav">דמויות עם ? נותנות משימות ופרסים. בתפריט יש יומן משימות ומסע תגים עם מיקומי ההיכלים. אפשר לרפא חינם בבקתה ולהתאמן לפני אתגר קשה.</p>`)}
 function checksum(t){let h=2166136261;for(let i=0;i<t.length;i++)h=Math.imul(h^t.charCodeAt(i),16777619);return(h>>>0).toString(36)}
 function exportCode(){save();const p=activePlayer();const text=JSON.stringify({v:3,name:p.name,state:S});const code=btoa(Array.from(new TextEncoder().encode(text),b=>String.fromCharCode(b)).join(''));return 'TL3.'+checksum(code)+'.'+code}
 function transferMenu(){const code=exportCode();modal(`<h2>📤 העברת שחקן וגיבוי</h2><p class="flav">זה הקוד של ${esc(activePlayer().name)}. הוא כולל את השם, הטלטלים, המשימות והתגים. העבירו את כל הקוד לטלפון השני. שם בחרו ״קליטת שחקן ממכשיר אחר״ במסך בחירת השחקנים.</p><textarea class="nick" id="exportCode" readonly rows="4" style="font-size:11px;direction:ltr;user-select:text;touch-action:auto"></textarea><button class="btn grn" id="copyCode" style="width:100%;margin-top:8px">העתקת הקוד</button><p id="copyMsg"></p><p class="flav">זו העתקה בטוחה, לא סנכרון. השחקן במכשיר המקורי לא נמחק. אחרי העברה המשיכו במכשיר אחד, וצרו קוד חדש בכל העברה. אפשר לשמור את הקוד גם כגיבוי. מי שמקבל אותו יכול להעתיק את הפרופיל, אז שתפו רק עם המשפחה.</p><button class="btn sec" id="transferClose" style="width:100%">חזרה</button>`,b=>{b.querySelector('#exportCode').value=code;b.querySelector('#copyCode').onclick=async()=>{const field=b.querySelector('#exportCode');field.focus();field.select();try{await navigator.clipboard.writeText(code);b.querySelector('#copyMsg').textContent='✅ הועתק! אפשר להדביק בהודעה למשפחה.'}catch(e){b.querySelector('#copyMsg').textContent='לחצו לחיצה ארוכה על הקוד ובחרו העתקה.'}};b.querySelector('#transferClose').onclick=closeModal})}
@@ -729,14 +734,16 @@ function showTitle(){mode='title';const el=$('#title');el.style.display='block';
 function starterPick(){const el=$('#title');el.scrollTop=0;el.innerHTML=`<h2 style="margin-top:2vh">בחרו את הטלטל הראשון שלכם!</h2><div class="pick" id="pk"></div>`;const pk=el.querySelector('#pk');
  STARTERS.forEach(i=>{const sp=SP[i],d=document.createElement('div');d.className='card';d.appendChild(monCanvas(i,42));d.insertAdjacentHTML('beforeend',`<div><b style="font-size:19px">${sp.n}</b> ${chip(sp.t)}<div class="flav" style="margin:4px 0 0">${sp.f}</div></div>`);
   d.onclick=()=>{sfx('ok');const m=mkMon(i,6);S.party=[m];S.box=[];S.caught[i]=1;S.seen[i]=1;S.started=true;S.x=23;S.y=21;S.dir='up';P.x=P.px=23;P.y=P.py=21;P.dir='up';save();el.style.display='none';startMap(true)};pk.appendChild(d)})}
-function startMap(first){mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! יומן המשימות ומפת המסע בתפריט.  גרור את הג׳ויסטיק. בדיקה ליד דלת או מאמן 🎮',4000);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
+function startMap(first){mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';if(first)toast('ברוך הבא! הליכה עם כפתורי החיצים (אפשר ג׳ויסטיק מהתפריט). בדיקה ליד דלת או מאמן 🎮',4500);else toast('📍 '+ZONES[zoneAt(P.x,P.y)].n)}
 /* ---------- קלט ---------- */
 const dp=$('#dpad');let dpId=null;
-function dpadOff(){held=null;dpId=null;analogPower=1;dp.querySelector('i').style.transform='translate(0,0)'}
+function dpadOff(){held=null;dpId=null;analogPower=1;dp.querySelector('i').style.transform='translate(0,0)';document.querySelectorAll('#arrows button.on').forEach(b=>b.classList.remove('on'))}
 function dpUpdate(e){if(mode!=='map')return;const r=dp.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),len=Math.hypot(dx,dy),radius=r.width*.3,k=len>radius?radius/len:1;dp.querySelector('i').style.transform=`translate(${dx*k}px,${dy*k}px)`;analogPower=clamp(len/radius,0,1);if(len<r.width*.12){held=null;return}held=Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up')}
 dp.addEventListener('pointerdown',e=>{if(mode!=='map')return;ac();dpId=e.pointerId;dp.setPointerCapture(e.pointerId);dpUpdate(e);e.preventDefault()});
 dp.addEventListener('pointermove',e=>{if(e.pointerId===dpId)dpUpdate(e)});
 ['pointerup','pointercancel','lostpointercapture'].forEach(n=>dp.addEventListener(n,e=>{if(e.pointerId===dpId)dpadOff()}));
+function applyCtrl(){const ar=S&&S.ctrl!=='stick';dp.style.display=ar?'none':'block';$('#arrows').style.display=ar?'block':'none';$('#stickhint').textContent=ar?'לחצו על החיצים כדי ללכת':'גררו כדי ללכת'}
+document.querySelectorAll('#arrows button').forEach(b=>{const d=b.dataset.d;b.addEventListener('pointerdown',e=>{if(mode!=='map')return;ac();held=d;analogPower=1;b.classList.add('on');try{b.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault()});['pointerup','pointercancel','lostpointercapture'].forEach(n=>b.addEventListener(n,()=>{if(held===d)held=null;b.classList.remove('on')}))});
 // Act only on release, never on pointerdown. A newly opened dialog cannot inherit this pointer's release.
 $('#abtn').addEventListener('click',e=>{e.preventDefault();e.stopPropagation();ac();if(mode==='map')tapA=true});
 addEventListener('blur',dpadOff);addEventListener('resize',()=>{if($('#app').classList.contains('walk'))mapLayout(true)});
