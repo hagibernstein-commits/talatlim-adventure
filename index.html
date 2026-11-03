@@ -467,7 +467,7 @@ function stepDone(){
  const z=zoneAt(P.x,P.y);if(z!==region){region=z;toast('📍 '+ZONES[z].n)}
  if(P.x%3===0)save();
  checkSpot();
- const v=M[P.y][P.x];if(isTall(v)&&Math.random()<.15){held=null;dpadOff();startWild()}
+ const v=M[P.y][P.x];if(isTall(v)&&Math.random()<.12){held=null;dpadOff();startWild()}
 }
 function interact(){const d=DIRS[P.dir],x=P.x+d[0],y=P.y+d[1];if(solidAt(x,y)||true){const v=M[y]&&M[y][x];
  const qnpc=QUESTS.find(n=>n.x===x&&n.y===y);if(qnpc){questMenu(qnpc);return}const npc=TRAINERS.find(n=>n.x===x&&n.y===y);if(npc){trainerMenu(npc)}
