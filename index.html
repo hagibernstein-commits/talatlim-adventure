@@ -1211,7 +1211,7 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;
  try{updateMap(dt);if(B&&(mode==='battle'||mode==='trans'))drawBattle(ts);else if(mode!=='title')drawMap(ts);else{cx.setTransform(1,0,0,1,0,0);cx.fillStyle='#0e1a12';cx.fillRect(0,0,704,576)}
  if(mode==='trans'||TR)drawTrans(cx)}catch(err){console.error(err)}
  requestAnimationFrame(frame)}
-window.__g={get S(){return S},get B(){return B},get P(){return P},MV,ZONES,pickWildSp,rtIcon,MYST,activeMyst,mystMenu,interact,SYMBOLS,LOCKGATES,symLocked,checkSymbol,LEGENDS,legendMenu,startLegend,CAVES,enterCave,exitCave,caveChest,calc,wildLevelRange,GATES,ITEM_SPOTS,checkItem,itemPop,topLv,questMenu,QUESTS,trainerMenu,validatedImport,exportCode,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP,ITEMS,ALLQ,STORYQ,LOST_SPOT,worldMap,questLog,storyMenu,statusTick};
+window.__g={get S(){return S},get B(){return B},get P(){return P},MV,ZONES,pickWildSp,rtIcon,MYST,activeMyst,mystMenu,interact,SYMBOLS,LOCKGATES,symLocked,checkSymbol,LEGENDS,legendMenu,startLegend,CAVES,enterCave,exitCave,caveChest,stepDone,calc,wildLevelRange,GATES,ITEM_SPOTS,checkItem,itemPop,topLv,questMenu,QUESTS,trainerMenu,validatedImport,exportCode,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP,ITEMS,ALLQ,STORYQ,LOST_SPOT,worldMap,questLog,storyMenu,statusTick};
 hud();showProfiles();
 requestAnimationFrame(frame);
 })();
