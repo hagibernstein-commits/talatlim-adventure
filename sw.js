@@ -1,6 +1,6 @@
-const CACHE='talatlim-4.13.0';
+const CACHE='talatlim-4.14.0';
 const ROOT=new URL('./',self.location.href).href;
-const ASSETS=['./','./index.html','./manifest.webmanifest'].map(p=>new URL(p,ROOT).href);
+const ASSETS=['./','./index.html','./manifest.webmanifest','./arena-stadium.svg'].map(p=>new URL(p,ROOT).href);
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
 self.addEventListener('activate',e=>e.waitUntil(Promise.all([caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('talatlim-')&&k!==CACHE).map(k=>caches.delete(k)))),self.clients.claim()])));
 self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=new URL(e.request.url);if(u.origin!==self.location.origin||!u.href.startsWith(ROOT))return;
