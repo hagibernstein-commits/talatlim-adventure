@@ -152,7 +152,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='4.12.0';
+const VER='4.12.1';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -709,11 +709,11 @@ function drawMap(ts){
  if(!curCave&&S.quests.lostq===1&&!(S.story||{}).lostFound){const x=LOST_SPOT.x*TS-camx,y=LOST_SPOT.y*TS-camy;if(x>-32&&y>-32&&x<352&&y<cv.height/2){c.drawImage(monCanvas(5,20),x+2,y+8,28,28);const pl=1+.3*Math.sin(ts/300);c.font='bold '+Math.round(13*pl)+'px system-ui';c.textAlign='center';c.fillStyle='#ffe84a';c.fillText('!',x+16,y+4)}}
  if(!curCave)SPOTS.forEach((sp,i)=>{if((S.sparkles||{})[i]===spotCyc())return;const x=sp.x*TS-camx,y=sp.y*TS-camy;if(x<-32||y<-32||x>352||y>cv.height/2)return;const pl=1+.3*Math.sin(ts/250+i);c.font='bold '+Math.round(15*pl)+'px system-ui';c.textAlign='center';c.fillStyle='#ffe84a';c.fillText('✦',x+16,y+14)});
  if(!curCave)ITEM_SPOTS.forEach((sp,i)=>{if((S.pickups||{})[i]===spotCyc()||!itemPop(i)||SOLID.has(M[sp.y][sp.x]))return;const x=sp.x*TS-camx,y=sp.y*TS-camy;if(x<-32||y<-32||x>352||y>cv.height/2)return;const pl=1+.12*Math.sin(ts/300+i);c.font=Math.round(17*pl)+'px system-ui';c.textAlign='center';c.fillText('🎁',x+16,y+16)});
- amb(c,ts,zoneAt(Math.round(P.px),Math.round(P.py)));
+ amb(c,ts,curCave?'B':zoneAt(Math.round(P.px),Math.round(P.py)));
  if(!isNight()){const sg=c.createRadialGradient(304,24,4,304,24,58);sg.addColorStop(0,'rgba(255,240,160,.45)');sg.addColorStop(1,'rgba(255,240,160,0)');c.fillStyle=sg;c.fillRect(240,-30,130,130);E(c,304,24,9,9,'#ffec9e')}
  drawPlayer(c,sx,sy,P.dir,P.moving?P.mt:0,P.moving);
  if(isNight()){c.fillStyle='#09174666';c.fillRect(0,0,352,cv.height/2);for(let i=0;i<18;i++){const x=(i*97+21)%352,y=(i*61+17)%(cv.height/2);c.globalAlpha=.4+.6*Math.abs(Math.sin(ts/700+i));E(c,x,y,1.1,1.1,'#fff');c.globalAlpha=1}E(c,315,47,13,13,'#fff3b5');E(c,321,43,11,11,'#15233b')}
- const tx=Math.round(P.px),ty=Math.round(P.py);const tv=M[ty]&&M[ty][tx];
+ const tx=Math.round(P.px),ty=Math.round(P.py);const tv=AM[ty]&&AM[ty][tx];
  if(isTall(tv)){const im=ATL[tv][(Math.floor(ts/450)+tx+ty)%2];c.drawImage(im,0,28,64,36,tx*TS-camx,ty*TS-camy+14,TS,18)}
 }
 const symLocked=()=>(S.symbols||[]).length<3;
