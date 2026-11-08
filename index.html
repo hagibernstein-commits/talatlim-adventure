@@ -846,7 +846,7 @@ function battleIntro(o){return new Promise(res=>{S.introSeen=S.introSeen||{};con
  function arena(){if(finished)return;const t=o.trainer;
   el.className='arena'+(seen?' repeat':'');
   const title=t.boss?'ארנת האלופים':t.gym?'אתגר ההיכל':'ארנת המאמנים';
-  el.innerHTML=`<img class="arena-art" src="arena-stadium.svg" alt="אצטדיון מאויר מלא בקהל, זרקורים ושני מאמנים מתמודדים"><div class="arena-shade"></div><div class="arena-light"></div><div class="arena-dust"></div><div class="arena-top"><div class="arena-eyebrow">ליגת הטלטלים · הקרב מתחיל</div><h2>${title}</h2><div class="arena-rule"></div><div class="arena-tag">כל היציעים על הרגליים</div></div><div class="arena-match"><div class="arena-name home"><small>הצוות שלכם</small><strong>${esc(activePlayer()?.name||'השחקן')}</strong></div><div class="arena-versus">VS</div><div class="arena-name away"><small>${t.boss?'האלופה':t.gym?'מאמן ההיכל':'היריב'}</small><strong>${esc(t.n)}</strong></div></div><div class="arena-go">לקרב!</div><div class="arena-foot"><div class="arena-prize">${t.badge?'✦ האתגר: '+esc(t.badge):'פרס הניצחון: '+t.reward+' מטבעות'}</div><div class="hint">געו במסך כדי לדלג</div></div>`;
+  el.innerHTML=`<img class="arena-art" src="arena-stadium.svg" alt="אצטדיון מאויר מלא בקהל, זרקורים ושני מאמנים מתמודדים"><div class="arena-shade"></div><div class="arena-light"></div><div class="arena-dust"></div><div class="arena-top"><div class="arena-eyebrow">ליגת הטלטלים · הקרב מתחיל</div><h2>${title}</h2><div class="arena-rule"></div><div class="arena-tag">כל היציעים על הרגליים</div></div><div class="arena-match"><div class="arena-name home"><small>הצוות שלכם</small><strong>${esc(activePlayer()?.name||'השחקן')}</strong></div><div class="arena-versus">VS</div><div class="arena-name away"><small>${t.boss?'קרב אליפות':t.gym?'מאמן ההיכל':'היריב'}</small><strong>${esc(t.n)}</strong></div></div><div class="arena-go">לקרב!</div><div class="arena-foot"><div class="arena-prize">${t.badge?'✦ האתגר: '+esc(t.badge):'פרס הניצחון: '+t.reward+' מטבעות'}</div><div class="hint">געו במסך כדי לדלג</div></div>`;
   if(!seen)sfx('vs');
   to=setTimeout(done,seen?650:2400)}
  to=setTimeout(o.wild?done:arena,seen?750:2000);
@@ -1260,4 +1260,4 @@ requestAnimationFrame(frame);
 })();
 </script>
 </body>
-</html>
+  </html>
