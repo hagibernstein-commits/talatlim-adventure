@@ -1,4 +1,4 @@
-const CACHE='talatlim-4.14.0';
+const CACHE='talatlim-4.14.1';
 const ROOT=new URL('./',self.location.href).href;
 const ASSETS=['./','./index.html','./manifest.webmanifest','./arena-stadium.svg'].map(p=>new URL(p,ROOT).href);
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
