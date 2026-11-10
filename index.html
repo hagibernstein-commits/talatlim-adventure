@@ -162,7 +162,8 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 @media(prefers-reduced-motion:reduce){#tmons canvas,#title h1,#toast,.mbox,.pn{animation:none}}
 </style>
 </head>
-<body>
+<body><div id="family-control-prelock" dir="rtl" style="position:fixed;inset:0;z-index:2147483647;background:#f5f3eb;color:#173c39;display:flex;align-items:center;justify-content:center;padding:30px;text-align:center;font:18px Arial,sans-serif"><div><h2>בודקים את זמן המשחק</h2><p>כדי לשחק צריך חיבור לאינטרנט ומכשיר שצורף על ידי הורה.</p><button onclick="location.reload()" style="display:block;margin:20px auto;background:#173c39;color:white;border:0;border-radius:12px;padding:12px 18px;font:inherit">ניסיון נוסף</button><a style="color:inherit" href="https://hagibernstein-commits.github.io/family-hub/">למרכז המשפחתי</a></div></div>
+
 <div id="app">
  <div id="stage">
   <canvas id="cv" width="704" height="576"></canvas>
@@ -1263,6 +1264,6 @@ hud();showProfiles();
 requestAnimationFrame(frame);
 })();
 </script>
-<script src="https://hagibernstein-commits.github.io/family-hub/gatekeeper.js" data-app="talatlim-adventure"></script>
+<script src="https://hagibernstein-commits.github.io/family-hub/gatekeeper.js?v=secure2" data-app="talatlim-adventure"></script>
 </body>
   </html>
