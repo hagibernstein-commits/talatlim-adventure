@@ -187,7 +187,7 @@ input.nick{width:100%;padding:12px;border:2px solid #a8dca1;border-radius:10px;f
 <script>
 (()=>{
 'use strict';
-const VER='4.14.1';
+const VER='5.0.0';
 const $=s=>document.querySelector(s);
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const pick=a=>a[Math.floor(Math.random()*a.length)];
@@ -1260,6 +1260,896 @@ function frame(ts){const dt=Math.min(.05,(ts-last)/1000);last=ts;
  if(mode==='trans'||TR)drawTrans(cx)}catch(err){console.error(err)}
  requestAnimationFrame(frame)}
 window.__g={get S(){return S},get B(){return B},get P(){return P},MV,ZONES,pickWildSp,rtIcon,MYST,activeMyst,mystMenu,interact,SYMBOLS,LOCKGATES,symLocked,checkSymbol,LEGENDS,legendMenu,startLegend,CAVES,enterCave,exitCave,caveChest,stepDone,calc,wildLevelRange,GATES,ITEM_SPOTS,checkItem,itemPop,topLv,questMenu,QUESTS,trainerMenu,validatedImport,exportCode,startWild,openColl,hutMenu,openMenu,startTrainer,evolve,save,mkMon,TRAINERS,get mode(){return mode},M,say,SP,ITEMS,ALLQ,STORYQ,LOST_SPOT,worldMap,questLog,storyMenu,statusTick};
+
+/* ============ V5 BLOCK w1.js ============ */
+/* ================= גרסה 5: עולם של ערים, שבילים ומבנים ================= */
+const MAPS={};
+const GROUND_OF={A:0,B:0,C:0,E:0,F:0,D:14,G:20,H:23,I:25};
+const TALL_OF={A:10,B:11,C:12,E:16,F:17,D:14,G:21,H:24,I:26};
+const TREE_OF={A:3,B:3,C:4,E:3,F:18,D:15,G:22,H:3,I:27};
+const BORD_OF={A:3,B:3,C:4,E:3,F:18,D:15,G:22,H:3,I:27};
+function mkTiles(w,h,v){const t=[];for(let y=0;y<h;y++)t.push(new Array(w).fill(v));return t}
+function trect(T,x1,y1,x2,y2,v){for(let y=y1;y<=y2;y++)for(let x=x1;x<=x2;x++)if(T[y]&&T[y][x]!=null)T[y][x]=v}
+function tborder(T,w,h,v){for(let x=0;x<w;x++){T[0][x]=v;T[h-1][x]=v}for(let y=0;y<h;y++){T[y][0]=v;T[y][w-1]=v}}
+function tscatter(T,w,h,seed,pairs,ground){ground=ground??0;let sd=seed;const r=()=>{sd=(sd*1664525+1013904223)>>>0;return sd/4294967296};for(let y=1;y<h-1;y++)for(let x=1;x<w-1;x++){if(T[y][x]!==ground)continue;const q=r();let acc=0;for(const[p,v]of pairs){acc+=p;if(q<acc){T[y][x]=v;break}}}}
+function newMap(o){const m=Object.assign({buildings:[],npcs:[],links:[],spots:[],items:[],signs:[],doors:[],fields:[],deco:[],indoor:false,town:false},o);if(!m.tiles)m.tiles=mkTiles(m.w,m.h,GROUND_OF[m.zone]??0);MAPS[m.id]=m;return m}
+/* בניין: מלבן מוצק עם גג, דלת ושלט. doorX = עמודת הדלת; דריכה על שטיח הדלת מכניסה פנימה */
+function addBld(m,o){const b=Object.assign({},o);m.buildings.push(b);
+ const dx=o.x+Math.floor(o.w/2);b.doorX=dx;b.frontY=o.y+o.h;
+ for(let x=o.x;x<o.x+o.w;x++)m.tiles[o.y][x]=(x===dx&&o.w%2===1)?13:6;
+ for(let y=o.y+1;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)m.tiles[y][x]=7;
+ m.tiles[o.y+o.h-1][dx]=8;
+ if(m.tiles[o.y+o.h]&&m.tiles[o.y+o.h][dx]!=null)m.tiles[o.y+o.h][dx]=1;
+ if(o.into){m.doors=m.doors||[];m.doors.push({x:dx,y:o.y+o.h-1,into:o.into,req:o.req||null})}
+ return b}
+function addSign(m,x,y,msg){m.signs.push({x,y,msg});m.tiles[y][x]=9}
+function addLink(m,x,y,to,tx,ty,req,msg){m.links.push({x,y,to,tx,ty,req,msg});m.tiles[y][x]=1}
+function npcPut(n){const m=MAPS[n.map];m.npcs.push(n);return n}
+/* ---------- עיר: כפר הפרחים (נקודת ההתחלה) ---------- */
+(function(){const m=newMap({id:'meadow-town',n:'כפר הפרחים',zone:'A',w:26,h:20,town:true,spawn:{x:13,y:14},heal:{map:'meadow-town',x:13,y:15}});
+ tborder(m.tiles,26,20,3);
+ tscatter(m.tiles,26,20,11,[[.05,3],[.09,5],[1,0]]);
+ // כבישים ראשיים
+ trect(m.tiles,1,15,24,15,1);trect(m.tiles,13,3,13,15,1);trect(m.tiles,5,15,5,18,1);trect(m.tiles,21,15,21,18,1);trect(m.tiles,13,2,13,3,1);
+ trect(m.tiles,1,15,1,15,1);
+ // בריכה קטנה בפארק
+ trect(m.tiles,18,2,22,5,2);trect(m.tiles,19,6,21,6,2);m.tiles[2][17]=49;m.tiles[3][17]=49;
+ // בית השחקן
+ addBld(m,{x:2,y:4,w:4,h:3,roof:'#4a7ad0',wall:'#f3e6c8',icon:'🏠',name:'הבית שלי',into:'home-player'});
+ // בית חולים
+ addBld(m,{x:8,y:4,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-meadow'});
+ // מכולת
+ addBld(m,{x:16,y:9,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-meadow'});
+ // היכל העלים
+ addBld(m,{x:8,y:9,w:6,h:4,roof:'#3e9a3a',wall:'#e8f4d8',icon:'🍃',name:'היכל העלים',into:'gym1',gym:true});
+ // בתים פרטיים
+ addBld(m,{x:2,y:9,w:4,h:3,roof:'#b06ac8',wall:'#f8ecd8',icon:'🏡',name:'בית סבתא חכמה',into:'home-savta'});
+ addBld(m,{x:17,y:14,w:4,h:3,roof:'#e0a040',wall:'#fdf0d8',icon:'🏡',name:'בית דני',into:'home-dani'});
+ m.tiles[13][13]=1;
+ // שער קסם
+ m.tiles[12][3]=28;m.portal={id:'home',n:'כפר הפרחים',x:3,y:12};
+ // מעברים
+ addLink(m,13,1,'route-flower',8,24,null);m.tiles[1][13]=1;
+ addLink(m,24,15,'route-swamp',1,7,null);m.tiles[15][24]=1;
+ addSign(m,14,15,'🪧 צפונה: שביל הפרחים אל גבעות הגחלים · ימינה: שביל הביצה · בעיירה: בית חולים, מכולת, היכל העלים ובתים של שכנים');
+})();
+/* ---------- שביל הפרחים ---------- */
+(function(){const m=newMap({id:'route-flower',n:'שביל הפרחים',zone:'A',w:16,h:27,heal:{map:'meadow-town',x:13,y:15}});
+ tborder(m.tiles,16,27,3);
+ tscatter(m.tiles,16,27,23,[[.05,3],[.10,5],[.35,10],[1,0]]);
+ trect(m.tiles,7,1,8,25,1);
+ trect(m.tiles,3,6,5,10,10);trect(m.tiles,10,12,12,16,10);trect(m.tiles,2,18,6,22,10);trect(m.tiles,10,4,12,7,10);
+ addLink(m,8,25,'meadow-town',13,2,null);addLink(m,7,25,'meadow-town',13,2,null);
+ addLink(m,7,1,'hills',11,19,null);addLink(m,8,1,'hills',11,19,null);
+ m.spots=[{x:2,y:4},{x:13,y:20}];m.items=[{x:12,y:8},{x:3,y:24}];
+ addSign(m,9,2,'🪧 שביל הפרחים: צפונה אל גבעות הגחלים - שם מחכה צור, אלוף הגבעות! בעשב הגבוה מסתתרים טלטלים פראיים');
+})();
+/* ---------- גבעות הגחלים (אזור טבע + אלוף הגבעות) ---------- */
+(function(){const m=newMap({id:'hills',n:'גבעות הגחלים',zone:'C',w:24,h:23,heal:{map:'meadow-town',x:13,y:15}});
+ tborder(m.tiles,24,23,4);
+ tscatter(m.tiles,24,23,31,[[.06,4],[.05,3],[.30,12],[1,0]]);
+ trect(m.tiles,10,19,12,21,1);trect(m.tiles,11,4,11,19,1);trect(m.tiles,2,11,22,11,1);
+ trect(m.tiles,3,3,7,7,12);trect(m.tiles,15,4,20,8,12);trect(m.tiles,14,14,19,17,12);trect(m.tiles,3,14,7,17,12);
+ // זירת צור בצפון
+ trect(m.tiles,9,2,13,4,1);
+ addBld(m,{x:16,y:19,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בקתת ריפוי',into:'hosp-hills',small:true});
+ m.spots=[{x:2,y:9},{x:21,y:13},{x:12,y:21}];m.items=[{x:5,y:9},{x:20,y:5},{x:9,y:15}];
+ addLink(m,11,21,'route-flower',7,2,null);addLink(m,12,21,'route-flower',8,2,null);
+ addLink(m,22,11,'lake-town',2,15,null);
+ addSign(m,12,10,'🪧 גבעות הגחלים: בקצה הצפוני מחכה צור, אלוף הגבעות. מנצחים אותו ומקבלים את תג הגביש! ימינה: עיירת הברכה');
+})();
+/* ---------- עיירת הברכה ---------- */
+(function(){const m=newMap({id:'lake-town',n:'עיירת הברכה',zone:'B',w:28,h:21,town:true,heal:{map:'lake-town',x:14,y:16}});
+ tborder(m.tiles,28,21,3);
+ tscatter(m.tiles,28,21,41,[[.04,3],[.07,5],[1,0]]);
+ // הברכה הגדולה
+ trect(m.tiles,16,2,25,8,2);trect(m.tiles,18,9,24,10,2);
+ trect(m.tiles,15,4,15,7,49);trect(m.tiles,14,7,15,7,49); // מזח
+ // כבישים
+ trect(m.tiles,2,15,25,15,1);trect(m.tiles,14,4,14,15,1);trect(m.tiles,14,15,14,18,1);trect(m.tiles,5,15,5,18,1);
+ addBld(m,{x:3,y:4,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-lake'});
+ addBld(m,{x:9,y:4,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-lake'});
+ addBld(m,{x:3,y:9,w:6,h:4,roof:'#2b7fd0',wall:'#e0f0f8',icon:'🌊',name:'היכל הגלים',into:'gym2',gym:true});
+ addBld(m,{x:17,y:12,w:4,h:3,roof:'#7ac86a',wall:'#fdf0d8',icon:'🏡',name:'בית נרקיס',into:'home-narkis'});
+ addBld(m,{x:22,y:12,w:4,h:3,roof:'#c86a8a',wall:'#f8ecd8',icon:'🏡',name:'בית נוגה',into:'home-noga'});
+ m.tiles[14][13]=1;
+ m.tiles[12][14]=28;m.portal={id:'lake',n:'עיירת הברכה',x:14,y:12};
+ addLink(m,1,15,'hills',21,11,null);m.tiles[15][1]=1;
+ addLink(m,14,1,'route-frost',8,22,'boss','🔒 הגשר למעבר הכפור חסום! קודם זכו בתג הגביש אצל צור, אלוף הגבעות שבגבעות הגחלים.');
+ m.spots=[{x:26,y:11},{x:10,y:18}];m.items=[{x:6,y:2},{x:25,y:18}];
+ addSign(m,13,15,'🪧 עיירת הברכה: היכל הגלים של אדווה בכיכר · צפונה מעבר הכפור (צריך תג גביש) · שמאלה גבעות הגחלים');
+})();
+/* ---------- שביל הביצה ---------- */
+(function(){const m=newMap({id:'route-swamp',n:'שביל הביצה',zone:'A',w:19,h:15,heal:{map:'meadow-town',x:13,y:15}});
+ tborder(m.tiles,19,15,3);
+ tscatter(m.tiles,19,15,53,[[.05,3],[.08,5],[.30,10],[1,0]]);
+ trect(m.tiles,1,7,17,7,1);
+ trect(m.tiles,3,3,6,5,10);trect(m.tiles,10,9,14,11,10);trect(m.tiles,8,2,11,4,10);
+ addLink(m,1,7,'meadow-town',23,15,null);addLink(m,17,7,'swamp',1,15,'lv10','🔒 הביצה הירוקה מסוכנת! צריך טלטל ברמה 10 לפחות בצוות כדי להיכנס.');
+ m.spots=[{x:15,y:3}];m.items=[{x:4,y:11}];
+ addSign(m,8,7,'🪧 מזרחה: הביצה הירוקה - טלטלים שאי אפשר למצוא בשום מקום! צריך טלטל ברמה 10');
+})();
+/* ---------- הביצה הירוקה ---------- */
+(function(){const m=newMap({id:'swamp',n:'הביצה הירוקה',zone:'E',w:27,h:21,heal:{map:'meadow-town',x:13,y:15}});
+ tborder(m.tiles,27,21,3);
+ tscatter(m.tiles,27,21,67,[[.05,3],[.06,2],[.32,16],[1,0]]);
+ trect(m.tiles,1,15,25,15,1);trect(m.tiles,6,4,6,15,1);trect(m.tiles,6,4,20,4,1);
+ trect(m.tiles,10,7,15,10,2);trect(m.tiles,18,10,23,13,2);trect(m.tiles,3,8,4,10,2);
+ trect(m.tiles,8,16,13,18,16);trect(m.tiles,16,6,20,8,16);
+ addBld(m,{x:3,y:2,w:6,h:4,roof:'#3f8a5a',wall:'#e0f0e0',icon:'🐸',name:'היכל הביצה',into:'gymE',gym:true});
+ addBld(m,{x:20,y:16,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בקתת ריפוי',into:'hosp-swamp',small:true});
+ m.tiles[13][20]=30; // מערת הביצה
+ m.tiles[6][24]=28;m.portal={id:'swamp',n:'הביצה הירוקה',x:24,y:6};
+ addLink(m,1,15,'route-swamp',16,7,null);
+ m.spots=[{x:9,y:12},{x:24,y:9}];m.items=[{x:14,y:11},{x:22,y:5},{x:4,y:13}];
+ addSign(m,7,15,'🪧 הביצה הירוקה: היכל הביצה של טינה בצפון־מערב · מערה נסתרת בסלעים במזרח 🕳️ · זהירות מהבריכות!');
+})();
+
+/* ============ V5 BLOCK w2.js ============ */
+/* ---------- מעבר הכפור ---------- */
+(function(){const m=newMap({id:'route-frost',n:'מעבר הכפור',zone:'D',w:17,h:25,heal:{map:'lake-town',x:14,y:16}});
+ tborder(m.tiles,17,25,15);
+ tscatter(m.tiles,17,25,71,[[.07,15],[1,14]],14);
+ trect(m.tiles,7,1,8,23,53);
+ trect(m.tiles,2,4,5,8,14);trect(m.tiles,10,10,13,14,14);trect(m.tiles,3,15,6,19,14);
+ trect(m.tiles,7,1,8,23,53); // שביל אחוז שלג אחרי הפיזור
+ trect(m.tiles,2,11,5,11,2);
+ addLink(m,8,23,'lake-town',14,2,null);addLink(m,7,23,'lake-town',14,2,null);
+ addLink(m,7,1,'frost-village',11,15,null);addLink(m,8,1,'frost-village',11,15,null);
+ m.spots=[{x:14,y:6},{x:2,y:20}];m.items=[{x:11,y:17},{x:4,y:3}];
+ addSign(m,9,2,'🪧 מעבר הכפור: צפונה אל כפר הכפור - שם מחכים היכל הקרח של נבו ואצטדיון האליפות של אוריון! קר כאן, התחממו בקרבות');
+})();
+/* ---------- כפר הכפור ---------- */
+(function(){const m=newMap({id:'frost-village',n:'כפר הכפור',zone:'D',w:24,h:18,town:true,heal:{map:'frost-village',x:12,y:13}});
+ tborder(m.tiles,24,18,15);
+ tscatter(m.tiles,24,18,79,[[.06,15],[1,53]],14);
+ trect(m.tiles,2,13,21,13,53);trect(m.tiles,12,3,12,13,53);trect(m.tiles,12,13,12,16,53);trect(m.tiles,6,13,6,16,53);
+ trect(m.tiles,18,2,21,5,2);
+ addBld(m,{x:2,y:3,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-frost'});
+ addBld(m,{x:8,y:3,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-frost'});
+ addBld(m,{x:15,y:7,w:6,h:4,roof:'#6484b8',wall:'#e8f0fc',icon:'❄️',name:'היכל הקרח',into:'gym3',gym:true});
+ addBld(m,{x:2,y:7,w:7,h:4,roof:'#c8a018',wall:'#fdf6dc',icon:'👑',name:'אצטדיון הזוהר',into:'stadium1',gym:true});
+ addBld(m,{x:16,y:12,w:4,h:3,roof:'#8a6ac8',wall:'#f0e8f8',icon:'🏡',name:'בית שלג',into:'home-sheleg'});
+ m.tiles[8][14]=28;m.portal={id:'ice',n:'כפר הכפור',x:14,y:8};
+ addLink(m,12,16,'route-frost',7,2,null);
+ addLink(m,22,13,'route-volcano',8,22,'gym2','🔒 הדרך לשביל הגעש חסומה! קודם זכו בתג הגל בהיכל הגלים שבעיירת הברכה.');
+ m.spots=[{x:10,y:6}];m.items=[{x:20,y:10},{x:3,y:12}];
+ addSign(m,13,13,'🪧 כפר הכפור: היכל הקרח ואצטדיון הזוהר של אוריון האלוף! מזרחה: שביל הגעש (צריך תג גל)');
+})();
+/* ---------- שביל הגעש ---------- */
+(function(){const m=newMap({id:'route-volcano',n:'שביל הגעש',zone:'F',w:17,h:25,heal:{map:'frost-village',x:12,y:13}});
+ tborder(m.tiles,17,25,18);
+ tscatter(m.tiles,17,25,83,[[.06,18],[.04,19],[.30,17],[1,0]]);
+ trect(m.tiles,7,1,8,23,1);
+ trect(m.tiles,2,5,5,9,17);trect(m.tiles,10,12,13,16,17);trect(m.tiles,3,16,6,20,17);
+ trect(m.tiles,12,3,14,5,19);
+ addLink(m,8,23,'frost-village',21,13,null);addLink(m,7,23,'frost-village',21,13,null);
+ addLink(m,7,1,'volcano-village',10,15,null);addLink(m,8,1,'volcano-village',10,15,null);
+ m.spots=[{x:3,y:12},{x:13,y:19}];m.items=[{x:13,y:8},{x:4,y:22}];
+ addSign(m,9,2,'🪧 שביל הגעש: צפונה כפר הלהבה והיכל הלהבה של גלה! לava חמה - היזהרו מהסלעים הבוערים');
+})();
+/* ---------- כפר הלהבה ---------- */
+(function(){const m=newMap({id:'volcano-village',n:'כפר הלהבה',zone:'F',w:22,h:18,town:true,heal:{map:'volcano-village',x:11,y:13}});
+ tborder(m.tiles,22,18,18);
+ tscatter(m.tiles,22,18,89,[[.06,18],[.03,19],[1,0]]);
+ trect(m.tiles,2,13,19,13,1);trect(m.tiles,11,3,11,13,1);trect(m.tiles,11,13,11,16,1);trect(m.tiles,5,13,5,15,1);
+ trect(m.tiles,17,2,20,4,19);trect(m.tiles,2,2,5,4,17);
+ addBld(m,{x:6,y:3,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בקתת הריפוי',into:'hosp-volcano',small:true});
+ addBld(m,{x:13,y:7,w:6,h:4,roof:'#d84818',wall:'#f8e0d0',icon:'🔥',name:'היכל הלהבה',into:'gymF',gym:true});
+ addBld(m,{x:3,y:7,w:4,h:3,roof:'#b06828',wall:'#f8ecd8',icon:'🏡',name:'בית אשף',into:'home-ashaf'});
+ m.tiles[11][20]=28;m.portal={id:'volcano',n:'כפר הלהבה',x:20,y:11};
+ m.tiles[16][19]=30; // מערת הגעש
+ m.tiles[15][19]=18;m.tiles[16][18]=18;m.tiles[17][19]=18;
+ addLink(m,11,16,'route-volcano',7,2,null);
+ addLink(m,1,13,'route-forest',18,7,'lv15','🔒 יער הערפל עבה מדי! צריך טלטל ברמה 15 לפחות בצוות כדי להיכנס.');
+ m.spots=[{x:8,y:6}];m.items=[{x:19,y:12},{x:2,y:11}];
+ addSign(m,12,13,'🪧 כפר הלהבה: היכל הלהבה של גלה · מערה נסתרת בצפון 🕳️ · שמאלה: שביל היער (צריך רמה 15)');
+})();
+/* ---------- שביל היער ---------- */
+(function(){const m=newMap({id:'route-forest',n:'שביל היער',zone:'H',w:20,h:16,heal:{map:'volcano-village',x:11,y:13}});
+ tborder(m.tiles,20,16,3);
+ tscatter(m.tiles,20,16,97,[[.08,3],[.32,24],[1,23]],23);
+ trect(m.tiles,1,7,18,7,1);trect(m.tiles,9,2,9,7,1);trect(m.tiles,9,7,9,13,1);
+ trect(m.tiles,2,2,5,5,24);trect(m.tiles,12,9,16,12,24);trect(m.tiles,13,2,16,4,24);
+ trect(m.tiles,3,10,5,12,2);
+ addLink(m,18,7,'volcano-village',2,13,null);addLink(m,1,7,'forest-village',21,13,null);
+ m.spots=[{x:11,y:13},{x:6,y:4}];m.items=[{x:17,y:12},{x:2,y:13}];
+ addSign(m,10,7,'🪧 שביל היער: מערבה אל כפר הערפל - היכל הערפל של טלה והשומר העתיק של היער');
+})();
+/* ---------- כפר הערפל ---------- */
+(function(){const m=newMap({id:'forest-village',n:'כפר הערפל',zone:'H',w:25,h:19,town:true,heal:{map:'forest-village',x:12,y:14}});
+ tborder(m.tiles,25,19,3);
+ tscatter(m.tiles,25,19,101,[[.07,3],[.10,24],[1,23]],23);
+ trect(m.tiles,2,14,22,14,1);trect(m.tiles,12,4,12,14,1);trect(m.tiles,12,14,12,17,1);trect(m.tiles,6,14,6,17,1);
+ trect(m.tiles,18,2,22,5,24);trect(m.tiles,2,2,5,5,24);
+ trect(m.tiles,14,7,16,9,2);
+ // חורשת השומר בצפון
+ trect(m.tiles,2,7,5,10,24);trect(m.tiles,3,11,4,11,24);
+ addBld(m,{x:7,y:4,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-forest'});
+ addBld(m,{x:14,y:4,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-forest'});
+ addBld(m,{x:8,y:8,w:6,h:4,roof:'#2e6a4a',wall:'#d8ece0',icon:'🌫️',name:'היכל הערפל',into:'gymH',gym:true});
+ addBld(m,{x:17,y:11,w:4,h:3,roof:'#6a9a4a',wall:'#eef4dc',icon:'🏡',name:'בית אלמה',into:'home-alma'});
+ m.tiles[8][15]=28;m.portal={id:'forest',n:'כפר הערפל',x:15,y:8};
+ m.tiles[2][12]=29; // דלת הסמלים אל חורשת האוצר
+ addLink(m,22,14,'route-forest',2,7,null);
+ addLink(m,12,1,'route-desert',11,14,'gymF','🔒 סופת המדבר לוהטת מדי! קודם זכו בתג הלהבה בהיכל הלהבה שבכפר הלהבה.');
+ m.spots=[{x:20,y:8},{x:4,y:16}];m.items=[{x:23,y:16},{x:8,y:2}];
+ addSign(m,13,14,'🪧 כפר הערפל: היכל הערפל · חורשת השומר העתיק במערב · דלת סמלים מסתורית בצפון 🔺🔷⭐ · צפונה: שביל המדבר');
+})();
+
+/* ============ V5 BLOCK w3.js ============ */
+/* ---------- שביל המדבר ---------- */
+(function(){const m=newMap({id:'route-desert',n:'שביל המדבר',zone:'G',w:22,h:16,heal:{map:'forest-village',x:12,y:14}});
+ tborder(m.tiles,22,16,22);
+ tscatter(m.tiles,22,16,103,[[.06,22],[.04,4],[.30,21],[1,20]],20);
+ trect(m.tiles,2,7,19,7,1);trect(m.tiles,11,2,11,14,1);
+ trect(m.tiles,3,3,7,5,21);trect(m.tiles,13,9,17,12,21);trect(m.tiles,15,3,18,5,21);
+ trect(m.tiles,4,10,7,12,2);
+ addLink(m,11,14,'forest-village',12,2,null);addLink(m,11,1,'desert-town',11,15,null);
+ m.spots=[{x:2,y:13},{x:19,y:4}];m.items=[{x:19,y:12},{x:3,y:6}];
+ addSign(m,12,7,'🪧 שביל המדבר: צפונה עיירת החול והיכל החול של סהרה · בדיונות מסתתרים טלטלי מדבר נדירים');
+})();
+/* ---------- עיירת החול ---------- */
+(function(){const m=newMap({id:'desert-town',n:'עיירת החול',zone:'G',w:25,h:19,town:true,heal:{map:'desert-town',x:12,y:14}});
+ tborder(m.tiles,25,19,22);
+ tscatter(m.tiles,25,19,107,[[.06,22],[.04,5],[1,20]],20);
+ trect(m.tiles,2,14,22,14,1);trect(m.tiles,12,4,12,14,1);trect(m.tiles,12,14,12,17,1);trect(m.tiles,6,14,6,17,1);
+ trect(m.tiles,18,3,22,6,2);trect(m.tiles,19,7,21,7,2); // נווה מדבר
+ trect(m.tiles,2,2,5,5,21);
+ // חורבות השומר במערב
+ trect(m.tiles,2,8,5,11,21);m.tiles[8][3]=4;m.tiles[9][4]=4;m.tiles[10][3]=4;
+ addBld(m,{x:7,y:4,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-desert'});
+ addBld(m,{x:14,y:4,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-desert'});
+ addBld(m,{x:8,y:8,w:6,h:4,roof:'#c9a44a',wall:'#f4e8c8',icon:'🏜️',name:'היכל החול',into:'gymG',gym:true});
+ addBld(m,{x:16,y:11,w:4,h:3,roof:'#a87838',wall:'#f8ecd8',icon:'🏡',name:'בית חמד',into:'home-hamed'});
+ addBld(m,{x:20,y:11,w:4,h:3,roof:'#8a5a9a',wall:'#f0e8f8',icon:'🏡',name:'בית פרופ׳ אלון',into:'home-alon'});
+ m.tiles[8][15]=28;m.portal={id:'desert',n:'עיירת החול',x:15,y:8};
+ addLink(m,12,17,'route-desert',11,2,null);
+ addLink(m,24,14,'route-storm',8,22,'gymG','🔒 סופת הפסגות חזקה מדי! קודם זכו בתג החול בהיכל החול שבעיירת החול.');
+ m.spots=[{x:9,y:16},{x:23,y:10}];m.items=[{x:4,y:13},{x:21,y:2}];
+ addSign(m,13,14,'🪧 עיירת החול: היכל החול · חורבות השומר העתיק במערב · מזרחה: שביל הסערה (צריך תג חול)');
+})();
+/* ---------- שביל הסערה ---------- */
+(function(){const m=newMap({id:'route-storm',n:'שביל הסערה',zone:'I',w:17,h:25,heal:{map:'desert-town',x:12,y:14}});
+ tborder(m.tiles,17,25,27);
+ tscatter(m.tiles,17,25,109,[[.07,27],[.30,26],[1,25]],25);
+ trect(m.tiles,7,1,8,23,1);
+ trect(m.tiles,2,4,5,8,26);trect(m.tiles,10,10,13,14,26);trect(m.tiles,3,15,6,19,26);trect(m.tiles,10,18,13,21,26);
+ addLink(m,8,23,'desert-town',23,14,null);addLink(m,7,23,'desert-town',23,14,null);
+ addLink(m,7,1,'storm-city',12,17,null);addLink(m,8,1,'storm-city',12,17,null);
+ m.spots=[{x:13,y:6},{x:3,y:21}];m.items=[{x:11,y:15},{x:5,y:10}];
+ addSign(m,9,2,'🪧 שביל הסערה: צפונה עיר הסערה - היכל הסערה של רעם ואצטדיון הסופה של נורה האלופה! הברקים כאן אמיתיים ⚡');
+})();
+/* ---------- עיר הסערה ---------- */
+(function(){const m=newMap({id:'storm-city',n:'עיר הסערה',zone:'I',w:26,h:20,town:true,heal:{map:'storm-city',x:13,y:15}});
+ tborder(m.tiles,26,20,27);
+ tscatter(m.tiles,26,20,113,[[.06,27],[.06,26],[1,25]],25);
+ trect(m.tiles,2,15,23,15,1);trect(m.tiles,13,4,13,15,1);trect(m.tiles,13,15,13,18,1);trect(m.tiles,6,15,6,18,1);
+ trect(m.tiles,19,2,23,5,26);trect(m.tiles,2,2,5,4,26);
+ // פסגת השומר במערב
+ trect(m.tiles,2,6,5,9,26);m.tiles[6][3]=27;m.tiles[7][4]=27;m.tiles[8][3]=27;
+ addBld(m,{x:7,y:4,w:5,h:3,roof:'#e04040',wall:'#fff3ea',icon:'🏥',name:'בית החולים',into:'hosp-storm'});
+ addBld(m,{x:15,y:4,w:5,h:3,roof:'#3a8ad0',wall:'#eef4ff',icon:'🛒',name:'המכולת',into:'shop-storm'});
+ addBld(m,{x:8,y:8,w:6,h:4,roof:'#4a4a92',wall:'#e0e0f4',icon:'⚡',name:'היכל הסערה',into:'gymI',gym:true});
+ addBld(m,{x:16,y:8,w:7,h:4,roof:'#6a2a9a',wall:'#ecd8f8',icon:'🌪️',name:'אצטדיון הסופה',into:'stadium2',gym:true});
+ addBld(m,{x:3,y:11,w:4,h:3,roof:'#3a7a9a',wall:'#dceef4',icon:'🏡',name:'בית סער',into:'home-saar'});
+ m.tiles[8][16]=28;m.portal={id:'storm',n:'עיר הסערה',x:16,y:8};
+ addLink(m,13,18,'route-storm',7,2,null);
+ m.spots=[{x:24,y:10},{x:9,y:17}];m.items=[{x:24,y:17},{x:2,y:10}];
+ addSign(m,14,15,'🪧 עיר הסערה: היכל הסערה של רעם · אצטדיון הסופה של נורה האלופה · פסגת השומר העתיק במערב');
+})();
+
+/* נרמול: spots/items -> fields */
+Object.values(MAPS).forEach(m=>{m.fields=(m.fields||[]).concat((m.spots||[]).map(f=>({x:f.x,y:f.y,type:'sparkle'})),(m.items||[]).map(f=>({x:f.x,y:f.y,type:'pickup'})))});
+
+/* ============ V5 BLOCK w4.js ============ */
+/* ================= פנים מבנים ================= */
+/* אריחי פנים: 34 שטיח דלת (כניסה), 35 יציאה, 36 רצפת עץ, 37 קיר, 38 שטיח אדום,
+   39 דלפק, 40 רצפת היכל, 41 פסל/אביזר, 42 רצפת בית חולים, 43 רצפת מכולת,
+   44 במה, 45 שולחן, 46 מיטה/ספה, 47 מדפים, 49 מזח, 51 גדר, 52 פנס, 53 שלג דחוס, 55 מתחת לבניין */
+function interiorShell(id,n,zone,w,h,floor,wallCol){const m=newMap({id,n,zone,w,h,indoor:true,tiles:mkTiles(w,h,floor)});
+ tborder(m.tiles,w,h,37);return m}
+function exitMat(m,x,y,back,bx,by){m.tiles[y][x]=35;m.back={map:back,x:bx,y:by};m.spawn={x,y:y-1};m.exit=1}
+function addNpc(m,n){n.map=m.id;m.npcs.push(n);return n}
+/* בית חולים: אחות מאחורי דלפק */
+function buildHospital(id,n,zone,back,bx,by){const m=interiorShell(id,n,zone,12,10,42);
+ trect(m.tiles,3,3,8,3,39);
+ trect(m.tiles,1,1,2,2,46);trect(m.tiles,9,1,10,2,46);
+ m.tiles[1][5]=41;m.tiles[1][6]=41;
+ exitMat(m,5,9,back,bx,by);exitMat(m,6,9,back,bx,by);
+ addNpc(m,{kind:'nurse',n:'אחות לילי',x:5,y:2,dir:'down',pal:'nurse',txt:'ברוכים הבאים ל'+n+'! אני מרפאת את כל הצוות שלכם - בחינם ובשמחה.'});
+ addNpc(m,{kind:'talk',n:'אבי הדייג',x:9,y:6,dir:'left',pal:'b',txt:'בית החולים מרפא בחינם, תמיד! ומולו במכולת קונים כדורים ושיקויים. בקרב קשה - שיקוי שווה זהב!'});
+ return m}
+/* מכולת: מוכר מאחורי דלפק */
+function buildShop(id,n,zone,back,bx,by){const m=interiorShell(id,n,zone,12,10,43);
+ trect(m.tiles,3,3,8,3,39);
+ trect(m.tiles,1,1,2,2,47);trect(m.tiles,9,1,10,2,47);trect(m.tiles,1,5,2,6,47);m.tiles[1][9]=41;m.tiles[1][10]=41;
+ exitMat(m,5,9,back,bx,by);exitMat(m,6,9,back,bx,by);
+ addNpc(m,{kind:'shopkeeper',n:'רמי המכולת',x:6,y:2,dir:'down',pal:'shop',txt:'הכל לטלטלים! כדורים, שיקויים, פריטים וגם סוכריית דרגה נדירה במלאי מוגבל.'});
+ return m}
+/* בית פרטי */
+function buildHouse(id,n,zone,back,bx,by,npcs){const m=interiorShell(id,n,zone,11,9,36);
+ trect(m.tiles,4,3,6,4,45);m.tiles[2][1]=46;m.tiles[2][2]=46;m.tiles[8][1]=47;m.tiles[8][2]=47;m.tiles[1][8]=41;
+ exitMat(m,5,8,back,bx,by);
+ (npcs||[]).forEach(o=>addNpc(m,o));
+ return m}
+/* היכל: שני מאמנים זוטרים + המאסטר על הבמה */
+function buildGym(g){const m=interiorShell(g.id,g.n,g.zone,13,12,40);
+ trect(m.tiles,6,2,6,10,38); // שטיח מרכזי
+ m.tiles[2][3]=41;m.tiles[2][9]=41;m.tiles[5][3]=41;m.tiles[5][9]=41;
+ trect(m.tiles,4,1,8,2,44); // במת המאסטר
+ exitMat(m,6,11,g.back,g.bx,g.by);
+ addNpc(m,Object.assign({kind:'trainer',ref:g.j1.id,x:4,y:7,dir:'down',pal:'g'+g.zone},g.j1));
+ addNpc(m,Object.assign({kind:'trainer',ref:g.j2.id,x:8,y:5,dir:'down',pal:'g'+g.zone},g.j2));
+ addNpc(m,{kind:'master',ref:g.master,x:6,y:1,dir:'down',pal:'gym'});
+ return m}
+/* אצטדיון אליפות */
+function buildStadium(id,n,zone,back,bx,by,masterId){const m=interiorShell(id,n,zone,13,12,40);
+ trect(m.tiles,6,2,6,10,38);
+ for(let x=1;x<=11;x++){if(x<4||x>8){m.tiles[1][x]=41;m.tiles[2][x]=41}}
+ trect(m.tiles,4,1,8,2,44);
+ exitMat(m,6,11,back,bx,by);
+ addNpc(m,{kind:'master',ref:masterId,x:6,y:1,dir:'down',pal:'gym'});
+ addNpc(m,{kind:'talk',n:'מנהל האצטדיון',x:2,y:5,dir:'right',pal:'a',txt:'איזה יחסי צופים! האלוף מחכה על הבמה. רק מאמנים עם תגי ההיכלים מועמדים לכתר!'});
+ return m}
+/* חורשת אוצר מאחורי דלת הסמלים */
+function buildGrove(id,n,zone,back,bx,by){const m=interiorShell(id,n,zone,9,8,23);
+ trect(m.tiles,2,2,6,4,24);m.tiles[2][4]=33;m.tiles[3][7]=33;
+ exitMat(m,4,7,back,bx,by);m.grove=id;
+ return m}
+
+/* ============ V5 BLOCK w5.js ============ */
+/* ================= דמויות ותוכן ================= */
+/* מאמנים: kind trainer. gym=מאסטר היכל (בפנים), juniors נוספו לכל היכל */
+const TR5=[
+ {id:'noa',n:'נועה שומרת האחו',map:'route-flower',x:11,y:14,team:[[4,8],[6,9]],reward:65,txt:'טלטלים מתחזקים כשמתאמנים יחד. יש לי צמח וגם ברק - תצטרכו להחליף! מוכנים לקרב?'},
+ {id:'gal',n:'גל חוקר החוף',map:'lake-town',x:26,y:13,team:[[20,11],[23,12]],reward:100,txt:'הגלים לימדו אותי לא לוותר!'},
+ {id:'boss',n:'צור אלוף הגבעות',map:'hills',x:11,y:3,team:[[8,13],[22,14],[18,16]],reward:220,boss:true,txt:'ברוכים הבאים לאתגר הגבעות! שלושה טלטלים, תג אחד. נועה וגל יכינו אתכם לקרב.'},
+ {id:'swamp1',n:'בוצי שומר הביצה',map:'swamp',x:20,y:13,team:[[30,12],[32,13],[33,14]],reward:150,txt:'הביצה מסתירה טלטלים שאי אפשר למצוא בשום מקום אחר!'},
+ {id:'volc1',n:'להט שומר הגעש',map:'route-volcano',x:4,y:13,team:[[34,20],[36,22],[37,23]],reward:260,txt:'רק מאמנים אמיצים מטפסים אל הר הגעש! הצוות שלי משלב אש ואדמה. חשבו אילו סוגים חזקים נגדם.'},
+ {id:'forest1',n:'דנה מאמנת היער',map:'route-forest',x:4,y:4,team:[[41,15],[44,16]],reward:140,txt:'היער מלא בטלטלים חדשים שעוד לא ראית!'},
+ {id:'forest2',n:'עמרי צופה היער',map:'route-forest',x:15,y:11,team:[[42,16],[40,17],[44,17]],reward:180,txt:'צופים לומדים להכיר כל שביל. בואו נראה אתכם!'},
+ {id:'desert1',n:'נגב רוכב הגמלים',map:'route-desert',x:5,y:4,team:[[49,27],[50,28]],reward:300,txt:'המדבר מחזק את מי שמכבד אותו. אצלי תפגשו רגיל ואש - צוות מגוון ינצח. מוכנים?'},
+ {id:'desert2',n:'טליה שומרת הנווה',map:'desert-town',x:21,y:8,team:[[47,28],[50,29]],reward:320,txt:'הנווה הוא המקום הכי יפה במדבר. אל תדרכו על הפרחים!'},
+ {id:'storm1',n:'ברק מאתגר הפסגות',map:'route-storm',x:4,y:6,team:[[53,33],[55,34]],reward:380,txt:'כאן למעלה הרוח שרה שירת ברקים! ברק ומים באים יחד - מי בלי אדמה וצמח ייתקע!'},
+ {id:'storm2',n:'עננה רוכפת העננים',map:'route-storm',x:12,y:17,team:[[55,33],[54,34],[57,35]],reward:420,txt:'העננים לחשו לי שאתם בדרך לפסגה. קדימה!'},
+ {id:'guardH',n:'שומר היער העתיק',map:'forest-village',x:3,y:9,team:[[40,30],[43,31],[44,32]],reward:500,boss:true,txt:'עצורו! כאן חי יעראל, טלטל אגדי. רק מאמן שינצח אותי יזכה לפגוש אותו! מוכנים?'},
+ {id:'guardG',n:'שומר המדבר העתיק',map:'desert-town',x:3,y:9,team:[[46,35],[48,36],[50,37]],reward:650,boss:true,txt:'עצורו! כאן חי חוליאל, טלטל אגדי. רק מאמן שינצח אותו יזכה לפגוש אותו! מוכנים?'},
+ {id:'guardI',n:'שומר הסערה העתיק',map:'storm-city',x:3,y:7,team:[[53,40],[55,41],[57,42]],reward:800,boss:true,txt:'עצורו! כאן חיה סופאל, טלטל אגדי. רק מאמנית שתנצח אותי תזכה לפגוש אותה! מוכנים?'},
+ /* מאסטרי ההיכלים - בפנים, על הבמה */
+ {id:'gym1',n:'יערה · היכל העלים',map:'gym1',x:6,y:1,team:[[14,18],[21,19],[15,20]],reward:180,gym:1,requires:'boss',badge:'תג העלה',cap:25,gift:{item:'charm_plant',balls:['gballs',2]},txt:'ההיכל הראשון! בחרו צוות מאוזן, לא רק טלטל חזק אחד.'},
+ {id:'gym2',n:'אדווה · היכל הגלים',map:'gym2',x:6,y:1,team:[[12,21],[20,22],[13,23]],reward:240,gym:2,requires:'gym1',badge:'תג הגל',cap:30,gift:{item:'charm_water',balls:['gballs',2]},txt:'מי ששולט בסוגי המכות יעבור את הגלים.'},
+ {id:'gym3',n:'נבו · היכל הקרח',map:'gym3',x:6,y:1,team:[[25,24],[27,25],[26,26]],reward:300,gym:3,requires:'gym2',badge:'תג הכפור',cap:40,gift:{item:'coin_amulet',balls:['uballs',1]},txt:'הקור לא עוצר אלופים. שלושה שומרי מערות מחכים לכם.'},
+ {id:'gymE',n:'טינה · היכל הביצה',map:'gymE',x:6,y:1,team:[[31,13],[33,14],[30,15]],reward:260,gym:5,requires:'boss',badge:'תג הביצה',cap:28,gift:{tea:3,balls:['uballs',1]},txt:'הביצה בוחנת מאמנים נחושים. המים העכורים מסתירים כוח אמיתי!'},
+ {id:'gymH',n:'טלה · היכל הערפל',map:'gymH',x:6,y:1,team:[[42,17],[40,18],[45,20]],reward:320,gym:7,requires:'gym1',badge:'תג הערפל',cap:33,gift:{item:'berry',itemN:2,balls:['uballs',1]},txt:'הערפל מסתיר את האמת. רק מאמנים עם תג העלה יכולים לאתגר אותי!'},
+ {id:'gymF',n:'גלה · היכל הלהבה',map:'gymF',x:6,y:1,team:[[35,25],[36,26],[34,27]],reward:340,gym:6,requires:'gym3',badge:'תג הלהבה',cap:45,gift:{item:'xp_star',balls:['uballs',1]},txt:'רק מי שעבר את הקרח רשאי לעמוד מול הלהבה. זה האתגר האחרון לפני האלוף!'},
+ {id:'gymG',n:'סהרה · היכל החול',map:'gymG',x:6,y:1,team:[[48,28],[46,29],[51,31]],reward:420,gym:8,requires:'gymF',badge:'תג החול',cap:48,gift:{item:'charm_earth',balls:['uballs',2]},txt:'סופת חול מבחינה בין טיילים לאלופים. רק בעלי תג הלהבה!'},
+ {id:'gymI',n:'רעם · היכל הסערה',map:'gymI',x:6,y:1,team:[[54,34],[53,35],[58,37]],reward:520,gym:9,requires:'gymG',badge:'תג הסערה',cap:50,gift:{item:'charm_spark',balls:['uballs',2]},txt:'הברק לא מכה פעמיים באותו מקום. אני כן! רק בעלי תג החול.'},
+ {id:'champion',n:'אוריון · אלוף הזוהר',map:'stadium1',x:6,y:1,team:[[16,28],[10,29],[26,30],[27,32]],reward:500,gym:4,requires:'gymF',boss:true,badge:'כתר הטלטלים',cap:50,txt:'הגמר הגדול! ארבעה טלטלים. השתמשו בהחלפות, שיקויים והתאמות סוגים.'},
+ {id:'champion2',n:'נורה · אלופת הסופה',map:'stadium2',x:6,y:1,team:[[59,40],[51,40],[52,41],[58,41],[45,42]],reward:900,gym:10,requires:'gymI',boss:true,badge:'כתר הסערה',cap:50,txt:'האתגר האמיתי האחרון! חמישה טלטלים מהאזורים החדשים. הבאתם שיקויים?'},
+ /* מאמני היכל זוטרים */
+ {id:'gym1a',n:'עלי מן ההיכל',map:'gym1',team:[[4,15],[21,16]],reward:90,txt:'מאמני היכל העלים לא מוותרים! תעברו אותי קודם.'},
+ {id:'gym1b',n:'פרח מן ההיכל',map:'gym1',team:[[5,16],[4,17]],reward:95,txt:'העלים שלי חדים כמו סכין! רוצים לפגוש את יערה? קודם אותי!'},
+ {id:'gym2a',n:'שלי מן ההיכל',map:'gym2',team:[[2,18],[20,19]],reward:110,txt:'הגלים שולטים בברכה! בואו נראה אם תצליחו לעמוד מולם.'},
+ {id:'gym2b',n:'גלית מן ההיכל',map:'gym2',team:[[3,19],[12,20]],reward:115,txt:'אדווה לימדה אותי הכל. נצחו אותי ואולי תהיו ראויים לה!'},
+ {id:'gym3a',n:'קורי מן ההיכל',map:'gym3',team:[[25,21],[27,22]],reward:130,txt:'הכפור כאן מקפיא גם את הרוח! מוכנים?'},
+ {id:'gym3b',n:'קרחוני מן ההיכל',map:'gym3',team:[[26,22],[25,23]],reward:135,txt:'רק מי שעובר אותי פוגש את נבו. בואו נראה!'},
+ {id:'gymEa',n:'בצלי מן ההיכל',map:'gymE',team:[[30,11],[32,12]],reward:80,txt:'הביצה דביקה ומסוכנת - בדיוק כמו הטלטלים שלי!'},
+ {id:'gymEb',n:'טיטי מן ההיכל',map:'gymE',team:[[31,12],[33,13]],reward:85,txt:'טינה אומרת שאף אחד לא עובר בלי קרב טוב!'},
+ {id:'gymHa',n:'אראל מן ההיכל',map:'gymH',team:[[40,15],[43,16]],reward:100,txt:'בערפל קשה לראות - אבל הטלטלים שלי רואים אתכם מצוין!'},
+ {id:'gymHb',n:'שושי מן ההיכל',map:'gymH',team:[[41,16],[44,17]],reward:105,txt:'הפרפרים שלי ילככו אתכם בערפל! קדימה!'},
+ {id:'gymFa',n:'גחלי מן ההיכל',map:'gymF',team:[[34,22],[35,23]],reward:150,txt:'הלהבה שלי בוערת חזק! רק אלופים עוברים מכאן.'},
+ {id:'gymFb',n:'לבנה מן ההיכל',map:'gymF',team:[[36,23],[37,24]],reward:155,txt:'חם פה, אה? עוד לא ראיתם כלום!'},
+ {id:'gymGa',n:'דיוני מן ההיכל',map:'gymG',team:[[46,25],[48,26]],reward:170,txt:'החול קובר הכל! גם את תכנית הקרב שלכם!'},
+ {id:'gymGb',n:'סופתי מן ההיכל',map:'gymG',team:[[47,26],[50,27]],reward:175,txt:'סהרה מחכה למעלה - אבל קודם תעברו את סופת החול שלי!'},
+ {id:'gymIa',n:'זיקי מן ההיכל',map:'gymI',team:[[53,31],[55,32]],reward:200,txt:'הברק שלי מכה לפני שתספיקו למצמץ!'},
+ {id:'gymIb',n:'הדידה מן ההיכל',map:'gymI',team:[[54,32],[56,33]],reward:210,txt:'ההד של הסערה מבשר על בואכם... ועל הניצחון שלי!'}];
+const GYMS=[
+ {id:'gym1',n:'היכל העלים',zone:'A',back:'meadow-town',master:'gym1',j1:TR5.find(t=>t.id==='gym1a'),j2:TR5.find(t=>t.id==='gym1b')},
+ {id:'gym2',n:'היכל הגלים',zone:'B',back:'lake-town',master:'gym2',j1:TR5.find(t=>t.id==='gym2a'),j2:TR5.find(t=>t.id==='gym2b')},
+ {id:'gym3',n:'היכל הקרח',zone:'D',back:'frost-village',master:'gym3',j1:TR5.find(t=>t.id==='gym3a'),j2:TR5.find(t=>t.id==='gym3b')},
+ {id:'gymE',n:'היכל הביצה',zone:'E',back:'swamp',master:'gymE',j1:TR5.find(t=>t.id==='gymEa'),j2:TR5.find(t=>t.id==='gymEb')},
+ {id:'gymH',n:'היכל הערפל',zone:'H',back:'forest-village',master:'gymH',j1:TR5.find(t=>t.id==='gymHa'),j2:TR5.find(t=>t.id==='gymHb')},
+ {id:'gymF',n:'היכל הלהבה',zone:'F',back:'volcano-village',master:'gymF',j1:TR5.find(t=>t.id==='gymFa'),j2:TR5.find(t=>t.id==='gymFb')},
+ {id:'gymG',n:'היכל החול',zone:'G',back:'desert-town',master:'gymG',j1:TR5.find(t=>t.id==='gymGa'),j2:TR5.find(t=>t.id==='gymGb')},
+ {id:'gymI',n:'היכל הסערה',zone:'I',back:'storm-city',master:'gymI',j1:TR5.find(t=>t.id==='gymIa'),j2:TR5.find(t=>t.id==='gymIb')}];
+
+/* ============ V5 BLOCK w6.js ============ */
+/* משימות */
+const Q5=[
+{id:'water',n:'מיה חוקרת הטיפות',map:'meadow-town',x:10,y:14,goal:'הראו לי טלטל מים בצוות או בקופסה.',reward:40,balls:5,test:()=>allMons5().some(m=>SP[m.sp].t==='water')},
+{id:'explore',n:'עידו חוקר הטבע',map:'meadow-town',x:18,y:16,goal:'אספו לפחות חמישה סוגי טלטלים שונים.',reward:80,balls:8,test:()=>Object.keys(S.caught).length>=5},
+{id:'night',n:'לונה שומרת הלילה',map:'hills',x:6,y:12,goal:'תפסו ירחף או לילפז שמופיעים רק בלילה.',reward:120,balls:10,test:()=>allMons5().some(m=>[28,29].includes(m.sp))},
+{id:'ice',n:'שלג חוקר המערות',map:'route-frost',x:4,y:6,goal:'תפסו שני מינים שונים ממעבר הכפור: פתיתון, כפורן או זוהרור.',reward:180,balls:12,test:()=>[25,26,27].filter(i=>S.caught[i]).length>=2},
+{id:'shiny',n:'נוגה אוספת הנצנצים',map:'home-noga',x:5,y:2,goal:'מצאו ותפסו טלטל בוהק אחד. זה אתגר נדיר במיוחד!',reward:400,balls:20,test:()=>allMons5().some(m=>m.shiny)},
+{id:'swampq',n:'טל חוקרת הביצה',map:'swamp',x:10,y:13,goal:'תפסו שני מינים שונים מהביצה הירוקה: בוציון, עגורון, צפרדעל או בצלחי.',reward:150,balls:10,test:()=>[30,31,32,33].filter(i=>S.caught[i]).length>=2},
+{id:'volcq',n:'אשף חוקר הגעש',map:'home-ashaf',x:5,y:2,goal:'תפסו שני מינים שונים מאזור הגעש: גחשוק, לבהלב, אבנגד או עשנון.',reward:200,balls:12,test:()=>[34,35,36,37].filter(i=>S.caught[i]).length>=2},
+{id:'goldq',n:'זהבי צייד המטבעות',map:'lake-town',x:15,y:7,goal:'תפסו זהבית, דג הזהב הנדיר ששוחה בברכה של העיירה. הוא שווה הון!',reward:180,balls:8,test:()=>!!S.caught[39]},
+{id:'sparkq',n:'ניצה אוספת הניצוצות',map:'volcano-village',x:8,y:8,goal:'מצאו 5 נקודות ניצוץ ✦ שונות במפה. הן מחכות בכל העולם!',reward:220,balls:10,test:()=>Object.keys(S.sparkles||{}).length>=5},
+{id:'forestq',n:'אלמה חוקרת היער',map:'home-alma',x:5,y:2,goal:'תפסו שני מינים שונים מיער הערפל: פרפרפל, צפצפון, פקעון, ערפילי או שרציץ.',reward:200,balls:10,test:()=>[40,41,42,43,44].filter(i=>S.caught[i]).length>=2},
+{id:'desertq',n:'חמד חוקר המדבר',map:'home-hamed',x:5,y:2,goal:'תפסו שני מינים שונים ממדבר החולות: חולבב, קקטוש, עקרבז, גמלה או מדברור.',reward:260,balls:12,test:()=>[46,47,48,49,50].filter(i=>S.caught[i]).length>=2},
+{id:'stormq',n:'סער חוקר הפסגות',map:'home-saar',x:5,y:2,goal:'תפסו שני מינים שונים מפסגות הסערה: רעמון, סופטל, עננון, פלדון או תקיפור.',reward:320,balls:14,test:()=>[53,54,55,56,57].filter(i=>S.caught[i]).length>=2},
+{id:'explorerq',n:'נווט מצפה הדרכים',map:'hills',x:19,y:6,goal:'גלו את שלושת האזורים הרחוקים: יער הערפל, מדבר החולות ופסגות הסערה.',reward:250,balls:10,test:()=>{const v=S.visited||{};return!!(v.H&&v.G&&v.I)}},
+{id:'portalq',n:'קסמיא שומרת השערים',map:'lake-town',x:11,y:14,goal:'גלו 4 שערי קסם  שונים בעולם. הם מחכים בכל עיר!',reward:180,balls:8,test:()=>Object.keys(S.portals||{}).length>=4},
+{id:'masterq',n:'פרופ׳ אלון מאסטר האוסף',map:'home-alon',x:5,y:2,goal:'השלימו 50 מינים שונים באנציקלופדיה. אתגר לאספנים אמיתיים!',reward:600,balls:20,test:()=>Object.keys(S.caught).length>=50}];
+const SQ5=[
+{id:'lostq',story:1,n:'דני ופטרוש האבוד',map:'home-dani',x:5,y:2,goal:'הפטרוש של דני ברח והסתתר בעשב הגבוה של שביל הפרחים. חפשו אותו והחזירו אותו הביתה!',reward:150,balls:8,test:()=>(S.story||{}).lostFound===2},
+{id:'riddleq',story:1,n:'סבתא חכמה וחידת הטלטלים',map:'home-savta',x:5,y:2,goal:'לסבתא חכמה יש חידה על טלטל מיוחד. מי שקורא את האנציקלופדיה ידע את התשובה!',reward:120,balls:5,test:()=>false},
+{id:'letterq',n:'נרקיס והמכתב לחוקר המערות',story:1,map:'home-narkis',x:5,y:2,goal:'נרקיס מבקשת להביא מכתב  לשלג חוקר המערות, שחוקר במעבר הכפור ומחכה לחדשות. שער הקסם יכול לקצר את הדרך!',reward:90,balls:0,test:()=>(S.story||{}).letter===2}];
+const ALLQ5=Q5.concat(SQ5);
+const LOST_SPOT5={map:'route-flower',x:4,y:8};
+/* החלפות טלטלים */
+const TRADES5=[
+{id:'tr-nir',n:'ניר המאסף',map:'home-noga',x:8,y:5,want:3,give:{sp:20,lv:12,nick:'בועבוע',item:'berry'},txt:'אני מחפש צדפון! אם תביאו לי צדפון, תקבלו בתמורה את בועבוע שלי - בועמון שמחזיק פרי מרפא! שימו לב: טלטל שהתקבל בהחלפה מציית רק עד גבול התגים שלכם.'},
+{id:'tr-maor',n:'מאור הקרח',map:'home-sheleg',x:8,y:5,want:30,give:{sp:25,lv:16,nick:'קרחונת'},txt:'הבאתם בוציון מהביצה? אני אתן לכם בתמורה פתיתון חמוד מהכפור!'},
+{id:'tr-lital',n:'ליטל הלהבה',map:'home-ashaf',x:8,y:5,want:31,give:{sp:34,lv:20,nick:'גחלת'},txt:'יש לכם עגורון? תמורתו תקבלו גחשוק לוהט מהגעש!'},
+{id:'tr-nitzan',n:'ניצן הפרחים',map:'home-alma',x:8,y:5,want:32,give:{sp:40,lv:16,nick:'פרפר'},txt:'אני מת על צפרדעל מהביצה! בתמורה תקבלו פרפרפל מהיער שלנו.'},
+{id:'tr-sultan',n:'סולטן הנווה',map:'home-hamed',x:8,y:5,want:49,give:{sp:50,lv:27,nick:'נוצצי',shiny:true},txt:'ההצעה של המאה: תביאו לי גמלה, ותקבלו מדברור בוהק ✨! כן כן, בוהק אמיתי ונדיר ביותר!'},
+{id:'tr-tal',n:'טל הברקים',map:'home-saar',x:8,y:5,want:55,give:{sp:53,lv:34,nick:'רעמי'},txt:'עננון תמורת רעמון גור הברקים - עסקה הוגנת, לא?'}];
+/* דמויות שיחה */
+const TALKS=[
+{map:'meadow-town',x:8,y:14,n:'רוני השכן',pal:'a',txt:'ברוכים הבאים לכפר הפרחים! מעל כל דמות יש סימן: ⚔️ קרב, ❗ משימה, 🔄 החלפה, 💬 שיחה, 🏥 בית חולים, 🛒 מכולת. נכנסים למבנים דרך שטיח הדלת!'},
+{map:'meadow-town',x:20,y:6,n:'גברת פרח',pal:'c',txt:'הברכה שלנו מלאה חיים! בעשב הגבוה של השבילים מסתתרים טלטלים פראיים - תמיד טוב לשמור שיקוי בתיק.'},
+{map:'lake-town',x:18,y:16,n:'דייג זקן',pal:'b',txt:'הזהבית שוחה בברכה. נדיר מאוד! מי שמביס אותו מרוויח פי שלושה מטבעות.'},
+{map:'hills',x:14,y:9,n:'מטפס הרים',pal:'a',txt:'צור אלוף הגבעות בראש הגבעה. תג הגביש שלו פותח את הגשר למעבר הכפור!'},
+{map:'frost-village',x:9,y:6,n:'ילד כפור',pal:'b',txt:'ב-ב-קרררר! באצטדיון הזוהר משחקים רק אלופים. יום אחד אני אהיה שם!'},
+{map:'volcano-village',x:6,y:6,n:'אשה עם צעיף',pal:'c',txt:'המערה בצפון מסתירה אוצר, אבל הרצפה שם סדוקה ומלאה טלטלים!'},
+{map:'forest-village',x:10,y:10,n:'צייד פטריות',pal:'a',txt:'השומר העתיק בחורשה לא מוותרן. נצחו אותו והטלטל האגדי יעראל יסכים לפגוש אתכם!'},
+{map:'desert-town',x:9,y:9,n:'סוחר עתיקות',pal:'b',txt:'בחורבות במערב חי שומר המדבר העתיק. רק החזקים ביותר פוגשים את חוליאל האגדי.'},
+{map:'storm-city',x:17,y:13,n:'נער עם מטרייה',pal:'a',txt:'נורה אלופת הסופה היא המאמנית הכי חזקה בעולם! קודם צריך את תג הסערה של רעם.'},
+{map:'route-flower',x:6,y:10,n:'מטיילת',pal:'c',txt:'מעברים בין אזורים: פשוט הולכים על החץ בקצה המפה! השבילים ארוכים אבל יפים.'},
+{map:'route-desert',x:15,y:10,n:'נודד צמא',pal:'b',txt:'מים... סליחה, התחלתי לדבר כמו הדיונות. הצל של הקקטוסים מציל חיים כאן.'}];
+TALKS.forEach(t=>{const m=MAPS[t.map];m.npcs.push({kind:'talk',n:t.n,x:t.x,y:t.y,dir:'down',pal:t.pal,txt:t.txt})});
+/* הדמות המסתורית */
+const MYST5=[{map:'route-flower',x:12,y:22},{map:'swamp',x:22,y:17},{map:'forest-village',x:20,y:16},{map:'desert-town',x:18,y:16},{map:'storm-city',x:21,y:16}];
+const MYST5_TALK=[
+ ['הו... מטיילים קטנים עם טלטלים חדשים. מעניין, מעניין...','אני טיילת ארוכה. אולי ניפגש שוב - בביצה הירוקה. עד אז, קחו מתנה!'],
+ ['שוב אתם? יוצאי דופן! רק מאמנים נחושים מגיעים עד הביצה.','בפעם הבאה חפשו אותי בכפר הערפל, בצפון. שם הערפל מכיר אותי...'],
+ ['הערפל לוחש לי שאתם מתחזקים מיום ליום. יפה מאוד!','עוד קצת! חפשו אותי בעיירת החול, בעמק המדבר.'],
+ ['חם כאן, אה? גם אני חמה - מהתרגשות!','בפעם הבאה, בעיר הסערה, אוריד את הברדס ותראו מי אני באמת...'],
+ ['הגעתם עד לכאן... כל הכבוד! רוצים לדעת מי אני?']];
+const MYST5_GIFTS=[
+ ()=>{S.coins+=40;S.balls+=5;return'40 מטבעות 🪙 ו־5 כדורי לכידה ⚪'},
+ ()=>{S.coins+=60;S.gballs=(S.gballs||0)+2;return'60 מטבעות 🪙 ו־2 כדורים משופרים 🔵'},
+ ()=>{S.coins+=80;S.spots=(S.spots||0)+1;return'80 מטבעות 🪙 וסופר שיקוי '},
+ ()=>{S.coins+=100;S.uballs=(S.uballs||0)+1;return'100 מטבעות 🪙 וכדור על 🟡'},
+ ()=>{S.coins+=300;S.uballs=(S.uballs||0)+3;S.items=S.items||{};S.items.charm_spark=(S.items.charm_spark||0)+1;return'300 מטבעות 🪙, 3 כדורי על 🟡 וקמיע הברק ⚡'}];
+const MYST5_NEXT=['הביצה הירוקה','כפר הערפל בצפון','עיירת החול','עיר הסערה',''];
+/* סמלים נסתרים */
+const SYMBOLS5=[{map:'route-flower',x:4,y:19,g:'🔺'},{map:'hills',x:6,y:15,g:'🔷'},{map:'swamp',x:9,y:17,g:'⭐'}];
+/* מערות נסתרות */
+const CAVES5=[
+ {id:'caveE',name:'מערת הביצה הנסתרת',map:'swamp',ex:20,ey:13,sp:[30,31,32,33],lv:[12,16],ub:2,rc:120,rows:[
+  '###########','#C..#....T#','#.##.##.#.#','#.#....#..#','#.#.##.##.#','#....#....#','####X######']},
+ {id:'caveF',name:'מערת הגעש הנסתרת',map:'volcano-village',ex:19,ey:16,sp:[34,35,36,37],lv:[24,28],ub:3,rc:200,rows:[
+  '###########','#T...#...C#','#.##.#.##.#','#.#....#..#','#.#.##.#.##','#....#....#','####X######']}];
+const CVT5={'#':27,'.':25,'T':32,'C':33,'X':35};
+CAVES5.forEach(cv=>{const tiles=cv.rows.map(r=>[...r].map(ch=>CVT5[ch]));const w=cv.rows[0].length,h=cv.rows.length;const yy=cv.rows.findIndex(r=>r.includes('X'));
+ const m=newMap({id:cv.id,n:cv.name,zone:'D',w,h,tiles,indoor:true,caveConf:cv});
+ m.back={map:cv.map,x:cv.ex,y:cv.ey+1};m.cave=true;
+ const om=MAPS[cv.map];om.tiles[cv.ey][cv.ex]=30;om.caves=om.caves||[];om.caves.push({x:cv.ex,y:cv.ey,id:cv.id})});
+const LEG5=[
+ {tid:'guardH',sp:62,lv:35,n:'יאראל',call:'היער שותק... יעראל האגדי מופיע מהערפל! 🌿✨'},
+ {tid:'guardG',sp:63,lv:40,n:'חוליאל',call:'החולות רועדים... חוליאל האגדי קם מהדיונות! 🏜️✨'},
+ {tid:'guardI',sp:64,lv:45,n:'סופאל',call:'הברקים מבהיקים... סופאל האגדית יורדת מהעננים! ⚡✨'}];
+SOLID.add(37);SOLID.add(39);SOLID.add(41);SOLID.add(45);SOLID.add(46);SOLID.add(47);SOLID.add(51);SOLID.add(52);
+/* תיקון מיקומי דמויות: אף דמות לא עומדת על אריח מוצק, ותמיד יש לה צד נגיש */
+(function fixNpcs(){const SOLIDS=new Set([2,3,4,6,7,8,9,13,15,18,19,22,27,30,31,33,37,39,41,45,46,47,51,52]);
+ const bad=(m,x,y)=>{const t=m.tiles[y]&&m.tiles[y][x];return t==null||SOLIDS.has(t)||t===29};
+ const fixOne=(m,n)=>{if(!m)return;
+  const okAdj=(x,y)=>[[0,1],[0,-1],[1,0],[-1,0]].some(([dx,dy])=>!bad(m,x+dx,y+dy)&&!(m.npcs||[]).some(o=>o!==n&&o.x===x+dx&&o.y===y+dy));
+  if(!bad(m,n.x,n.y)&&okAdj(n.x,n.y))return;
+  outer:for(let r=1;r<=4;r++)for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+   const nx=n.x+dx,ny=n.y+dy;if(bad(m,nx,ny))continue;if((m.npcs||[]).some(o=>o!==n&&o.x===nx&&o.y===ny))continue;
+   if(!okAdj(nx,ny))continue;n.x=nx;n.y=ny;break outer}};
+ TR5.forEach(t=>{if(t.map&&MAPS[t.map]&&!MAPS[t.map].indoor)fixOne(MAPS[t.map],t)});
+ Q5.concat(SQ5).forEach(q=>{if(q.map&&MAPS[q.map]&&!MAPS[q.map].indoor)fixOne(MAPS[q.map],q)});
+ Object.values(MAPS).forEach(m=>(m.npcs||[]).forEach(n=>fixOne(m,n)));
+})();
+Object.assign(LEG5[0],{map:'forest-village',x:4,y:8});
+Object.assign(LEG5[1],{map:'desert-town',x:4,y:9});
+Object.assign(LEG5[2],{map:'storm-city',x:4,y:7});
+LEG5.forEach(l=>{const m=MAPS[l.map];if(m)m.tiles[l.y][l.x]=GROUND_OF[m.zone]??0});
+
+/* ============ V5 BLOCK w7.js ============ */
+/* ================= בניית הפנים וחיווט ================= */
+GYMS.forEach(g=>{const b=MAPS[g.back];const bd=b.buildings.find(x=>x.into===g.id);g.bx=bd.doorX;g.by=bd.frontY;buildGym(g)});
+buildStadium('stadium1','אצטדיון הזוהר','D','frost-village',5,11,'champion');
+buildStadium('stadium2','אצטדיון הסופה','I','storm-city',19,12,'champion2');
+buildHospital('hosp-meadow','בית החולים','A','meadow-town',10,7);
+buildHospital('hosp-lake','בית החולים','B','lake-town',5,7);
+buildHospital('hosp-frost','בית החולים','D','frost-village',4,6);
+buildHospital('hosp-forest','בית החולים','H','forest-village',9,7);
+buildHospital('hosp-desert','בית החולים','G','desert-town',9,7);
+buildHospital('hosp-storm','בית החולים','I','storm-city',9,7);
+buildHospital('hosp-hills','בקתת הריפוי','C','hills',18,22);
+buildHospital('hosp-swamp','בקתת הריפוי','E','swamp',22,19);
+buildHospital('hosp-volcano','בקתת הריפוי','F','volcano-village',8,6);
+buildShop('shop-meadow','המכולת','A','meadow-town',18,12);
+buildShop('shop-lake','המכולת','B','lake-town',11,7);
+buildShop('shop-frost','המכולת','D','frost-village',10,6);
+buildShop('shop-forest','המכולת','H','forest-village',16,7);
+buildShop('shop-desert','המכולת','G','desert-town',16,7);
+buildShop('shop-storm','המכולת','I','storm-city',17,7);
+buildHouse('home-player','הבית שלי','A','meadow-town',4,7,[
+ {kind:'nurse',n:'אמא',x:5,y:2,dir:'down',pal:'mom',txt:'הצצתי וראיתי שהצוות שלך עייף - בואי ארפא את כולם! אצל אמא הריפוי תמיד בחינם.'},
+ {kind:'talk',n:'אח קטן',x:8,y:5,dir:'left',pal:'kid',txt:'וואו, אתה כבר מאמן אמיתי! תחזור לספר לי כמה תגים יש לך!'}]);
+buildHouse('home-savta','בית סבתא חכמה','A','meadow-town',4,12,[
+ {kind:'quest',ref:'riddleq',x:5,y:2,dir:'down',pal:'old'},
+ {kind:'talk',n:'סבא יונה',x:8,y:5,dir:'left',pal:'old2',txt:'סבתא חכמה אוהבת חידות. התשובות מסתתרות באנציקלופדיה - קראו את התיאורים!'}]);
+buildHouse('home-dani','בית דני','A','meadow-town',19,17,[
+ {kind:'quest',ref:'lostq',x:5,y:2,dir:'down',pal:'kid'},
+ {kind:'talk',n:'אמא של דני',x:8,y:5,dir:'left',pal:'mom',txt:'דני ביכרוס מהבית בלי הפטרוש שלו... תודה שאתם עוזרים!'}]);
+buildHouse('home-narkis','בית נרקיס','B','lake-town',19,15,[
+ {kind:'quest',ref:'letterq',x:5,y:2,dir:'down',pal:'c'},
+ {kind:'talk',n:'שכן',x:8,y:5,dir:'left',pal:'a',txt:'שלג חוקר המערות עומד במעבר הכפור, צפונה מכאן. הדרך עוברת בגשר שפתוח רק לבעלי תג הגביש.'}]);
+buildHouse('home-noga','בית נוגה','B','lake-town',24,15,[
+ {kind:'quest',ref:'shiny',x:5,y:2,dir:'down',pal:'c'},
+ {kind:'trade',ref:'tr-nir',x:8,y:5,dir:'left',pal:'b'}]);
+buildHouse('home-sheleg','בית שלג','D','frost-village',18,15,[
+ {kind:'trade',ref:'tr-maor',x:8,y:5,dir:'left',pal:'b'},
+ {kind:'talk',n:'אחות של שלג',x:5,y:2,dir:'down',pal:'c',txt:'שלג, אח שלי, חוקר במעבר הכפור בחוץ. הוא ישמח אם תעזרו לו למצוא טלטלי כפור!'}]);
+buildHouse('home-ashaf','בית אשף','F','volcano-village',5,10,[
+ {kind:'quest',ref:'volcq',x:5,y:2,dir:'down',pal:'a'},
+ {kind:'trade',ref:'tr-lital',x:8,y:5,dir:'left',pal:'c'}]);
+buildHouse('home-alma','בית אלמה','H','forest-village',19,14,[
+ {kind:'quest',ref:'forestq',x:5,y:2,dir:'down',pal:'c'},
+ {kind:'trade',ref:'tr-nitzan',x:8,y:5,dir:'left',pal:'a'}]);
+buildHouse('home-hamed','בית חמד','G','desert-town',18,14,[
+ {kind:'quest',ref:'desertq',x:5,y:2,dir:'down',pal:'b'},
+ {kind:'trade',ref:'tr-sultan',x:8,y:5,dir:'left',pal:'a'}]);
+buildHouse('home-alon','בית פרופ׳ אלון','G','desert-town',22,14,[
+ {kind:'quest',ref:'masterq',x:5,y:2,dir:'down',pal:'old2'},
+ {kind:'talk',n:'עוזרת המעבדה',x:8,y:5,dir:'left',pal:'c',txt:'פרופ׳ אלון אוסף נתונים על כל 60 המינים! האנציקלופדיה בתפריט מראה כמה תפסתם.'}]);
+buildHouse('home-saar','בית סער','I','storm-city',5,14,[
+ {kind:'quest',ref:'stormq',x:5,y:2,dir:'down',pal:'a'},
+ {kind:'trade',ref:'tr-tal',x:8,y:5,dir:'left',pal:'b'}]);
+buildGrove('grove-swamp','חורשת האוצר','E','swamp',24,3);
+buildGrove('grove-forest','חורשת האוצר','H','forest-village',12,4);
+/* רישום דמויות החוץ */
+TR5.forEach(t=>{if(!t.map||!MAPS[t.map]||MAPS[t.map].indoor)return;npcPut({kind:'trainer',ref:t.id,map:t.map,x:t.x,y:t.y,dir:'down',pal:t.boss?'gym':'t'})});
+Q5.concat(SQ5).forEach(q=>{if(!MAPS[q.map]||MAPS[q.map].indoor)return;npcPut({kind:'quest',ref:q.id,map:q.map,x:q.x,y:q.y,dir:'down',pal:'q'})});
+
+/* ============ V5 BLOCK w8.js ============ */
+/* ================= אריחי פנים חדשים (34-53) - מערכי פריימים כמו ATL ================= */
+ATL[34]=[mkT(c=>{c.fillStyle='#d8c8a0';c.fillRect(0,0,32,32);c.fillStyle='#c8b488';c.fillRect(0,0,32,3);c.fillRect(0,29,32,3);c.fillStyle='#b09a70';for(let i=4;i<32;i+=8)c.fillRect(i,3,1,26)})];
+ATL[35]=[mkT(c=>{c.fillStyle='#8a6a40';c.fillRect(0,0,32,32);c.fillStyle='#d8b860';c.fillRect(3,3,26,26);c.fillStyle='#f0d888';c.fillRect(6,6,20,20);c.fillStyle='#8a6a40';c.font='bold 14px system-ui';c.textAlign='center';c.fillText('▼',16,21)})];
+ATL[36]=[mkT(c=>{c.fillStyle='#a87848';c.fillRect(0,0,32,32);c.fillStyle='#b88858';for(let i=0;i<4;i++)c.fillRect(0,i*8+1,32,6);c.fillStyle='#8a5e36';for(let i=0;i<4;i++)c.fillRect(0,i*8,32,1);c.fillRect((7*3)%23,0,1,32)})];
+ATL[37]=[mkT(c=>{c.fillStyle='#8a5a3a';c.fillRect(0,0,32,32);c.fillStyle='#6d4529';for(let r=0;r<4;r++){c.fillRect(0,r*8,32,1);for(let cx2=0;cx2<2;cx2++)c.fillRect(((r%2)*8+cx2*16),r*8,1,8)}c.fillStyle='rgba(255,255,255,.08)';c.fillRect(0,0,32,2)})];
+ATL[38]=[mkT(c=>{c.fillStyle='#3a5aa8';c.fillRect(0,0,32,32);c.fillStyle='#4a6ac0';c.fillRect(3,3,26,26);c.strokeStyle='#c8a030';c.lineWidth=2;c.strokeRect(2,2,28,28);c.fillStyle='#d8b848';c.beginPath();c.arc(16,16,3,0,7);c.fill()})];
+ATL[39]=[mkT(c=>{c.fillStyle='#9a6a40';c.fillRect(0,0,32,32);c.fillStyle='#c89860';c.fillRect(0,0,32,7);c.fillStyle='#7a5230';c.fillRect(0,7,32,2);c.fillStyle='#5a4020';c.fillRect(5,14,4,14);c.fillRect(23,14,4,14)})];
+ATL[40]=[mkT(c=>{c.fillStyle='#9aa2ae';c.fillRect(0,0,32,32);c.fillStyle='#aab2be';c.fillRect(0,0,16,16);c.fillRect(16,16,16,16);c.strokeStyle='rgba(0,0,0,.15)';c.lineWidth=1;c.strokeRect(0,0,32,32)})];
+ATL[41]=[mkT(c=>{c.fillStyle='#9aa2ae';c.fillRect(0,0,32,32);c.fillStyle='#787f88';c.fillRect(6,22,20,7);c.fillStyle='#c8cdd4';c.beginPath();c.arc(16,13,8,0,7);c.fill();c.fillRect(12,17,8,6);c.fillStyle='#787f88';c.fillRect(12,11,2,4);c.fillRect(20,11,2,4)})];
+ATL[42]=[mkT(c=>{c.fillStyle='#e8f4f8';c.fillRect(0,0,32,32);c.fillStyle='#d8e8f0';for(let i=0;i<4;i++)for(let j=0;j<4;j++)if((i+j)%2)c.fillRect(i*8,j*8,8,8);c.fillStyle='#d04848';c.fillRect(13,2,6,2);c.fillRect(15,0,2,6)})];
+ATL[43]=[mkT(c=>{c.fillStyle='#d8e8d0';c.fillRect(0,0,32,32);c.fillStyle='#c8dcc0';for(let i=0;i<4;i++)for(let j=0;j<4;j++)if((i+j)%2)c.fillRect(i*8,j*8,8,8);c.fillStyle='#3a8ad0';c.fillRect(2,2,4,4)})];
+ATL[44]=[mkT(c=>{c.fillStyle='#8a6a9a';c.fillRect(0,0,32,32);c.fillStyle='#9a7aaa';c.fillRect(0,0,32,4);c.strokeStyle='#6a4a7a';c.lineWidth=1;c.strokeRect(0,0,32,32);c.fillStyle='#f0c040';c.beginPath();c.arc(16,16,4,0,7);c.fill()})];
+ATL[45]=[mkT(c=>{c.fillStyle='#a87848';c.fillRect(0,0,32,32);c.fillStyle='#c89860';c.fillRect(2,6,28,18);c.strokeStyle='#8a5e36';c.lineWidth=2;c.strokeRect(2,6,28,18);c.fillStyle='#7a5230';c.fillRect(4,24,4,7);c.fillRect(24,24,4,7);c.fillStyle='#e8e0d0';c.beginPath();c.arc(20,15,4,0,7);c.fill()})];
+ATL[46]=[mkT(c=>{c.fillStyle='#a87848';c.fillRect(0,0,32,32);c.fillStyle='#7a5230';c.fillRect(2,4,28,24);c.fillStyle='#d04858';c.fillRect(4,12,24,14);c.fillStyle='#f0e8d8';c.fillRect(4,6,24,6);c.fillStyle='#b03848';c.fillRect(4,12,24,2)})];
+ATL[47]=[mkT(c=>{c.fillStyle='#a87848';c.fillRect(0,0,32,32);c.fillStyle='#7a5230';c.fillRect(3,2,26,28);c.fillStyle='#5a4020';c.fillRect(5,4,22,24);const bc=['#c04848','#4880c0','#48a058','#d0a030'];for(let r=0;r<2;r++)for(let cc=0;cc<4;cc++){c.fillStyle=bc[(r*4+cc)%4];c.fillRect(6+cc*5.5,6+r*13,4,10)}c.fillStyle='#7a5230';c.fillRect(5,15,22,2)})];
+ATL[48]=[mkT(c=>{c.fillStyle='#e8dcc0';c.fillRect(0,0,32,32);c.fillStyle='#7a5230';c.fillRect(6,6,20,20);c.fillStyle='#a8d8f0';c.fillRect(8,8,16,16);c.fillStyle='#fff';c.fillRect(10,10,4,4);c.fillStyle='#7a5230';c.fillRect(14,8,4,16);c.fillRect(8,14,16,4)})];
+ATL[49]=[mkT(c=>{c.fillStyle='#8a5e36';c.fillRect(0,0,32,32);c.fillStyle='#a87848';for(let i=0;i<4;i++)c.fillRect(0,i*8+1,32,6);c.fillStyle='#5a4020';c.fillRect(0,0,2,32);c.fillRect(16,0,2,32);c.fillStyle='rgba(70,130,190,.55)';c.fillRect(0,28,32,4)})];
+ATL[50]=[mkT(c=>{c.fillStyle='#888';c.fillRect(0,0,32,32)})];
+ATL[51]=[mkT(c=>{grassBase(c,1);c.fillStyle='#8a5e36';c.fillRect(2,6,5,24);c.fillRect(25,6,5,24);c.fillRect(2,10,28,4);c.fillRect(2,20,28,4);c.fillStyle='#6d4529';c.fillRect(2,6,5,3);c.fillRect(25,6,5,3)})];
+ATL[52]=[mkT(c=>{grassBase(c,2);c.fillStyle='#3a4048';c.fillRect(14,10,4,22);c.fillStyle='#ffd878';c.beginPath();c.arc(16,8,6,0,7);c.fill();c.fillStyle='rgba(255,216,120,.25)';c.beginPath();c.arc(16,8,11,0,7);c.fill()})];
+ATL[53]=[mkT(c=>{c.fillStyle='#eef3fa';c.fillRect(0,0,32,32);c.fillStyle='#fff';c.beginPath();c.arc(8,24,8,0,7);c.fill();c.beginPath();c.arc(26,8,6,0,7);c.fill();c.fillStyle='#c8d8e8';c.fillRect(6,6,2,2);c.fillRect(22,18,2,2);c.fillRect(12,26,2,2);c.fillRect(28,28,2,2)})];
+
+/* ============ V5 BLOCK w15.js ============ */
+/* ================= v5 חיווט אחרון: שערים, מערות, דמות מסתורית, נרמול ================= */
+const REQ5={
+ boss:{ok:()=>S.badges>0,msg:'🔒 הגשר למעבר הכפור חסום! קודם זכו בתג הגביש אצל צור, אלוף הגבעות שבגבעות הגחלים.'},
+ lv10:{ok:()=>topLv()>=10,msg:'🔒 הביצה הירוקה מסוכנת מדי! צריך טלטל ברמה 10 לפחות בצוות כדי להיכנס.'},
+ gym2:{ok:()=>!!S.defeated.gym2,msg:'🔒 הדרך לשביל הגעש חסומה! קודם זכו בתג הגל בהיכל הגלים שבעיירת הברכה.'},
+ lv15:{ok:()=>topLv()>=15,msg:'🔒 יער הערפל עבה מדי! צריך טלטל ברמה 15 לפחות בצוות כדי להיכנס.'},
+ gymF:{ok:()=>!!S.defeated.gymF,msg:'🔒 סופת המדבר לוהטת מדי! קודם זכו בתג הלהבה בהיכל הלהבה שבכפר הלהבה.'},
+ gymG:{ok:()=>!!S.defeated.gymG,msg:'🔒 סופת הפסגות חזקה מדי! קודם זכו בתג החול בהיכל החול שבעיירת החול.'}};
+/* דלתות סמלים אל חורשות האוצר */
+MAPS['swamp'].tiles[2][24]=29;MAPS['swamp'].doors.push({x:24,y:2,into:'grove-swamp'});
+MAPS['forest-village'].doors.push({x:12,y:2,into:'grove-forest'});
+/* נרמול נקודות יציאה: תמיד מול דלת המבנה החיצוני */
+Object.values(MAPS).forEach(m=>{if(!m.back)return;const bm=MAPS[m.back.map];if(!bm)return;const dr=(bm.doors||[]).find(d2=>d2.into===m.id);if(dr){m.back.x=dr.x;m.back.y=dr.y+1}});
+/* ברירת מחדל: נקודת הופעה של עיירה = נקודת הריפוי שלה */
+Object.values(MAPS).forEach(m=>{if(m.town&&!m.spawn&&m.heal)m.spawn={x:m.heal.x,y:m.heal.y}});
+/* סימון עיירות עם היכל לצורך מפת העולם */
+GYMS.forEach(g=>{if(MAPS[g.back])MAPS[g.back].gym=g.master});
+const PORT5=Object.values(MAPS).filter(m=>m.portal).map(m=>({id:m.portal.id,n:m.portal.n,map:m.id,x:m.portal.x,y:m.portal.y}));
+const WORLD_NODES={'meadow-town':[60,150],'route-flower':[60,120],'hills':[28,95],'lake-town':[110,122],'route-swamp':[165,152],'swamp':[195,125],'route-frost':[110,85],'frost-village':[110,55],'route-volcano':[160,42],'volcano-village':[200,58],'route-forest':[240,75],'forest-village':[268,95],'route-desert':[268,130],'desert-town':[240,155],'route-storm':[190,178],'storm-city':[150,178]};
+/* פריטי היכל חדשים */
+ITEMS.coin_amulet={n:'קמיע הזהב',icon:'💰',d:'טלטל שמחזיק אותו מכפיל את המטבעות מניצחונות בקרבות',held:true};
+ITEMS.xp_star={n:'כוכב הניסיון',icon:'⭐',d:'טלטל שמחזיק אותו מקבל בונוס של 50% נקודות ניסיון בקרבות',held:true};
+const giveXp0=giveXp;
+giveXp=async function(m,amt){if(m.item==='xp_star')amt=Math.floor(amt*1.5);return giveXp0(m,amt)};
+/* כניסה למערה */
+function enterCave(cv2){const cm=MAPS[cv2.id];curCave=cv2;S.caveRet={x:P.x,y:P.y};
+ AM=cm.tiles;AW=cm.w;AH=cm.h;
+ const yy=cv2.rows.findIndex(r=>r.includes('X')),sx=cv2.rows[yy].indexOf('X');
+ P.x=sx;P.y=yy;P.px=P.x;P.py=P.y;P.dir='up';S.x=P.x;S.y=P.y;save();sfx('ok');
+ toast('🕳️ '+cv2.name+'! מצאו את תיבת האוצר - וזהירות מהרצפה הסדוקה!',4000)}
+/* הדמות המסתורית */
+const activeMyst5=()=>(S.myst||0)<MYST5.length?MYST5[S.myst||0]:null;
+function mystMenu(){if(mode!=='map')return;const i=S.myst||0;if(i>=MYST5.length)return;mode='menu';
+ const lines=MYST5_TALK[i];const last=i===MYST5.length-1;
+ modal(`<h2>🕶️ דמות מסתורית</h2><p>${lines[0]}</p><p>${lines[1]}</p><button class="btn grn" id="mg" style="width:100%">קחו מתנה 🎁</button>`,b=>{
+ b.querySelector('#mg').onclick=()=>{const g=MYST5_GIFTS[i]();S.myst=i+1;hud();sfx('ok');save();closeModal();mode='map';
+  if(last){modal(`<h2>✨ ההופעה!</h2><p>הדמות מורידה את הברדס... זו נורה, אלופת הסופה! "חיכיתי לראות עד כמה תגיעו. כשתזכו בתג הסערה - אחכה לכם באצטדיון לקרב האמיתי!"</p><button class="btn grn" id="mr" style="width:100%">וואו!</button>`,c=>{c.querySelector('#mr').onclick=()=>{closeModal();mode='map'}});toast('🎁 קיבלתם: '+g,4000)}
+  else toast('🎁 קיבלתם: '+g+(MYST5_NEXT[i]?' · רמז לפעם הבאה: '+MYST5_NEXT[i]:''),4500)}})}
+
+/* ============ V5 BLOCK w10.js ============ */
+/* ================= v5 ENGINE OVERRIDES (append; function decls win) ================= */
+let curMapId=(S&&S.map&&MAPS[S.map])?S.map:'meadow-town';
+const curMap=()=>MAPS[curMapId]||MAPS['meadow-town'];
+const zAt5=()=>curMap().zone;
+AM=curMap().tiles;AW=curMap().w;AH=curMap().h;
+async function travelTo(mapId,x,y,dir){dpadOff();tapA=false;mapLayout(false);mode='trans';await transition(true);
+ curMapId=mapId;const m=curMap();AM=m.tiles;AW=m.w;AH=m.h;curCave=null;
+ P.x=x;P.y=y;P.px=x;P.py=y;P.moving=false;P.dir=dir||'down';S.map=mapId;S.x=x;S.y=y;S.dir=P.dir;region='';save();
+ mapLayout(true);mode='map';sfx('ok');await transition(false);
+ const z=m.zone;S.visited=S.visited||{};if(!S.visited[z]){S.visited[z]=1;save()}
+ toast('📍 '+m.n,2800)}
+function npcsHere(){return curMap().npcs||[]}
+function linkAt(x,y){return (curMap().links||[]).find(l=>l.x===x&&l.y===y)}
+function linkReq(l){if(!l.req)return null;const r=typeof l.req==='string'?REQ5[l.req]:l.req;return r||null}
+function solidAt(x,y){
+ if(x<0||y<0||x>=AW||y>=AH)return true;
+ const v=AM[y][x];
+ if(v===29)return symLocked();
+ if(SOLID.has(v))return true;
+ if(npcsHere().some(n=>n.x===x&&n.y===y))return true;
+ if(LEG5.some(l=>l.map===curMapId&&l.x===x&&l.y===y))return true;
+ if(LOST_SPOT5.map===curMapId&&LOST_SPOT5.x===x&&LOST_SPOT5.y===y&&(S.quests.lostq===1)&&!(S.story||{}).lostFound)return true;
+ const l=linkAt(x,y);if(l){const r=linkReq(l);if(r&&!r.ok())return true}
+ return false}
+function tryMove(d){if(P.moving||mode!=='map')return;P.dir=d;const v=DIRS[d],nx=P.x+v[0],ny=P.y+v[1];
+ if(nx<0||ny<0||nx>=AW||ny>=AH){if(!P.bump||performance.now()-P.bump>400){P.bump=performance.now();sfx('bump')}return}
+ if(solidAt(nx,ny)){const tv=AM[ny][nx];
+  if(tv===29&&symLocked()){if(!P.bump||performance.now()-P.bump>1200){P.bump=performance.now();sfx('bump');toast('🔒 דלת הסמלים נעולה! מצאו שלושה סמלים נסתרים 🔺🔷⭐ ('+(S.symbols||[]).length+'/3)',3500)}return}
+  const l=linkAt(nx,ny);if(l){const r=linkReq(l);if(r&&!r.ok()){if(!P.bump||performance.now()-P.bump>1200){P.bump=performance.now();sfx('bump');toast(r.msg||l.msg||'🔒 הדרך חסומה!',3500)}return}}
+  if(!P.bump||performance.now()-P.bump>400){P.bump=performance.now();sfx('bump')}return}
+ P.moving=true;P.mt=0;P.from={x:P.x,y:P.y};P.to={x:nx,y:ny}}
+function stepDone(){
+ const m=curMap(),v=AM[P.y][P.x];
+ if(curCave){if(v===35){exitCave();return}
+  if(v===32||Math.random()<0.055){startWild(pick(curCave.sp),curCave.lv)}return}
+ if(v===35&&m.exit){travelTo(m.back.map,m.back.x,m.back.y,'down');return}
+ if(v===29){const dr=(m.doors||[]).find(d2=>d2.x===P.x&&d2.y===P.y);if(dr){const im=MAPS[dr.into];if(im&&im.spawn){travelTo(dr.into,im.spawn.x,im.spawn.y,'up');return}}}
+ if(v===30){const c2=CAVES5.find(c3=>c3.map===curMapId&&c3.ex===P.x&&c3.ey===P.y);if(c2){enterCave(c2);return}}
+ const l=linkAt(P.x,P.y);if(l){travelTo(l.to,l.tx,l.ty,'down');return}
+ checkSymbol();checkItem();checkSpot();
+ if(isTall(v)){if(S.repel>0){S.repel--;if(S.repel===0)toast('🛡 דוחה המפגשים נגמר',2500);else if(S.repel===10)toast('🛡 דוחה המפגשים: נשארו 10 צעדים בעשב',2500)}else if(Math.random()<.12){held=null;dpadOff();startWild()}}}
+function newB(e){const z=zAt5();const pi=S.party.findIndex(m=>m.hp>0);return{e,z,pi,parts:[pi],eo:{x:0,y:0},po:{x:0,y:0},es:1,ps:1,ea:1,pa:1,ball:null,proj:null,fx:[],flash:{e:0,p:0},t:0}}
+
+/* ============ V5 BLOCK w11.js ============ */
+/* ================= v5 ציור מפה (מבוסס על המקור + סינון מפה + סמנים) ================= */
+function markerOf(n){switch(n.kind){
+ case 'trainer':return S.defeated[n.ref]?{i:'✓',c:'#8a8a8a'}:{i:'⚔️',c:'#d04848'};
+ case 'master':{if(S.defeated[n.ref])return{i:'✓',c:'#8a8a8a'};const g=GYMS.find(g2=>g2.master===n.ref);if(g&&!(S.defeated[g.j1.id]&&S.defeated[g.j2.id]))return{i:'🔒',c:'#8888aa'};return{i:'👑',c:'#d0a018'}}
+ case 'quest':{const st=S.quests[n.ref];if(st===2)return{i:'✓',c:'#8a8a8a'};if(st===1){const q=ALLQ5.find(q2=>q2.id===n.ref);return q&&q.test&&q.test()?{i:'🎁',c:'#38a038'}:{i:'❓',c:'#c8a018'}}return{i:'❗',c:'#38a038'}}
+ case 'trade':return(S.trades&&S.trades[n.ref])?{i:'✓',c:'#8a8a8a'}:{i:'🔄',c:'#7a4ad0'};
+ case 'nurse':return{i:'🏥',c:'#d04848'};
+ case 'shopkeeper':return{i:'🛒',c:'#3a8ad0'};
+ case 'talk':return{i:'💬',c:'#5aa85a'};
+ default:return{i:'❗',c:'#c8a018'}}}
+function drawMap(ts){
+ const c=cx;c.setTransform(2,0,0,2,0,0);
+ let camx=P.px*TS+16-VW*TS/2,camy=P.py*TS+16-VH*TS/2;camx=Math.round(clamp(camx,0,AW*TS-VW*TS)*2)/2;camy=Math.round(clamp(camy,0,AH*TS-VH*TS)*2)/2;
+ c.fillStyle='#000';c.fillRect(0,0,352,cv.height/2);
+ const x0=Math.floor(camx/TS),y0=Math.floor(camy/TS),wf=Math.floor(ts/500)%2;
+ for(let y=y0;y<=y0+VH;y++)for(let x=x0;x<=x0+VW;x++){if(x<0||y<0||x>=AW||y>=AH)continue;const t=AM[y][x];let a=ATL[t];if(!a)continue;let im;
+  if(t===2||t===19)im=a[wf];else if(GROUNDV.has(t))im=a[(x*7+y*3)%3];else if(isTall(t))im=a[(Math.floor(ts/450)+x+y)%2];else im=a[0];
+  c.drawImage(im,x*TS-camx,y*TS-camy,TS,TS)}
+ const sx=P.px*TS-camx,sy=P.py*TS-camy;
+ const bob=Math.sin(ts/350)*1.6;
+ if(!curCave)npcsHere().forEach(n=>{const x=n.x*TS-camx,y=n.y*TS-camy;if(x<-32||y<-32||x>352||y>cv.height/2)return;
+  drawPlayer(c,x,y,n.dir||'down',0,false);const mk=markerOf(n);
+  E(c,x+16,y+5+bob*.4,7,4,'rgba(255,255,255,.92)');c.fillStyle=mk.c;c.font='bold 10px system-ui';c.textAlign='center';c.fillText(mk.i,x+16,y+9+bob*.4)});
+ const myn=curCave?null:activeMyst5();if(myn&&myn.map===curMapId){const x=myn.x*TS-camx,y=myn.y*TS-camy;if(x>-32&&y>-32&&x<352&&y<cv.height/2){E(c,x+16,y+26,11,4,'rgba(40,20,80,.35)');poly(c,[x+6,y+28,x+10,y+10,x+16,y+5,x+22,y+10,x+26,y+28],'#3a2560');E(c,x+16,y+8,8,7,'#2a1a4a');E(c,x+16,y+5,6,4,'#4a2a7a');E(c,x+13.5,y+8,1.4,1.8,'#ffd23f');E(c,x+18.5,y+8,1.4,1.8,'#ffd23f');const pl=1+.3*Math.sin(ts/300);c.font='bold '+Math.round(15*pl)+'px system-ui';c.textAlign='center';c.fillStyle='#d0a8ff';c.fillText('?',x+16,y-4)}}
+ if(!curCave)SYMBOLS5.forEach((sm,i2)=>{if(sm.map!==curMapId||(S.symbols||[]).includes(i2))return;const x=sm.x*TS-camx,y=sm.y*TS-camy;if(x<-32||y<-32||x>352||y>cv.height/2)return;const pl=1+.25*Math.sin(ts/280+i2*2);E(c,x+16,y+16,11*pl,11*pl,'rgba(255,240,180,.3)');c.font='bold 16px system-ui';c.textAlign='center';c.fillText(sm.g,x+16,y+22)});
+ if(!curCave&&S.quests.lostq===1&&!(S.story||{}).lostFound&&LOST_SPOT5.map===curMapId){const x=LOST_SPOT5.x*TS-camx,y=LOST_SPOT5.y*TS-camy;if(x>-32&&y>-32&&x<352&&y<cv.height/2){c.drawImage(monCanvas(5,20),x+2,y+8,28,28);const pl=1+.3*Math.sin(ts/300);c.font='bold '+Math.round(13*pl)+'px system-ui';c.textAlign='center';c.fillStyle='#ffe84a';c.fillText('!',x+16,y+4)}}
+ if(!curCave)curMap().fields.forEach((f,i)=>{const x=f.x*TS-camx,y=f.y*TS-camy;if(x<-32||y<-32||x>352||y>cv.height/2)return;
+  if(f.type==='sparkle'){if((S.sparkles||{})[curMapId+':'+i]===spotCyc())return;const pl=1+.3*Math.sin(ts/250+i);c.font='bold '+Math.round(15*pl)+'px system-ui';c.textAlign='center';c.fillStyle='#ffe84a';c.fillText('✦',x+16,y+14)}
+  else if(f.type==='pickup'){if((S.pickups||{})[curMapId+':'+i]===spotCyc()||!itemPop(i))return;const pl=1+.12*Math.sin(ts/300+i);c.font=Math.round(17*pl)+'px system-ui';c.textAlign='center';c.fillText('🎁',x+16,y+16)}
+  else if(f.type==='chest'){const pl=1+.15*Math.sin(ts/400+i);c.font=Math.round(15*pl)+'px system-ui';c.textAlign='center';c.fillText(S.chests&&S.chests[f.id]?'📭':'🎁',x+16,y+16)}
+  else if(f.type==='symbolLock'){const n2=(S.symbols||[]).length;for(let i2=0;i2<3;i2++){c.beginPath();c.arc(x+8+i2*8,y+10,3,0,7);c.fillStyle=i2<n2?['#ff5a4a','#4aa8ff','#ffd23f'][i2]:'rgba(0,0,0,.45)';c.fill()}}});
+ amb(c,ts,curCave?'B':zAt5());
+ if(!isNight()&&!curMap().indoor){const sg=c.createRadialGradient(304,24,4,304,24,58);sg.addColorStop(0,'rgba(255,240,160,.45)');sg.addColorStop(1,'rgba(255,240,160,0)');c.fillStyle=sg;c.fillRect(240,-30,130,130);E(c,304,24,9,9,'#ffec9e')}
+ drawPlayer(c,sx,sy,P.dir,P.moving?P.mt:0,P.moving);
+ if(isNight()&&!curMap().indoor){c.fillStyle='#09174666';c.fillRect(0,0,352,cv.height/2);for(let i=0;i<18;i++){const x=(i*97+21)%352,y=(i*61+17)%(cv.height/2);c.globalAlpha=.4+.6*Math.abs(Math.sin(ts/700+i));E(c,x,y,1.1,1.1,'#fff');c.globalAlpha=1}E(c,315,47,13,13,'#fff3b5');E(c,321,43,11,11,'#15233b')}
+ const tx=Math.round(P.px),ty=Math.round(P.py);const tv=AM[ty]&&AM[ty][tx];
+ if(isTall(tv)){const im=ATL[tv][(Math.floor(ts/450)+tx+ty)%2];c.drawImage(im,0,28,64,36,tx*TS-camx,ty*TS-camy+14,TS,18)}
+}
+/* ================= יציאה ממערה/פנים ================= */
+function exitCave(){const m=curMap();AM=m.tiles;AW=m.w;AH=m.h;curCave=null;P.x=S.caveRet.x;P.y=S.caveRet.y;P.px=P.x;P.py=P.y;S.x=P.x;S.y=P.y;save();sfx('ok');toast('חזרתם לאור השמש! ☀️',2000)}
+/* ================= שערי קסם ================= */
+function portalMenu(){if(mode!=='map')return;mode='menu';S.portals=S.portals||{};const here=PORT5.find(p=>p.map===curMapId);if(here)S.portals[here.id]=1;const others=PORT5.filter(p=>S.portals[p.id]&&(!here||p.id!==here.id));
+ modal(`<h2>🌀 שער קסם</h2><p class="flav">דילוג מידי אל שער שכבר גיליתם. שערים חדשים נפתחים כשמגיעים אליהם ברגל!</p><div style="display:grid;gap:8px">${others.map(p=>`<button class="btn" data-p="${p.id}">${p.n}</button>`).join('')||'<p>עוד לא גיליתם שערים אחרים. חפשו מערבולות סגולות בעולם!</p>'}<button class="btn sec" id="pc">סגור</button></div>`);
+ others.forEach(p=>{const b=document.querySelector(`[data-p="${p.id}"]`);if(b)b.onclick=()=>{closeModal();mode='map';portalTravel(p)}});
+ $('#pc').onclick=()=>{closeModal();mode='map'}}
+async function portalTravel(p){await travelTo(p.map,p.x,p.y,'down');toast('🌀 הגעתם אל '+p.n+'!',3000)}
+
+/* ============ V5 BLOCK w12.js ============ */
+/* ================= v5 לוגיקה: אינטראקציה, תפריטים, טקס תג, ציות ================= */
+function interact(){const d=DIRS[P.dir],x=P.x+d[0],y=P.y+d[1];if(mode!=='map')return;
+ const n=npcsHere().find(n2=>n2.x===x&&n2.y===y);
+ if(n){switch(n.kind){
+  case 'nurse':hospitalMenu();return;
+  case 'shopkeeper':shopMenu();return;
+  case 'talk':mode='menu';modal(`<h2>${n.n}</h2><p>${n.txt}</p><button class="btn grn" id="tk" style="width:100%">הבנתי!</button>`,b=>{b.querySelector('#tk').onclick=()=>{closeModal();mode='map'}});return;
+  case 'trainer':trainerMenu(TR5.find(t=>t.id===n.ref));return;
+  case 'master':{const g=GYMS.find(g2=>g2.master===n.ref);const mst=TR5.find(t=>t.id===n.ref);
+   if(g&&!(S.defeated[g.j1.id]&&S.defeated[g.j2.id])){mode='menu';modal(`<h2>🏛️ ${mst.n}</h2><p>${g.lockTxt||'רגע, אלוף צעיר! כדי להתמודד מולי צריך קודם לנצח את שני המאמנים של ההיכל. הם מחכים לך במגרש.'}</p><p class="flav">מאמני ההיכל: ${S.defeated[g.j1.id]?'✅':'⚔️'} ${g.j1.n} · ${S.defeated[g.j2.id]?'✅':'⚔️'} ${g.j2.n}</p><button class="btn grn" id="tk" style="width:100%">אתאמן ואחזור!</button>`,b=>{b.querySelector('#tk').onclick=()=>{closeModal();mode='map'}});return}
+   trainerMenu(mst);return}
+  case 'quest':{const q=ALLQ5.find(q2=>q2.id===n.ref);if(q)q.story?storyMenu(q):questMenu(q);return}
+  case 'trade':tradeMenu(TRADES5.find(t=>t.id===n.ref));return;
+ }}
+ const v=AM[y]&&AM[y][x];
+ if(v===8){const bl=(curMap().doors||[]).find(d2=>d2.x===x&&d2.y===y);
+  if(bl){if(bl.req){const r=typeof bl.req==='string'?REQ5[bl.req]:bl.req;if(r&&!r.ok()){toast(r.msg||'🔒 נעול!',3500);return}}
+   const im=MAPS[bl.into];if(im&&im.spawn){travelTo(bl.into,im.spawn.x,im.spawn.y,'up');return}}
+  hutMenu();return}
+ if(v===33&&curCave){caveChest();return}
+ if(LOST_SPOT5.map===curMapId&&LOST_SPOT5.x===x&&LOST_SPOT5.y===y&&(S.quests.lostq===1)&&!(S.story||{}).lostFound){lostFound();return}
+ if(v===28){portalMenu();return}
+ if(v===9){const sg=(curMap().signs||[]).find(s2=>s2.x===x&&s2.y===y);if(sg){mode='menu';modal(`<h2>🪧 שלט</h2><p>${sg.msg||sg.txt}</p><button class="btn grn" id="tk" style="width:100%">קראתי</button>`,b=>{b.querySelector('#tk').onclick=()=>{closeModal();mode='map'}})}return}
+ const lg=LEG5.find(l2=>l2.map===curMapId&&l2.x===x&&l2.y===y);if(lg){if(!S.defeated[lg.tid]){toast('השומר העתיק חוסם את הדרך! נצחו אותו קודם ⚔️',3000);return}legendMenu(lg);return}
+ const myn=activeMyst5();if(myn&&myn.map===curMapId&&myn.x===x&&myn.y===y){mystMenu();return}
+}
+/* ---------- בית חולים ---------- */
+function hospitalMenu(){if(mode!=='map')return;mode='menu';
+ modal(`<h2>🏥 בית החולים</h2><p>אחות לילי: "ברוכים הבאים! כאן מרפאים את כל הצוות - בחינם, תמיד."</p><div style="display:grid;gap:8px"><button class="btn grn" id="hl">💚 ריפוי מלא לכל הצוות (חינם)</button><button class="btn sec" id="hc">סגור</button></div>`,b=>{
+ b.querySelector('#hl').onclick=()=>{S.party.forEach(m=>{m.hp=maxHp(m);m.status=null});sfx('heal');save();closeModal();mode='map';toast('💚 כל הצוות בריא ומלא כוח!',2500)};
+ b.querySelector('#hc').onclick=()=>{closeModal();mode='map'}})}
+/* ---------- חנות ---------- */
+function shopMenu(){if(mode!=='map')return;mode='menu';
+ const cyc=spotCyc();const candyLeft=S.candyCyc!==cyc;
+ const draw=()=>modal(`<h2>🛒 המכולת</h2><div style="margin-bottom:10px">🪙 ${S.coins} מטבעות · ⚪ ${S.balls} 🔵 ${S.gballs||0} 🟡 ${S.uballs||0}</div>
+ <div style="display:grid;gap:8px"><button class="btn" id="s2" ${S.coins<10?'disabled':''}>⚪ קנה כדור לכידה<small>10 🪙</small></button>
+ <button class="btn" id="s6" ${S.coins<25?'disabled':''}>🔵 קנה כדור משופר<small>25 🪙 · סיכוי גבוה יותר ללכידה</small></button>
+ <button class="btn" id="s7" ${S.coins<100?'disabled':''}>🟡 קנה כדור על<small>100 🪙 · הסיכוי הטוב ביותר ללכידה</small></button>
+ <button class="btn" id="s3" ${S.coins<15?'disabled':''}>🧪 קנה שיקוי קטן<small>15 🪙 · +35 חיים</small></button>
+ <button class="btn" id="s8" ${S.coins<40?'disabled':''}>🧪 קנה סופר שיקוי<small>40 🪙 · מחזיר חצי מהחיים</small></button>
+ <button class="btn" id="s9" ${S.coins<100?'disabled':''}>🧪 קנה אולטרה שיקוי<small>100 🪙 · חיים מלאים</small></button>
+ <button class="btn" id="s10" ${S.coins<500||!candyLeft?'disabled':''}>🍬 קנה סוכריית כוח נדירה<small>500 🪙 · מעלה טלטל רמה שלמה! רק אחת למחזור יום-לילה</small></button>
+ <button class="btn" id="s11" ${S.coins<200?'disabled':''}>🪀 קנה פיתיון נוצץ<small>200 🪙 · סיכוי גבוה פי 4 לבוהקים למשך 20 לכידות</small></button>
+ <button class="btn" id="s12" ${S.coins<60?'disabled':''}>🛡 קנה דוחה מפגשים<small>60 🪙 · 100 צעדים בעשב בלי קרבות</small></button>
+ <button class="btn sec" id="sc">סגור</button></div>`,b=>{
+  const buy=(id,price,fn)=>{b.querySelector(id).onclick=()=>{if(S.coins<price)return;S.coins-=price;hud();sfx('ok');fn();save();closeModal();shopMenu()}};
+  buy('#s2',10,()=>{S.balls++;toast('⚪ קנית כדור לכידה!',2000)});
+  buy('#s6',25,()=>{S.gballs=(S.gballs||0)+1;toast('🔵 קנית כדור משופר!',2000)});
+  buy('#s7',100,()=>{S.uballs=(S.uballs||0)+1;toast('🟡 קנית כדור על!',2000)});
+  buy('#s3',15,()=>{S.pots++;toast('🧪 קנית שיקוי קטן!',2000)});
+  buy('#s8',40,()=>{S.spots=(S.spots||0)+1;toast('🧪 קנית סופר שיקוי!',2000)});
+  buy('#s9',100,()=>{S.upots=(S.upots||0)+1;toast('🧪 קנית אולטרה שיקוי!',2000)});
+  buy('#s11',200,()=>{S.lure=(S.lure||0)+20;toast('🪀 הפיתיון הנוצץ פעיל ל-20 הלכידות הבאות!',2500)});
+  buy('#s12',60,()=>{S.repel=(S.repel||0)+100;toast('🛡 100 צעדים שקטים בעשב!',2500)});
+  b.querySelector('#s10').onclick=()=>{if(S.coins<500||!candyLeft)return;closeModal();pickCandyMon()};
+  b.querySelector('#sc').onclick=()=>{closeModal();mode='map'}});
+ draw()}
+/* ---------- החלפה ---------- */
+function tradeMenu(t){if(mode!=='map'||!t)return;mode='menu';
+ if(S.trades&&S.trades[t.id]){modal(`<h2>🔄 ${t.n}</h2><p>נהיה בקשר! תודה על ההחלפה.</p><button class="btn grn" id="tc2" style="width:100%">להתראות</button>`,b=>{b.querySelector('#tc2').onclick=()=>{closeModal();mode='map'}});return}
+ const have=allMons5().find(m=>SP[m.sp].n===t.want||SP[m.sp].n===t.want+'');
+ modal(`<h2>🔄 ${t.n}</h2><p>${t.txt}</p><p><b>מבקש:</b> ${t.want} · <b>מציע:</b> ${t.give.n} רמה ${t.give.lv}${t.give.shiny?' ✨בוהק!':''}</p><p class="flav">שימו לב: טלטל שהתקבל בהחלפה מציית רק עד רמת הציות של התגים שלכם (כרגע ${obeyCap()}). כל תג היכל מעלה את הגבול!</p>
+ ${have?`<button class="btn grn" id="tdo" style="width:100%">החלף! (מוסר ${nm(have)})</button>`:`<p>אין לכם עדיין ${t.want}. חזרו כשיתפסתם אחד!</p>`}
+ <button class="btn sec" id="tc2" style="width:100%;margin-top:8px">לא עכשיו</button>`,b=>{
+  if(have)b.querySelector('#tdo').onclick=()=>{const nm2=SP[have.sp].n;
+   S.party=S.party.filter(m=>m!==have);S.box=S.box.filter(m=>m!==have);
+   const g=mkMon(t.give.sp,t.give.lv);g.traded=true;if(t.give.shiny)g.shiny=true;
+   if(S.party.length<6)S.party.push(g);else S.box.push(g);
+   S.trades=S.trades||{};S.trades[t.id]=1;S.seen[g.sp]=1;S.caught[g.sp]=1;save();closeModal();mode='map';
+   toast(`🔄 מסרת ${nm2} וקיבלת ${SP[g.sp].n}!`,3500)};
+  b.querySelector('#tc2').onclick=()=>{closeModal();mode='map'}})}
+/* ---------- טקס תג היכל: ציות + מתנה ---------- */
+async function gymCeremony(t){const cap=BADGE_CAPS[t.id];if(cap){await say(`🏅 כוח ה${t.badge} פועם בך! טלטלים שהתקבלו בהחלפה יצייתו עד רמה ${cap}!`,2600)}
+ const g=t.gift;if(g){
+  if(g.item&&ITEMS[g.item]){S.items=S.items||{};S.items[g.item]=(S.items[g.item]||0)+(g.itemN||1);await say(`🎁 מתנת ההיכל: ${ITEMS[g.item].icon} ${ITEMS[g.item].n}${g.itemN>1?' ×'+g.itemN:''}! ${ITEMS[g.item].d||''}`,2400)}
+  if(g.tea){S.tea=(S.tea||0)+g.tea;await say(`🎁 וגם ${g.tea} תה מרפא 🍵!`,1800)}
+  if(g.balls){S[g.balls[0]]=(S[g.balls[0]]||0)+g.balls[1];await say(`🎁 וגם ${g.balls[1]} ${g.balls[0]==='uballs'?'כדורי על 🟡':'כדורים משופרים 🔵'}!`,1800)}}
+ save()}
+/* עטיפות על פונקציות מקוריות */
+const enemyDown0=enemyDown;
+enemyDown=async function(){const t=B&&B.trainer;const first=t&&!S.defeated[t.id];const r=await enemyDown0();if(r==='end'&&B&&B.e&&B.e.hp<=0){const am=S.party.find(m=>m.item==='coin_amulet');if(am){const bonus=Math.max(4,Math.floor(B.e.lv*2));S.coins+=bonus;hud();await say(`💰 קמיע הזהב של ${nm(am)} הכפיל את השלל! +${bonus} מטבעות`,1400)}}if(t&&t.gym&&first&&t.ceremony)await gymCeremony(t);return r};
+const useMove0=useMove;
+useMove=async function(a,d,mvk,isP){if(isP&&a.traded&&a.lv>obeyCap()&&Math.random()<.3){const acts=['משתעל ולא מקשיב... 🥱','מסתכל לכיוון אחר... 🙄','ישן עמוק... 😴'];await say(`${nm(a)} ${pick(acts)} (טלטל מהחלפה מעל רמת הציות ${obeyCap()})`,1400);return}return useMove0(a,d,mvk,isP)};
+/* הפסד: התעוררות במרפאה של העיירה הנוכחית */
+async function endBattle(){
+ const lost=B&&B.lost;mode='trans';await transition(true);
+ S.party.forEach(m=>{m.bst=0;m.status=null;m.itemUsed=0});
+ if(lost){S.coins=Math.floor(S.coins/2);S.party.forEach(m=>m.hp=maxHp(m));const h=curMap().heal||{map:'meadow-town',x:10,y:9};
+  if(h.map&&h.map!==curMapId){curMapId=h.map;const m2=curMap();AM=m2.tiles;AW=m2.w;AH=m2.h;S.map=h.map}
+  P.x=h.x;P.y=h.y;P.px=h.x;P.py=h.y;P.dir='down';S.x=h.x;S.y=h.y;S.dir='down'}
+ B=null;bui.style.display='none';menuEl.style.display='none';mapctrl.style.display='block';$('#hud').style.display='flex';pe.style.display='none';pp.style.display='none';hud();save();
+ mapLayout(true);mode='map';await transition(false);
+ if(lost)toast('התעוררת בבית החולים. איבדת חצי מהמטבעות.',3500)}
+
+/* ============ V5 BLOCK w13.js ============ */
+/* ================= v5 הגדרות עזר חסרות ================= */
+const BADGE_CAPS={gym1:25,gymE:28,gym2:30,gymH:33,gym3:40,gymF:45,gymG:48,gymI:50,champion:50,champion2:50};
+const obeyCap=()=>{let c=20;(S.gymBadges||[]).forEach(g=>{if(BADGE_CAPS[g]>c)c=BADGE_CAPS[g]});return c};
+const allMons5=()=>S.party.concat(S.box||[]);
+/* ================= סוכריית כוח 500 ================= */
+function pickCandyMon5(){if(!S.party.length){toast('אין טלטלים בצוות!',2000);return}
+ mode='menu';modal(`<h2>🍬 סוכריית כוח נדירה</h2><p class="flav">סוכרייה קסומה שמעלה טלטל רמה שלמה מיד! היא נדירה מאוד - אפשר לקנות רק אחת בכל מחזור יום ולילה. למי תתנו אותה?</p><div style="display:grid;gap:6px">${S.party.map((m,i)=>`<button class="btn" data-i="${i}">${SP[m.sp].icon||''} ${nm(m)} · רמה ${m.lv}</button>`).join('')}</div><button class="btn sec" id="cc2" style="width:100%;margin-top:8px">ביטול</button>`,b=>{
+ b.querySelectorAll('[data-i]').forEach(bt=>bt.onclick=()=>{const m=S.party[+bt.dataset.i];closeModal();useCandy5(m)});
+ b.querySelector('#cc2').onclick=()=>{closeModal();mode='map'}})}
+async function useCandy5(m){if(S.coins<500){toast('צריך 500 מטבעות!',2000);mode='map';return}
+ if(S.candyCyc===spotCyc()){toast('אפשר לקנות רק סוכריית כוח אחת בכל מחזור יום-לילה!',3000);mode='map';return}
+ S.coins-=500;S.candyCyc=spotCyc();mode='map';
+ if(m.lv>=50){toast('הטלטל כבר ברמה המקסימלית 50!',2500);S.coins+=500;S.candyCyc=-1;return}
+ m.lv++;const g2=maxHp(m)-m.hp;m.hp=maxHp(m)-Math.max(0,g2);m.xp=xpNeed(m.lv);
+ hud();sfx('lvl');save();
+ mode='menu';modal(`<h2>🍬 רמה עלתה!</h2><p>${nm(m)} אכל את סוכריית הכוח ועלה לרמה ${m.lv}! הכוח והחיים גדלו.</p><button class="btn grn" id="ok3" style="width:100%">יש!</button>`,b=>{b.querySelector('#ok3').onclick=async()=>{closeModal();mode='map';await mapEvolve(m)}})}
+/* ================= נקודות איסוף לפי מפה ================= */
+function checkSpot(){const m=curMap();(m.fields||[]).forEach((f,i)=>{if(f.type!=='sparkle'||f.x!==P.x||f.y!==P.y)return;
+ S.sparkles=S.sparkles||{};const k=curMapId+':'+i;if(S.sparkles[k]===spotCyc())return;S.sparkles[k]=spotCyc();
+ const c=rnd(15,35);S.coins+=c;hud();sfx('ok');toast('✦ מצאת נקודת ניצוץ! +'+c+' מטבעות 🪙',3000);save()})}
+function checkItem(){const m=curMap();(m.fields||[]).forEach((f,i)=>{if(f.type!=='pickup'||f.x!==P.x||f.y!==P.y)return;
+ S.pickups=S.pickups||{};const k=curMapId+':'+i;if(S.pickups[k]===spotCyc()||!itemPop(i))return;S.pickups[k]=spotCyc();
+ const r=(spotCyc()*31+i*17)%100;let t;
+ if(r<24){S.balls+=2;t='מצאת 2 כדורי לכידה! ⚪'}else if(r<38){S.pots++;t='מצאת שיקוי קטן! 🧪'}
+ else if(r<48){S.gballs++;t='מצאת כדור משופר! 🔵'}else if(r<58){S.tea=(S.tea||0)+1;t='מצאת תה מרפא! 🍵 מרפא כוויה, שינה, רעל ושיתוק'}
+ else if(r<68){S.spots=(S.spots||0)+1;t='מצאת סופר שיקוי! 🧪'}else if(r<76){S.uballs++;t='וואו! מצאת כדור על נדיר! 🟡'}
+ else if(r<84){S.upots=(S.upots||0)+1;t='וואו! מצאת אולטרה שיקוי נדיר! 🧪'}
+ else if(r<92){S.items=S.items||{};S.items.berry=(S.items.berry||0)+1;t='מצאת פרי מרפא 🫐! תנו אותו לטלטל וירפא את עצמו פעם אחת בכל קרב'}
+ else{S.items=S.items||{};const ck=pick(['charm_fire','charm_water','charm_plant','charm_spark','charm_earth']);S.items[ck]=(S.items[ck]||0)+1;t='מצאת '+ITEMS[ck].n+' '+ITEMS[ck].icon+'! תנו אותו לטלטל מתאים'}
+ hud();sfx('ok');toast('🎁 '+t,3000);save()})}
+function checkSymbol(){const i=SYMBOLS5.findIndex(sm=>sm.map===curMapId&&sm.x===P.x&&sm.y===P.y);if(i<0)return;
+ S.symbols=S.symbols||[];if(S.symbols.includes(i))return;S.symbols.push(i);sfx('ok');
+ if(S.symbols.length>=3){toast('🎉 מצאתם את שלושת הסמלים! דלתות האבן עם שלוש הנקודות נפתחו! בואו לגלות מה מסתתר מאחוריהן ✨',6000)}
+ else{toast(SYMBOLS5[i].g+' מצאת סמל קסום! ('+S.symbols.length+'/3) - עוד '+(3-S.symbols.length)+' מחכים בעולם',4000)}save()}
+/* ================= פרא ================= */
+const startWild0=startWild;
+async function startWild(fsp,flv){
+ mapLayout(false);mode='trans';sfx('enc');
+ const z=zAt5(),zn=ZONES[z];let sp,lv;
+ if(fsp!=null){sp=fsp;lv=rnd(flv[0],flv[1])}
+ else{const pool=curMap().wild;if(pool){sp=pick(pool.sp);lv=rnd(pool.lv[0],pool.lv[1])}else{sp=pickWildSp(zn);const range=wildLevelRange(z);lv=rnd(range[0],range[1])}}
+ const e=mkMon(sp,lv);const lureOn=(S.lure||0)>0;if(lureOn)S.lure--;e.shiny=Math.random()<(lureOn?1/32:1/128);await transition(true);
+ B=newB(e);S.seen[sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null;m.itemUsed=0});
+ mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display=pp.style.display='block';panels();mode='battle';await transition(false);
+ await battleIntro({key:'w'+sp,wild:true});entrance();await say(`הופה! ${nm(e)} פראי קופץ מהעשב!`,1100);battleLoop()}
+
+/* ============ V5 BLOCK w14.js ============ */
+/* ================= v5 התחלה, הגירה, מפת עולם, מדריך ================= */
+function startMap(first){const m=curMap();AM=m.tiles;AW=m.w;AH=m.h;curCave=null;S.map=curMapId;
+ const sp=(Number.isInteger(S.x)&&Number.isInteger(S.y)&&S.x>=0&&S.y>=0&&S.x<AW&&S.y<AH&&!SOLID.has(AM[S.y][S.x]))?{x:S.x,y:S.y}:(m.spawn||{x:2,y:2});
+ P.x=sp.x;P.y=sp.y;P.px=sp.x;P.py=sp.y;P.dir=S.dir||'down';P.moving=false;
+ mapLayout(true);mode='map';region='';hud();$('#bmute').textContent=S.snd?'🔊':'🔇';
+ if(first)toast('ברוך הבא לכפר הפרחים! הליכה עם החיצים, וכפתור הפעולה ליד דלתות ודמויות 🎮',5000);else toast('📍 '+m.n)}
+function migrateState5(j){const n=j||newState();
+ n.trades=n.trades||{};n.candyCyc=Number.isFinite(n.candyCyc)?n.candyCyc:-1;n.candies=n.candies||0;
+ if(n.mapv!==3||!n.map||!MAPS[n.map]){
+  n.map='meadow-town';const m=MAPS['meadow-town'];const sp=m.spawn||{x:2,y:2};
+  n.x=sp.x;n.y=sp.y;n.dir='down';n.sparkles={};n.pickups={}}
+ n.mapv=3;return n}
+/* הרצת הגירה מחדש - ההגירה המקורית רצה לפני שהעולם החדש נטען */
+if(activePlayer()){S=migrateState5(S);P.x=S.x;P.y=S.y;P.px=S.x;P.py=S.y;P.dir=S.dir||'down';save()}
+const validatedImport0=validatedImport;
+function validatedImport(code){const r=validatedImport0(code);r.state=migrateState5(r.state);return r}
+/* ================= מפת עולם סכמטית ================= */
+function worldMap(){mode='menu';
+ modal(`<h2>🗺️ מפת העולם</h2><canvas id="wmc" width="300" height="210" style="width:100%;image-rendering:pixelated;border-radius:8px;background:#12304a"></canvas><p class="flav" id="wml">העיירות והדרכים של עולם הטלטלים. נקודה זהובה - אתם כאן!</p><button class="btn sec" id="wmb" style="width:100%">סגור</button>`,b=>{
+  const c2=b.querySelector('#wmc').getContext('2d');
+  c2.strokeStyle='rgba(255,255,255,.35)';c2.lineWidth=2;
+  Object.values(MAPS).forEach(m=>{if(m.indoor)return;const a=WORLD_NODES[m.id];if(!a)return;
+   (m.links||[]).forEach(l=>{const t=WORLD_NODES[l.to];if(!t||MAPS[l.to].indoor)return;if(m.id<l.to){c2.beginPath();c2.moveTo(a[0],a[1]);c2.lineTo(t[0],t[1]);c2.stroke()}})});
+  Object.values(MAPS).forEach(m=>{if(m.indoor)return;const a=WORLD_NODES[m.id];if(!a)return;
+   const zc={A:'#7ed67e',B:'#6ec8e8',C:'#e8a05a',D:'#c8e8f8',E:'#8ad8a0',F:'#f08058',G:'#ecd9a0',H:'#9ad8b8',I:'#b0b8e8'}[m.zone]||'#ccc';
+   const seen=(S.visited||{})[m.zone];
+   c2.globalAlpha=seen?1:.55;c2.fillStyle=zc;c2.beginPath();c2.arc(a[0],a[1],m.town?7:4,0,7);c2.fill();
+   c2.strokeStyle='#102518';c2.lineWidth=1;c2.stroke();c2.globalAlpha=1;
+   if(m.gym||m.town){c2.font='6px system-ui';c2.textAlign='center';c2.fillStyle='#fff';c2.fillText(m.n,a[0],a[1]+(m.town?14:11))}
+   if(m.gym){c2.font='7px system-ui';c2.fillStyle=S.defeated[m.gym]?'#7ee87e':'#ffd23f';c2.fillText(S.defeated[m.gym]?'✓':'🏛️',a[0],a[1]-9)}});
+  const pm=WORLD_NODES[curMapId];if(pm&&!curMap().indoor){c2.fillStyle='#ffd23f';c2.strokeStyle='#3a2200';c2.lineWidth=1;c2.beginPath();c2.arc(pm[0],pm[1]-12,3,0,7);c2.fill();c2.stroke();c2.beginPath();c2.moveTo(pm[0],pm[1]-9);c2.lineTo(pm[0],pm[1]-4);c2.stroke()}
+  b.querySelector('#wmb').onclick=()=>{closeModal();if(!$('#mnu').offsetParent)mode='map'}})}
+/* ================= מדריך v5 ================= */
+function guide(){info(`<h2>🗺️ מפת המסע · גרסה 5.0</h2>
+<p>העולם גדול! 8 עיירות וכפרים מחוברים בדרכים. בכל יישוב: <b>בית חולים</b> (ריפוי חינם), <b>מכולת</b> (כדורים ושיקויים), <b>היכל תגים</b> ובתים לחקור.</p>
+<p>🏛️ <b>היכלי התגים:</b> בכל היכל מחכים שני מאמני היכל, ורק אחרי שמנצחים את שניהם נפתח הקרב מול האלוף. ניצחון על אלוף מעניק תג, <b>מתנה מיוחדת</b>, ומעלה את <b>רמת הציות</b> שלכם.</p>
+<p>🔄 <b>ציות בהחלפות:</b> טלטל שתפסתם בעצמכם תמיד מציית. טלטל שהתקבל בהחלפה מציית רק עד רמת הציות שלכם (מתחיל ב-20 ועולה עם כל תג). תגדלו - והוא יציית יותר!</p>
+<p>🍬 <b>סוכריית כוח:</b> במכולת, 500 מטבעות, מעלה רמה שלמה - אבל רק אחת בכל מחזור יום-לילה!</p>
+<p>💬 <b>סמנים מעל דמויות:</b> ⚔️ מאמן לקרב · ❗ משימה חדשה · 🎁 משימה מוכנה למסירה · 🔄 החלפה · 🏥 אחות · 🛒 מוכר · 👑 אלוף היכל · 🔒 נעול · ✓ סיימתם.</p>
+<p>🌀 שערי קסם מדלגים בין מקומות שכבר גיליתם. 💾 ההתקדמות נשמרת אוטומטית.</p>`)}
+Object.assign(window.__g,{MAPS,get curMapId(){return curMapId},travelTo,zAt5,obeyCap,markerOf,TR5,Q5,SQ5,ALLQ5,TRADES5,GYMS,CAVES5,LEG5,MYST5,SYMBOLS5,PORT5,LOST_SPOT5,REQ5,WORLD_NODES,REQ5});
+
 hud();showProfiles();
 requestAnimationFrame(frame);
 })();
