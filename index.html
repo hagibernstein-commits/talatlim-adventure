@@ -2105,7 +2105,7 @@ async function startWild(fsp,flv){
  const e=mkMon(sp,lv);const lureOn=(S.lure||0)>0;if(lureOn)S.lure--;e.shiny=Math.random()<(lureOn?1/32:1/128);await transition(true);
  B=newB(e);S.seen[sp]=1;S.party.forEach(m=>{m.bst=0;m.status=null;m.itemUsed=0});
  mapctrl.style.display='none';bui.style.display='flex';$('#hud').style.display='none';pe.style.display=pp.style.display='block';panels();mode='battle';await transition(false);
- await battleIntro({key:'w'+sp,wild:true});entrance();await say(`הופה! ${nm(e)} פראי קופץ מהעשב!`,1100);battleLoop()}
+ await battleIntro({key:'w'+e.sp,wild:true,mon:e});entrance();await say(`הופה! ${nm(e)} פראי קופץ מהעשב!${e.shiny?' ✨ בוהק נדיר!':''}`,1100);battleLoop()}
 
 /* ============ V5 BLOCK w14.js ============ */
 /* ================= v5 התחלה, הגירה, מפת עולם, מדריך ================= */
