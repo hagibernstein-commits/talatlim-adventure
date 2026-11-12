@@ -920,7 +920,7 @@ const t = [
       `<span style="display:inline-block;background:${v[t].c};border-radius:50%;padding:0 4px;line-height:1.25"></span>`,
     M = (t, e) =>
       0 === t ? 35 : 1 === t ? Math.max(70, Math.ceil(x(e) / 2)) : x(e);
-  function C(t, e) {
+  function C(t, e, m) { const r = window.__TLmoves && window.__TLmoves(t, e, m, C0); return r || C0(t, e); } function C0(t, e) {
     const a = f[t].t,
       n = ["tackle"];
     return (
@@ -4733,14 +4733,14 @@ const t = [
         `${Yt(e)}${s || Nt.trainer ? "" : " הפראי"} השתמש ב${l.n}!`,
         900,
       ),
-      "buff" === n)
+      ("buff" === n || (c[n] && c[n].st)))
     ) {
-      (Y("buff"), (e.bst = Math.min((e.bst || 0) + 1, 3)));
+      (Y("buff"), window.__TLstage ? window.__TLstage(e, n, s) : (e.bst = Math.min((e.bst || 0) + 1, 3)));
       const a = s ? ce() : re();
       return (
         oe(a.x, a.y, t[37], 16, 50),
         await i(400),
-        void (await ee(`ההתקפה של ${Yt(e)} עלתה!`, 900))
+        void (await ee(window.__TLstageMsg ? window.__TLstageMsg(e, n, s) : `ההתקפה של ${Yt(e)} עלתה!`, 900))
       );
     }
     if (
@@ -4802,9 +4802,9 @@ const t = [
           g(t.sp, t.lv, 1) *
           ("burn" === t.status ? 0.8 : 1) *
           (1 + 0.5 * (t.bst || 0)),
-        l = g(e.sp, e.lv, 2),
-        i = f[t.sp].t === a.t ? 1.25 : 1,
-        o = (r[a.t] && r[a.t][f[e.sp].t]) || 1,
+        l = g(e.sp, e.lv, 2) * (window.__TLdm ? window.__TLdm(e) : 1),
+        i = f[t.sp].t === a.t || f[t.sp].t2 === a.t ? 1.25 : 1,
+        o = window.__TLeff ? window.__TLeff(a.t, e.sp, r) : (r[a.t] && r[a.t][f[e.sp].t]) || 1,
         c = Math.random() < 1 / 12,
         d = 0.85 + 0.15 * Math.random();
       return {
@@ -4885,13 +4885,13 @@ const t = [
     ) {
       t.xp -= u(t.lv);
       const e = x(t),
-        a = C(t.sp, t.lv);
+        a = C(t.sp, t.lv, t);
       (t.lv++,
         (t.hp += x(t) - e),
         Y("lvl"),
         le(),
         await ee(`${Yt(t)} עלה לרמה ${t.lv}!`, 1100));
-      for (const e of C(t.sp, t.lv).filter((t) => !a.includes(t)))
+      for (const e of C(t.sp, t.lv, t).filter((t) => !a.includes(t)))
         await ee(`${Yt(t)} למד את ${c[e].n}!`, 1100);
     }
     (await Ee(t), le());
@@ -4967,10 +4967,10 @@ const t = [
       ]);
       if ("fight" === a) {
         const a = await ae(
-          C(e.sp, e.lv)
+          C(e.sp, e.lv, e)
             .map((t) => ({
               k: t,
-              h: `${c[t].n}${E(c[t].t)}<small>${c[t].p ? "עוצמה " + c[t].p : "מחזק התקפה"}</small>`,
+              h: `${c[t].n}${E(c[t].t)}<small>${c[t].p ? "עוצמה " + c[t].p : window.__TLstLabel ? window.__TLstLabel(c[t]) : "מחזק התקפה"}</small>`,
             }))
             .concat([{ k: "back", h: t[113], cls: "sec", span: 1 }]),
         );
@@ -5065,7 +5065,7 @@ const t = [
         o = i.filter((t) => ((r[t] && r[t][s]) || 1) > 1),
         d = i.filter((t) => ((r[t] && r[t][s]) || 1) < 1),
         p = i.filter((t) => ((r[s] && r[s][t]) || 1) > 1),
-        y = C(l.sp, l.lv)
+        y = C(l.sp, l.lv, l)
           .map((t) => {
             const e = c[t],
               a = (e.p && r[e.t] && r[e.t][s]) || 1,
@@ -5122,7 +5122,7 @@ const t = [
     const a = Qt(),
       n = Nt.e,
       o = (function (t, e) {
-        const a = C(t.sp, t.lv);
+        const a = C(t.sp, t.lv, t);
         if (!t.bst && a.includes("buff") && Math.random() < 0.15) return "buff";
         const n = a.filter((t) => "buff" !== t);
         if (Math.random() < 0.3) return s(n);
@@ -5806,10 +5806,7 @@ const t = [
     const a = f[e.sp],
       n = F.party.includes(e);
     Ie(
-      `<div id="mc"></div><h2 style="margin:6px 0">${Yt(e)} ${E(a.t)}</h2><div>${e.nick ? a.n + " · " : ""}רמה ${e.lv} · חיים ${e.hp}/${x(e)}</div>\n ${Be("חיים", x(e), 90)}${Be("התקפה", g(e.sp, e.lv, 1), 40)}${Be("הגנה", g(e.sp, e.lv, 2), 40)}${Be("מהירות", g(e.sp, e.lv, 3), 40)}\n <div class="row"><span class="l">ניסיון</span>${ze(e.xp / u(e.lv), "")}<span class="v" style="width:60px;font-size:11px">${e.xp}/${u(e.lv)}</span></div>\n ${C(
-        e.sp,
-        e.lv,
-      )
+      `<div id="mc"></div><h2 style="margin:6px 0">${Yt(e)} ${E(a.t)}</h2><div>${e.nick ? a.n + " · " : ""}רמה ${e.lv} · חיים ${e.hp}/${x(e)}</div>\n ${Be("חיים", x(e), 90)}${Be("התקפה", g(e.sp, e.lv, 1), 40)}${Be("הגנה", g(e.sp, e.lv, 2), 40)}${Be("מהירות", g(e.sp, e.lv, 3), 40)}\n <div class="row"><span class="l">ניסיון</span>${ze(e.xp / u(e.lv), "")}<span class="v" style="width:60px;font-size:11px">${e.xp}/${u(e.lv)}</span></div>\n ${C(e.sp, e.lv, e)
         .map(
           (t) =>
             `<div class="mv"><span>${c[t].n}</span>${E(c[t].t)}<span>${c[t].p ? "עוצמה " + c[t].p : "חיזוק"}</span></div>`,
@@ -12766,7 +12763,7 @@ const t = [
           R(r, l - 6, t + 4, 3, 5, n.plant, 0.6));
     return (Wn.set(s, o), o);
   }
-  (function () { try { window.TL63 && window.TL63({ get F() { return F; }, set F(v) { F = v; }, get Et() { return Et; }, set Et(v) { Et = v; }, get Rt() { return Rt; }, get ct() { return ct; }, get en() { return en; }, get Nt() { return Nt; }, get dt() { return dt; }, get ft() { return ft; }, get tt() { return tt; }, f, H, o, r, c, d, qn, Sn, $n, y, ua, Mn, $, Z, Ct, Tt, N, B, a, n, s, l, i, m, mt, x, g, b, T, Yt, Vt, E, G, L, W, z, ie, D, Bt, Ie, He, Ae, Pe, ee, Y, le, an, nn, _: _, get_() { return _; }, set_(v) { _ = v; }, getNe() { return Ne; }, setNe(v) { Ne = v; }, Ne(t) { return Ne(t); }, getXe() { return Xe; }, setXe(v) { Xe = v; }, getBn() { return bn; }, setBn(v) { bn = v; }, ver: e, }); } catch (e) { console.error("TL63", e); } })(); (ie(), la(), requestAnimationFrame(function e(a) {
+  (function () { try { window.TL63 && window.TL63({ get F() { return F; }, set F(v) { F = v; }, get Et() { return Et; }, set Et(v) { Et = v; }, get Rt() { return Rt; }, get ct() { return ct; }, get en() { return en; }, get Nt() { return Nt; }, get dt() { return dt; }, get ft() { return ft; }, get tt() { return tt; }, f, H, o, r, c, d, qn, Sn, $n, y, ua, Mn, $, Z, Ct, Tt, N, B, a, n, s, l, i, m, mt, x, g, b, T, Yt, Vt, E, G, L, W, z, ie, D, Bt, Ie, He, Ae, Pe, ee, Y, le, an, nn, _: _, get_() { return _; }, set_(v) { _ = v; }, getNe() { return Ne; }, setNe(v) { Ne = v; }, Ne(t) { return Ne(t); }, getXe() { return Xe; }, setXe(v) { Xe = v; }, getBn() { return bn; }, setBn(v) { bn = v; }, ver: e, Re: Re, Ha: Ha, ut: ut, bt: bt, at: at, ee: ee, }); } catch (e) { console.error("TL63", e); } })(); (ie(), la(), requestAnimationFrame(function e(a) {
       const n = Math.min(0.05, (a - ha) / 1e3);
       ha = a;
       try {
