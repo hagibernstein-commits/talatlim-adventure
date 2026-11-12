@@ -877,5 +877,64 @@ window.TL63_r2=function(K,X){
   <p>🦴 <b>מעבדת מאובנים:</b> מחיים טלטל עתיק (רק שם!) תוך 10 דקות אמיתיות.</p></div><button class="btn grn" id="tlwn2" style="width:100%;margin-top:10px">יוצאים להרפתקה!</button>`,m=>m.querySelector('#tlwn2').onclick=closeM)}
  setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen63&&!F.seen64&&K.Et==='map'){K.Et='menu';wn()}},2500);
 };
-window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX);window.TL63_r2&&window.TL63_r2(K,window.TLX)};
+window.TL63_r3=function(K,X){
+ const KEY=X.KEY,$q=s=>document.querySelector(s),esc=X.esc,closeM=()=>{K.He();K.Et='map'},f=K.f;
+ const fm=()=>{const F=K.F;F.fm=F.fm||{};return F.fm};
+ // ---- field moves ----
+ const FMV=[{k:'cut',ic:'🪓',n:'חיתוך',gym:'gym1',gname:'אלוף היכל הראשון',txt:'חותכים עץ שחוסם את הדרך: עומדים מולו ולוחצים לכיוונו.'},
+  {k:'surf',ic:'🌊',n:'גלישה',gym:'gym2',gname:'אלוף היכל השני',txt:'אפשר ללכת על מים. מי שאוהב לטייל באגם יגלה פינות חדשות.'},
+  {k:'str',ic:'💪',n:'כוח',gym:'gym3',gname:'אלוף היכל השלישי',txt:'דוחפים סלע גדול ממקומו: עומדים מולו ולוחצים לכיוונו, אם יש מקום פנוי מאחוריו.'}];
+ let seenSurf=null;
+ function fmModal(){const F=K.F,d=F.defeated||{},m=fm();
+  K.Ie(`<h2>🌊 מהלכי שדה</h2><div class="flav">הטלטלים שלכם לומדים כוחות מיוחדים לטיול. כל כוח נפתח כשמנצחים אלוף היכל, וקיים לכל הצוות.</div>`+
+   FMV.map(v=>`<div class="tlrow"><div><b>${m[v.k]?'✅':'🔒'} ${v.ic} ${v.n}</b><br><small>${m[v.k]?v.txt:'נפתח בניצחון על '+v.gname}</small></div></div>`).join('')+
+   `<button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}
+ function unlockPoll(){const F=K.F;if(!F||!F.started||K.Et!=='map')return;const d=F.defeated||{},m=fm();
+  for(const v of FMV){if(!m[v.k]&&d[v.gym]){m[v.k]=1;K._();K.Et='menu';K.Ie(`<h2>${v.ic} למדתם ${v.n}!</h2><div class="flav">${v.txt}</div><button class="btn grn" id="tlx" style="width:100%">מעולה!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM);return}}}
+ setInterval(()=>{try{unlockPoll();
+  const s=!!(K.F&&K.F.fm&&K.F.fm.surf);if(s!==seenSurf){seenSurf=s;if(s)K.ut.delete(2);else K.ut.add(2)}}catch(e){}},700);
+ // act on bumps
+ let lastB=0;
+ const DIR={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
+ function act(){try{const R=K.Rt;if(K.Et!=='map'||R.moving||!R.bump||R.bump===lastB||performance.now()-R.bump>450)return;
+  lastB=R.bump;const d=DIR[R.dir];if(!d)return;const x=R.x+d[0],y=R.y+d[1],ct=K.ct;if(!ct[y]||ct[y][x]===undefined)return;const t=ct[y][x],m=fm();
+  if(t===3){if(m.cut){ct[y][x]=0;K.Y('lvl');K.Bt('🪓 חתכתם את העץ!',1800)}else K.Bt('🌳 עץ עבה. אולי יעזור אלוף היכל ראשון... (תפריט ☰ ← מהלכי שדה)',2600)}
+  else if(t===4){if(!m.str){K.Bt('🪨 סלע כבד מדי. כוח נפתח בניצחון על אלוף היכל שלישי.',2600);return}
+   const x2=x+d[0],y2=y+d[1];const free=ct[y2]&&ct[y2][x2]!==undefined&&!K.ut.has(ct[y2][x2])&&ct[y2][x2]!==4&&!K.an().npcs.some(n=>n.x===x2&&n.y===y2)&&!(K.an().links||[]).some(l=>l.x===x2&&l.y===y2)&&(ct[y2][x2]===0||ct[y2][x2]===1);
+   if(free){ct[y2][x2]=4;ct[y][x]=0;K.Y('lvl');K.Bt('💪 דחפתם את הסלע!',1500)}else K.Bt('💪 אין מקום לדחוף את הסלע לשם.',1800)}
+  else if(t===2&&!m.surf&&K.ut.has(2)){K.Bt('🌊 מים עמוקים. גלישה נפתחת בניצחון על אלוף היכל שני.',2600)}
+ }catch(e){}}
+ setInterval(act,120);
+ // ---- shadow gang ----
+ const SH=[['route-flower','שומר צל ראשון'],['route-swamp','שומרת צל מהביצה'],['route-forest','שומר צל מהיער'],['route-desert','שומר צל מהמדבר'],['route-storm','שומרת צל מהסופה'],['route-volcano','שומר צל מההר']];
+ const lines=['המנהיג שלנו ידע שתבואו. אנחנו לא נותנים לילדים לעבור בלי להוכיח את עצמם!','ליקטנו טלטלים נדירים... לא, לא גנבנו. ממש לא. נו, בואו נילחם!','הצל הוא הבית שלנו. אתם נכנסים בלי לבקש רשות!'];
+ let placed=false;
+ function place(){if(placed||!K.ua||!K.Ha||!K.Ha.length)return;placed=true;
+  SH.forEach(([mid,n],i)=>{const mp=K.ua[mid];if(!mp)return;const base=K.Ha.find(h=>h.map===mid&&!/gym|guard/.test(h.id))||K.Ha.find(h=>h.map===mid)||K.Ha.find(h=>h.id==='swamp1');if(!base||!base.team)return;
+   const id='shadow'+(i+1);if(K.Ha.some(h=>h.id===id))return;
+   const T=mp.tiles,H=T.length,W=T[0].length,used=[...(mp.npcs||[]),...(mp.links||[]),...(mp.signs||[])];
+   const wk=v=>v!==undefined&&!K.ut.has(v)&&v!==9&&v!==29&&v!==5;const ok=(x,y)=>[[0,0],[1,0],[-1,0],[0,1],[0,-1],[-2,0],[2,0]].every(([a,b])=>wk((T[y+b]||[])[x+a]))&&!used.some(u=>Math.abs(u.x-x)<2&&Math.abs(u.y-y)<2)&&(K.bt.has(T[y][x])||T[y][x]===1);
+   let found=null;for(let k=0;k<400&&!found;k++){const x=3+((i*7+k*5)%(W-6)),y=3+((i*11+k*3)%(H-6));if(ok(x,y))found={x,y}}
+   if(!found)return;
+   K.Ha.push({id,n,map:mid,x:found.x,y:found.y,team:(i===0?base.team.map(t=>[t[0],t[1]+1]):base.team.map(t=>[t[0],t[1]+2]).concat([[base.team[0][0],base.team[0][1]+3]])).slice(0,4),reward:(base.reward||80)+40,txt:lines[i%3],shadow:true});
+   mp.npcs.push({kind:'trainer',ref:id,map:mid,x:found.x,y:found.y,dir:['left','right','down'][i%3],pal:'t'})});
+ }
+ const BOSS={id:'shadowboss',n:'ראש הצל',map:'hills',x:0,y:0,team:['cat2:38','gh2:39','cubD:40','bell2:40','moth:41'].map(s=>{const[a,b]=s.split(':');return[KEY[a],+b]}),reward:1200,txt:'כל הכבוד, ניצחתם את שומרי הצל שלי. אבל אני עדיין לא נכנע. אני הצל האמיתי!',boss:true,shadow:true};
+ function bossPoll(){const F=K.F;if(!F||!F.started||!K.ua)return;const d=F.defeated||{};const n=[1,2,3,4,5,6].filter(i=>d['shadow'+i]).length;
+  if(n>=6&&!K.Ha.some(h=>h.id==='shadowboss')){const mp=K.ua['hills'];if(!mp)return;const T=mp.tiles;let found=null;
+   for(let y=3;y<T.length-3&&!found;y++)for(let x=4;x<T[0].length-4&&!found;x++)if((K.bt.has(T[y][x])||T[y][x]===1)&&[[1,0],[-1,0],[0,1],[0,-1]].every(([a,b])=>!K.ut.has(T[y+b][x+a])&&T[y+b][x+a]!==9)&&![...(mp.npcs||[]),...(mp.links||[])].some(u=>Math.abs(u.x-x)<3&&Math.abs(u.y-y)<3))found={x,y};
+   if(!found)return;BOSS.x=found.x;BOSS.y=found.y;K.Ha.push(BOSS);mp.npcs.push({kind:'trainer',ref:'shadowboss',map:'hills',x:found.x,y:found.y,dir:'down',pal:'t'});
+   K.Et='menu';K.Ie(`<h2>🕶️ ראש הצל מופיע!</h2><div class="flav">ניצחתם את כל שומרי הצל. ראש הכנופיה ממתין בגבעות. הוא חזק. הביאו צוות מלא וריפוי.</div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}
+ function gang(){const F=K.F,d=F.defeated||{};
+  K.Ie(`<h2>🕶️ כנופיית הצל</h2><div class="flav">כנופיה מקומית נוסעת בין האזורים ומנסה לדחוף ילדים מהדרך. שישה שומרי צל מסתובבים בשבילים ובדרכים (מחפשים אותם: הם מחכים בקו ישר). מנצחים את כולם והמנהיג יופיע בגבעות.</div>`+
+   SH.map(([mid,n],i)=>`<div class="tlrow"><div><b>${d['shadow'+(i+1)]?'✅':'⚔️'} ${n}</b><br><small>${mid}</small></div></div>`).join('')+
+   `<div class="tlrow"><div><b>${d.shadowboss?'✅':K.Ha.some(h=>h.id==='shadowboss')?'⚔️':'🔒'} ראש הצל</b><br><small>גבעות</small></div></div><button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}
+ setInterval(()=>{try{place();bossPoll()}catch(e){console.error(e)}},2000);
+ // menu buttons
+ setInterval(()=>{try{if(K.Et!=='menu')return;const b=$q('#tlmenu3');if(!b||b.querySelector('#tlfm'))return;
+  const add=(id,t,fn)=>{const x=document.createElement('button');x.className='btn';x.id=id;x.innerHTML=t;x.onclick=()=>{K.Pe('mnu');fn()};b.appendChild(x)};
+  add('tlfm','🌊 מהלכי שדה',fmModal);add('tlgang','🕶️ כנופיית הצל',gang)}catch(e){}},500);
+ setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen64&&!F.seen65&&K.Et==='map'){F.seen65=1;K._();K.Et='menu';K.Ie(`<h2>🆕 גרסה 6.5</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪓💪🌊 <b>מהלכי שדה:</b> מנצחים אלופי היכל ופותחים חיתוך, גלישה וכוח. עוצרים מול עץ או סלע ולוחצים אליו. הסבר בתפריט ☰.</p><p>🕶️ <b>כנופיית הצל:</b> שישה שומרי צל בשבילים ומנהיג אחד בגבעות. אחרי שמנצחים את כולם הוא מופיע.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}},3000);
+};
+window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX);window.TL63_r2&&window.TL63_r2(K,window.TLX);window.TL63_r3&&window.TL63_r3(K,window.TLX)};
 })();
