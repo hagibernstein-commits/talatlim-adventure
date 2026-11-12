@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.1.0",
+  const e = "6.2.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -5201,6 +5201,7 @@ const t = [
                 y: s.y + (o.y - s.y) * t - 60 * Math.sin(3.14 * t),
                 r: 12.5 * t,
                 s: 1,
+                gy: o.y + 22,
               };
             }),
               await ne(300, (t) => {
@@ -5216,6 +5217,7 @@ const t = [
                   y: o.y + 22 * t * t + -8 * Math.sin(3.14 * t),
                   r: 12.5,
                   s: 1,
+                  gy: o.y + 22,
                 };
               }));
             const r = l(
@@ -5240,6 +5242,7 @@ const t = [
                   r: 12.5,
                   s: 1,
                   rot: 0.5 * Math.sin(6.283 * t) * (1 - 0.4 * t),
+                  gy: o.y + 22,
                 };
               }),
               Math.random() < c);
@@ -5999,7 +6002,7 @@ const t = [
     if ("map" !== Et) return;
     Et = "menu";
     const t = a("#mnu");
-    ((t.innerHTML = `<div class="top"><h2>תפריט · ${Vt(D()?.name || "")}</h2><button class="x" id="mx">✕</button></div>\n <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq"> יומן משימות</button><button class="btn" id="mw"> מפת העולם</button><button class="btn" id="mg"> מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh"> מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${F.snd ? "פועל" : "מושתק"}</button><button class="btn" id="mc">🎮 שליטה: ${"stick" === F.ctrl ? "ג׳ויסטיק" : "כפתורי חיצים"}</button><button class="btn sec" id="m3"> ${F.badges ? "תג הגביש" : "אין תגים עדיין"} ·  ⚪ ${F.balls} ·  ${F.pots}/${F.spots || 0}/${F.upots || 0} · 🪙 ${F.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi"> התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${e}</button></div>`),
+    ((t.innerHTML = `<div class="top"><h2>תפריט · ${Vt(D()?.name || "")}</h2><button class="x" id="mx">✕</button></div>\n <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq"> יומן משימות</button><button class="btn" id="mw"> מפת העולם</button><button class="btn" id="mg"> מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh"> מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${F.snd ? "פועל" : "מושתק"}</button><button class="btn" id="mc">🎮 שליטה: ${"stick" === F.ctrl ? "ג׳ויסטיק" : "float" === F.ctrl ? "מגע חופשי" : "כפתורי חיצים"}</button><button class="btn sec" id="m3"> ${F.badges ? "תג הגביש" : "אין תגים עדיין"} ·  ⚪ ${F.balls} ·  ${F.pots}/${F.spots || 0}/${F.upots || 0} · 🪙 ${F.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi"> התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${e}</button></div>`),
       Ae("mnu"),
       (t.querySelector("#mw").onclick = vn),
       (t.querySelector("#mq").onclick = Ln),
@@ -6019,7 +6022,7 @@ const t = [
         (Ue(), Je());
       }),
       (t.querySelector("#mc").onclick = () => {
-        ((F.ctrl = "stick" === F.ctrl ? "arrows" : "stick"), _(), ya(), Je());
+        ((F.ctrl = "arrows" === (F.ctrl || "arrows") ? "stick" : "stick" === F.ctrl ? "float" : "arrows"), _(), ya(), Je());
       }));
     let n = !1;
     t.querySelector("#m4").onclick = (t) => {
@@ -6552,7 +6555,7 @@ const t = [
                   (i.badges = s.badges ? 1 : 0),
                   (i.started = !0 === s.started),
                   (i.snd = !1 !== s.snd),
-                  (i.ctrl = "stick" === s.ctrl ? "stick" : "arrows"),
+                  (i.ctrl = ["stick", "float", "arrows"].includes(s.ctrl) ? s.ctrl : "arrows"),
                   (i.tracked = Wa.some((t) => t.id === s.tracked)
                     ? s.tracked
                     : null),
@@ -6941,12 +6944,15 @@ const t = [
               : "up"));
   }
   function ya() {
-    const t = F && "stick" !== F.ctrl;
-    ((ca.style.display = t ? "none" : "block"),
-      (a("#arrows").style.display = t ? "block" : "none"),
-      (a("#stickhint").textContent = t
-        ? "לחצו על החיצים כדי ללכת"
-        : "גררו כדי ללכת"));
+    const t = (F && F.ctrl) || "arrows";
+    ((ca.style.display = "stick" === t ? "block" : "none"),
+      (a("#arrows").style.display = "arrows" === t ? "block" : "none"),
+      (a("#stickhint").textContent =
+        "stick" === t
+          ? "גררו כדי ללכת"
+          : "float" === t
+            ? "געו וגררו בכל מקום על המפה כדי ללכת · נגיעה קצרה = בדיקה"
+            : "לחצו על החיצים כדי ללכת"));
   }
   (ca.addEventListener(t[93], (t) => {
     "map" === Et &&
@@ -6964,6 +6970,64 @@ const t = [
         t.pointerId === da && fa();
       }),
     ),
+    (function () {
+      const e = a("#fpad"),
+        n = a("#stage"),
+        s = e.querySelector("i");
+      let i = null,
+        o = 0,
+        r = 0,
+        c = 0,
+        d = 0;
+      function u() {
+        ((i = null),
+          (e.style.display = "none"),
+          F && "float" === F.ctrl && ((Pt = null), (Ht = 1)));
+      }
+      (n.addEventListener(t[93], (a) => {
+        if ("map" !== Et || !F || "float" !== F.ctrl) return;
+        if (a.target.closest("button") || a.target.closest("#hud")) return;
+        (J(), (i = a.pointerId), (o = a.clientX), (r = a.clientY), (c = 0), (d = performance.now()));
+        const t = n.getBoundingClientRect();
+        ((e.style.display = "block"),
+          (e.style.left = a.clientX - t.left + "px"),
+          (e.style.top = a.clientY - t.top + "px"),
+          (s.style.transform = "translate(0,0)"));
+        try {
+          n.setPointerCapture(a.pointerId);
+        } catch (t) {}
+        a.preventDefault();
+      }),
+        n.addEventListener("pointermove", (t) => {
+          if (t.pointerId !== i) return;
+          const e = t.clientX - o,
+            a = t.clientY - r,
+            n = Math.hypot(e, a),
+            d = 55,
+            u = n > d ? d / n : 1;
+          ((c = Math.max(c, n)),
+            (s.style.transform = `translate(${e * u}px,${a * u}px)`),
+            (Ht = l(n / d, 0, 1)),
+            (Pt =
+              n < 12
+                ? null
+                : Math.abs(e) > Math.abs(a)
+                  ? e > 0
+                    ? "right"
+                    : "left"
+                  : a > 0
+                    ? "down"
+                    : "up"));
+        }),
+        ["pointerup", "pointercancel", t[161]].forEach((a) =>
+          n.addEventListener(a, (a) => {
+            if (a.pointerId !== i) return;
+            const t = c < 12 && performance.now() - d < 250;
+            (u(), t && "map" === Et && (jt = !0));
+          }),
+        ),
+        addEventListener("blur", u));
+    })(),
     document.querySelectorAll("#arrows button").forEach((e) => {
       const a = e.dataset.d;
       (e.addEventListener(t[93], (t) => {
@@ -10537,7 +10601,9 @@ const t = [
       (a("#bmute").textContent = F.snd ? "🔊" : "🔇"),
       e
         ? Bt(
-            "ברוך הבא לכפר הפרחים! הליכה עם החיצים, וכפתור הפעולה ליד דלתות ודמויות 🎮",
+            "float" === F.ctrl
+              ? "ברוך הבא לכפר הפרחים! געו וגררו בכל מקום על המסך כדי ללכת, ונגיעה קצרה ליד דלתות ודמויות בודקת אותן 🎮"
+              : "ברוך הבא לכפר הפרחים! הליכה עם החיצים, וכפתור הפעולה ליד דלתות ודמויות 🎮",
             5e3,
           )
         : Bt("📍 " + n.n));
@@ -10693,7 +10759,9 @@ const t = [
   }
   function kn() {
     Qe(
-      "<h2>🗺️ מפת המסע · גרסה 6.1</h2>\n<p>העולם גדול! 8 עיירות וכפרים מחוברים בדרכים. בכל יישוב: <b>בית חולים</b> (ריפוי חינם), <b>מכולת</b> (כדורים ושיקויים), <b>היכל תגים</b> ובתים לחקור.</p>\n<p>🏛️ <b>היכלי התגים:</b> בכל היכל מחכים שני מאמני היכל, ורק אחרי שמנצחים את שניהם נפתח הקרב מול האלוף. ניצחון על אלוף מעניק תג, <b>מתנה מיוחדת</b>, ומעלה את <b>רמת הציות</b> שלכם.</p>\n<p>🔄 <b>ציות בהחלפות:</b> טלטל שתפסתם בעצמכם תמיד מציית. טלטל שהתקבל בהחלפה מציית רק עד רמת הציות שלכם (מתחיל ב-20 ועולה עם כל תג). תגדלו - והוא יציית יותר!</p>\n<p>🍬 <b>סוכריית כוח:</b> במכולת, 500 מטבעות, מעלה רמה שלמה - אבל רק אחת בכל מחזור יום-לילה!</p>\n<p>💬 <b>סמנים מעל דמויות:</b> ⚔️ מאמן לקרב · ❗ משימה חדשה · 🎁 משימה מוכנה למסירה · 🔄 החלפה · 🏥 אחות · 🛒 מוכר · 👑 אלוף היכל · 🔒 נעול · ✓ סיימתם.</p>\n<p>🌀 שערי קסם מדלגים בין מקומות שכבר גיליתם. 💾 ההתקדמות נשמרת אוטומטית.</p>\n<p>🪧 <b>שלטי הכוונה:</b> בצמתי הדרכים ובכניסות לאזורים עומדים שלטים. התקרבו לשלט ונגעו בו כדי לקרוא מה יש בכל כיוון ואיך קוראים למקום שאליו מגיעים.</p>\n<p>🗺️ <b>מפת העולם:</b> בתפריט לחצו על מפת העולם ותראו איפה אתם נמצאים (נקודה זהובה), איך קוראים לכל אזור, ואילו דרכים עוד נעולות (קו אדום מקווקו עם 🔒).</p>",
+      "<h2>🗺️ מפת המסע · גרסה 6.2</h2>
+<p>🕹️ <b>איך רוצים ללכת?</b> בתפריט לחצו על 🎮 שליטה ובחרו: <b>כפתורי חיצים</b>, <b>ג׳ויסטיק</b> קבוע, או <b>מגע חופשי</b> - געו וגררו בכל מקום על המפה והדמות תלך לשם! נגיעה קצרה במפה היא כמו כפתור הבדיקה.</p>
+<p>העולם גדול! 8 עיירות וכפרים מחוברים בדרכים. בכל יישוב: <b>בית חולים</b> (ריפוי חינם), <b>מכולת</b> (כדורים ושיקויים), <b>היכל תגים</b> ובתים לחקור.</p>\n<p>🏛️ <b>היכלי התגים:</b> בכל היכל מחכים שני מאמני היכל, ורק אחרי שמנצחים את שניהם נפתח הקרב מול האלוף. ניצחון על אלוף מעניק תג, <b>מתנה מיוחדת</b>, ומעלה את <b>רמת הציות</b> שלכם.</p>\n<p>🔄 <b>ציות בהחלפות:</b> טלטל שתפסתם בעצמכם תמיד מציית. טלטל שהתקבל בהחלפה מציית רק עד רמת הציות שלכם (מתחיל ב-20 ועולה עם כל תג). תגדלו - והוא יציית יותר!</p>\n<p>🍬 <b>סוכריית כוח:</b> במכולת, 500 מטבעות, מעלה רמה שלמה - אבל רק אחת בכל מחזור יום-לילה!</p>\n<p>💬 <b>סמנים מעל דמויות:</b> ⚔️ מאמן לקרב · ❗ משימה חדשה · 🎁 משימה מוכנה למסירה · 🔄 החלפה · 🏥 אחות · 🛒 מוכר · 👑 אלוף היכל · 🔒 נעול · ✓ סיימתם.</p>\n<p>🌀 שערי קסם מדלגים בין מקומות שכבר גיליתם. 💾 ההתקדמות נשמרת אוטומטית.</p>\n<p>🪧 <b>שלטי הכוונה:</b> בצמתי הדרכים ובכניסות לאזורים עומדים שלטים. התקרבו לשלט ונגעו בו כדי לקרוא מה יש בכל כיוון ואיך קוראים למקום שאליו מגיעים.</p>\n<p>🗺️ <b>מפת העולם:</b> בתפריט לחצו על מפת העולם ותראו איפה אתם נמצאים (נקודה זהובה), איך קוראים לכל אזור, ואילו דרכים עוד נעולות (קו אדום מקווקו עם 🔒).</p>",
     );
   }
   !(function () {
@@ -11318,7 +11386,7 @@ const t = [
       f: "גור לווייתן עננים ששוחה באוויר ואוסף טיפות גשם.",
       h: "I",
       evo: 98,
-      at: 38,
+      at: 36,
     }),
     (Sn[97] = { kind: "whale", type: "spark", stage: 0, variant: 11 }),
     f.push({
@@ -11337,11 +11405,11 @@ const t = [
       evo: 98,
       maps: [t[66], t[45]],
       time: "day",
-      lv: 38,
+      lv: 36,
       kind: "whale",
     }),
     ($n[97] = "בשטח: route-storm, storm-city · יום במשחק"),
-    ($n[98] = "התפתחות של עננלו ברמה 38"),
+    ($n[98] = "התפתחות של עננלו ברמה 36"),
     f.push({
       n: "קיפולג",
       t: "water",
@@ -11387,7 +11455,7 @@ const t = [
       f: "ינשוף פנסים שעזר לשומרי היער בעבר. אורו אינו מסנוור אף יצור.",
       h: "H",
       evo: 110,
-      at: 36,
+      at: 34,
     }),
     (Sn[102] = { kind: "lantern", type: "spark", stage: 0, variant: 3 }),
     f.push({
@@ -11399,7 +11467,7 @@ const t = [
       f: "חיפושית עתיקה שהתעוררה בתוך אבן. היא מזהה את צורת הכוכבים מלפני שנים.",
       h: "G",
       evo: 111,
-      at: 38,
+      at: 36,
     }),
     (Sn[103] = { kind: "beetle", type: "earth", stage: 0, variant: 4 }),
     f.push({
@@ -11411,7 +11479,7 @@ const t = [
       f: "אייל קרח שקרניו מחזירות את אור הזוהר הצפוני. הוא מופיע לצד חבר אמיתי.",
       h: "I",
       evo: 112,
-      at: 40,
+      at: 38,
     }),
     (Sn[104] = { kind: "deer", type: "water", stage: 0, variant: 5 }),
     f.push({
@@ -13148,9 +13216,15 @@ const t = [
                   ),
                   Nt.ball &&
                     (function (e, a) {
-                      (e.save(),
-                        e.translate(a.x, a.y),
-                        a.rot && e.rotate(a.rot));
+                      (e.save(), e.translate(a.x, a.y));
+                      if (a.gy && a.gy - a.y > 2) {
+                        const t = Math.max(0.12, 0.4 * (1 - (a.gy - a.y) / 160));
+                        ((e.fillStyle = `rgba(0,0,0,${t})`),
+                          e.beginPath(),
+                          e.ellipse(0, a.gy - a.y, 0.9 * (a.r || 12), 0.3 * (a.r || 12), 0, 0, 7),
+                          e.fill());
+                      }
+                      a.rot && e.rotate(a.rot);
                       const n = Math.max(2, a.r || 12);
                       (R(e, 0, 0, n, n, a.col || "#4a3ad0"),
                         R(e, 0.3 * -n, 0.35 * -n, 0.35 * n, 0.25 * n, t[145]),
