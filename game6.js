@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.2.0",
+  const e = "6.3.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -4825,7 +4825,7 @@ const t = [
     })(e, a, l);
     if (
       (s || (d.dmg = Math.max(1, Math.floor(0.85 * d.dmg))),
-      (a.hp = Math.max(0, a.hp - d.dmg)),
+      (a.hp = Math.max(0, a.hp - d.dmg)), window.__TLpop && window.__TLpop(s, d),
       le(),
       await (async function (t) {
         Nt.shk = 1;
@@ -5061,7 +5061,7 @@ const t = [
         n = f[a.sp],
         s = n.t,
         l = Qt(),
-        i = ["fire", "water", "plant", "spark", "earth", "norm"],
+        i = ["fire", "water", "plant", "spark", "earth", "norm"].concat(window.__TLX || []),
         o = i.filter((t) => ((r[t] && r[t][s]) || 1) > 1),
         d = i.filter((t) => ((r[t] && r[t][s]) || 1) < 1),
         p = i.filter((t) => ((r[s] && r[s][t]) || 1) > 1),
@@ -5086,7 +5086,7 @@ const t = [
             (n.querySelector("#bdt").onclick = () =>
               Ie(
                 `<h2>📊 טבלת סוגים</h2>${(function () {
-                  const e = ["fire", "water", "plant", "spark", "earth"];
+                  const e = ["fire", "water", "plant", "spark", "earth"].concat(window.__TLX || []);
                   return (
                     e
                       .map((t) => {
@@ -5987,7 +5987,7 @@ const t = [
         l.appendChild(e));
     }
     if (2 === e) {
-      const e = ["fire", "water", "plant", "spark", "earth"];
+      const e = ["fire", "water", "plant", "spark", "earth"].concat(window.__TLX || []);
       l.innerHTML =
         e
           .map((t) => {
@@ -12766,9 +12766,7 @@ const t = [
           R(r, l - 6, t + 4, 3, 5, n.plant, 0.6));
     return (Wn.set(s, o), o);
   }
-  (ie(),
-    la(),
-    requestAnimationFrame(function e(a) {
+  (function () { try { window.TL63 && window.TL63({ get F() { return F; }, set F(v) { F = v; }, get Et() { return Et; }, set Et(v) { Et = v; }, get Rt() { return Rt; }, get ct() { return ct; }, get en() { return en; }, get Nt() { return Nt; }, get dt() { return dt; }, get ft() { return ft; }, get tt() { return tt; }, f, H, o, r, c, d, qn, Sn, $n, y, ua, Mn, $, Z, Ct, Tt, N, B, a, n, s, l, i, m, mt, x, g, b, T, Yt, Vt, E, G, L, W, z, ie, D, Bt, Ie, He, Ae, Pe, ee, Y, le, an, nn, _: _, get_() { return _; }, set_(v) { _ = v; }, getNe() { return Ne; }, setNe(v) { Ne = v; }, Ne(t) { return Ne(t); }, getXe() { return Xe; }, setXe(v) { Xe = v; }, getBn() { return bn; }, setBn(v) { bn = v; }, ver: e, }); } catch (e) { console.error("TL63", e); } })(); (ie(), la(), requestAnimationFrame(function e(a) {
       const n = Math.min(0.05, (a - ha) / 1e3);
       ha = a;
       try {
