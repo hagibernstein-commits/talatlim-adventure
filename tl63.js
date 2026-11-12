@@ -324,11 +324,15 @@ const NEWSP=[
  ['scor2','עקרבור','venom','scorp','',1,78,84,72,68,'צבע עמוק וצבתות חזקות. הוא שומר על המדבר בלילה.',null],
  ['snk','נחשוש','venom','serpent','',0,48,54,44,66,'נחש קטן וחמוד. הארס שלו חלש, רק מספיק לעשות עקצוץ.',[['swamp','route-swamp','forest-village'],'day']],
  ['snk2','צפעור','venom','serpent','',1,76,86,66,84,'צפע חכם עם ברדס רחב. תוקף רק כשמאיימים עליו.',null],
+ ['fos1','קדמון','earth','golem','block',0,60,58,70,34,'טלטל עתיק שהתעורר ממאובן. מתפלא על העולם החדש.',null],
+ ['fos1b','קדמונר','earth','golem','knight',1,84,82,92,46,'שומר קדום עם שריון סלע. נאמן עד הסוף.',null],
+ ['fos2','עתיקון','earth','drake','',0,56,64,54,56,'זוחל עתיק עם גב מחוספס. אוהב להתחמם בשמש.',null],
+ ['fos2b','עתיקדרק','earth','drake','',1,80,90,70,70,'הצורה המלאה של העתיקון. הצל שלו מכסה את כל החצר.',null],
 ];
 // evolution wiring: key -> [targetKey, level]
 const EVO={hare:['hare2',24],wbird:['wbird2',20],wbird2:['wbird3',36],ball:['ball2',30],worm:['cocoon',9],cocoon:['moth',20],ant:['ant2',26],
  gh:['gh2',25],cat:['cat2',30],lion:['lion2',32],iron:['iron2',24],iron2:['iron3',40],cog:['cog2',30],monk:['monk2',22],monk2:['monk3',38],
- roos:['roos2',30],drk:['drk2',30],drk2:['drk3',45],bell:['bell2',24],frog:['frog2',30],scor:['scor2',28],snk:['snk2',30]};
+ roos:['roos2',30],drk:['drk2',30],drk2:['drk3',45],bell:['bell2',24],frog:['frog2',30],scor:['scor2',28],snk:['snk2',30],fos1:['fos1b',30],fos2:['fos2b',32]};
 // stone evolution: key -> {stoneKey: targetKey}
 const STONEEVO={cub:{flame:'cubF',wave:'cubW',leaf:'cubP',bolt:'cubS',frost:'cubI',sun:'cubL',moon:'cubD'},crys:{frost:'crys2'},star:{sun:'star2'}};
 const STONES=[
@@ -746,5 +750,132 @@ window.TL63_more=function(K,X){
   add('🎒 ציוד: חכה ואופניים',gear);add('🏡 מעון היום',daycare);
   const ref=mn.querySelector('#tlmenu');mn.insertBefore(box,ref?ref.nextSibling:mn.children[1])}catch(e){console.error(e)}});
 };
-window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX)};
+/* ---- round 2: dual types, learnsets, TMs, stat stages, four champions, line-of-sight trainers, fossil lab ---- */
+window.TL63_r2=function(K,X){
+ const f=K.f,c=K.c,o=K.o,KEY=X.KEY,$q=s=>document.querySelector(s);
+ const esc=X.esc,closeM=()=>{K.He();K.Et='map'};
+ // ---- dual types ----
+ const T2={cubF:'light',cubW:'ice',cubP:'bug',cubS:'wind',cubI:'wind',cubL:'fire',cubD:'venom',crys2:'light',ball2:'sound',moth:'wind',ant2:'metal',cat2:'fight',star2:'wind',lion2:'fire',cog2:'earth',monk3:'dragon',roos2:'wind',bell2:'shadow',frog2:'water',drk3:'metal',iron3:'earth',snk2:'shadow',scor2:'bug',hare2:'wind',gh2:'light',fos1b:'dragon',fos2b:'water'};
+ for(const k in T2)if(KEY[k]!==undefined)f[KEY[k]].t2=T2[k];
+ const TYPES=Object.keys(o);
+ // ---- moves ----
+ const M3={fire:'סערת להבות',water:'צונאמי',plant:'סופת עלים',spark:'רעם גדול',earth:'רעש אדמה',norm:'התרסקות',ice:'סופת קרח',wind:'ציקלון',bug:'נחיל זנבות',shadow:'ליל צללים',light:'קרן שמש',metal:'פטיש ענק',fight:'אגרוף על',dragon:'נשיפת דרקון',sound:'צלצול גדול',venom:'ענן ארסי'};
+ const MT={fire:'כדור אש',water:'סילון מים',plant:'חץ עלים',spark:'קשת חשמל',earth:'סלע נופל',norm:'מכת כוח',ice:'רסיס כפור',wind:'משב חד',bug:'עקיצה צורבת',shadow:'מכת צל',light:'הבזק אור',metal:'להב ברזל',fight:'בעיטה',dragon:'זנב דרקון',sound:'קול שובר',venom:'קוץ ארסי'};
+ TYPES.forEach(t=>{if(M3[t])c[t+'3']={n:M3[t],t,p:92,a:85};if(MT[t])c['tm_'+t]={n:MT[t],t,p:78,a:95}});
+ c.guard={n:'מגן',t:'norm',p:0,a:100,st:'def+'};c.scare={n:'בהלה',t:'norm',p:0,a:100,st:'def-'};
+ window.__TLstLabel=m=>m.st==='def+'?'מחזק הגנה':m.st==='def-'?'מחליש הגנה של היריב':'מחזק התקפה';
+ const foeOf=(e,s)=>s?K.Nt.e:K.F.party[K.Nt.pi];
+ window.__TLstage=(e,n,s)=>{const st=c[n]&&c[n].st;if(!st)return e.bst=Math.min((e.bst||0)+1,3);
+  if(st==='def+')e.dst=Math.min((e.dst||0)+1,3);else if(st==='def-'){const t=foeOf(e,s);if(t)t.dst=Math.max((t.dst||0)-1,-3)}};
+ window.__TLstageMsg=(e,n,s)=>{const st=c[n]&&c[n].st;if(st==='def+')return 'ההגנה של '+K.Yt(e)+' עלתה!';
+  if(st==='def-'){const t=foeOf(e,s);return 'ההגנה של '+(t?K.Yt(t):'היריב')+' ירדה!'}return 'ההתקפה של '+K.Yt(e)+' עלתה!'};
+ window.__TLdm=m=>{const d=m&&m.dst||0;return d>=0?1+.35*d:1/(1+.3*-d)};
+ window.__TLeff=(att,sp,r)=>{const s=f[sp],a=r[att]||{};let v=(a[s.t]||1)*(s.t2?(a[s.t2]||1):1);return Math.min(2.5,Math.max(.35,v))};
+ window.__TLmoves=(sp,lv,m,C0)=>{const s=f[sp],l=C0(sp,lv).slice();
+  if(m&&m.id){ // learnsets apply to the player's own tammed monsters only, enemies stay as before
+   if(lv>=16&&c[s.t+'3'])l.push(s.t+'3');
+   if(s.t2){if(lv>=5&&c[s.t2+'1'])l.push(s.t2+'1');if(lv>=12&&c[s.t2+'2'])l.push(s.t2+'2')}
+   (m.tm||[]).forEach(k=>{if(c[k]&&!l.includes(k))l.push(k)});
+  }else if(s.t2){if(lv>=5&&c[s.t2+'1'])l.push(s.t2+'1');if(lv>=12&&c[s.t2+'2'])l.push(s.t2+'2')}
+  while(l.length>6){const i=l.indexOf('tackle');l.splice(i>=0?i:1,1)}
+  return l};
+ // reset stat stages out of battle
+ setInterval(()=>{try{if(K.Et!=='battle'&&K.Et!=='trans'&&K.F&&K.F.party)K.F.party.forEach(m=>{if(m.dst)m.dst=0})}catch(e){}},1500);
+ // ---- TM shop ----
+ const TMS=[...TYPES.map(t=>({k:'tm_'+t,n:'💿 '+MT[t],t,cost:250})),{k:'guard',n:'🛡 מגן',t:null,cost:150},{k:'scare',n:'😱 בהלה',t:null,cost:150}];
+ const tms=()=>{const F=K.F;F.tms=F.tms||{};return F.tms};
+ const tmLine=k=>{const m=c[k];return m.st?(m.st==='def+'?'מחזק הגנה (עד 3 פעמים)':'מחליש הגנה של היריב'):'עוצמה '+m.p+' · דיוק '+m.a+'%'};
+ function tmShop(){
+  const F=K.F,st=tms();
+  K.Ie(`<h2>💿 חנות מכונות מהלך</h2><div class="flav">מכונה מלמדת טלטל מהלך חדש (עד 2 מכונות לטלטל, אחת לשימוש). מכונות סוג מתאימות לטלטלים מאותו סוג, 🛡 ו־😱 מתאימות לכולם. 🪙 ${F.coins}</div>`+
+   TMS.map(s=>`<div class="tlrow"><div><b>${s.n}</b> ${s.t?K.E(s.t):''}<br><small>${tmLine(s.k)} · בתיק: ${st[s.k]||0}</small></div><button class="btn" data-m="${s.k}" ${F.coins<s.cost?'disabled':''}>${s.cost} 🪙</button></div>`).join('')+
+   `<button class="btn sec" id="tlmx" style="width:100%;margin-top:8px">סגור</button>`,
+   m=>{m.querySelector('#tlmx').onclick=closeM;m.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const s=TMS.find(q=>q.k===b.dataset.m);if(F.coins<s.cost)return;F.coins-=s.cost;st[s.k]=(st[s.k]||0)+1;K.Y('buy');K.ie();K._();const sc=m.scrollTop;tmShop();$q('#mbox').scrollTop=sc})});
+ }
+ function tmPick(mon){
+  const st=tms(),sp=f[mon.sp],list=TMS.filter(s=>(st[s.k]||0)>0&&(!s.t||s.t===sp.t||s.t===sp.t2));
+  K.Ie(`<h2>💿 מכונת מהלך</h2><div class="flav">${esc(K.Yt(mon))} למד מהלך חדש. אם יש לו כבר 2 מכונות, הישנה ביותר תוחלף. מכונות לא מתאימות לא מופיעות.</div>`+
+   (list.length?list.map(s=>`<button class="btn" data-m="${s.k}" style="width:100%;margin:4px 0">${s.n} · ${tmLine(s.k)} (בתיק ${st[s.k]})</button>`).join(''):'<p>אין לכם מכונה מתאימה. אפשר לקנות בתפריט ☰ ← חנות מכונות מהלך.</p>')+`<button class="btn sec" id="tlmx" style="width:100%;margin-top:6px">ביטול</button>`,
+   m=>{m.querySelector('#tlmx').onclick=()=>{K.He();K.Ne(mon)};m.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const k=b.dataset.m;mon.tm=mon.tm||[];if(mon.tm.includes(k)){K.Bt('כבר למד את זה',1800);return}
+    st[k]--;mon.tm.push(k);if(mon.tm.length>2)mon.tm.shift();K.Y('lvl');K._();K.He();K.Ne(mon);K.Bt('💿 '+K.Yt(mon)+' למד '+c[k].n+'!',2800)})});
+ }
+ const Ne1=K.getNe();
+ K.setNe(function(t){Ne1(t);try{
+  const mb=$q('#mbox'),sp=f[t.sp];
+  const chip=mb.querySelector('h2 .chip');if(chip&&sp.t2&&!mb.querySelector('.tl2chip')){const s=document.createElement('span');s.innerHTML=K.E(sp.t2);const ch=s.firstChild;ch.classList.add('tl2chip');ch.style.marginInlineStart='4px';chip.after(ch)}
+  if(K.F.party.includes(t)||true){if(mb.querySelector('#tltm'))return;const cl=mb.querySelector('#d3');const b=document.createElement('button');b.className='btn';b.id='tltm';b.innerHTML='💿 מכונת מהלך'+((t.tm&&t.tm.length)?'<small>למד: '+t.tm.map(k=>c[k]&&c[k].n).join(', ')+'</small>':'');b.onclick=()=>tmPick(t);(cl?cl.parentNode:mb).insertBefore(b,cl||null)}
+ }catch(e){console.error(e)}});
+ // shops: add TM button
+ const mbox=$q('#mbox');
+ new MutationObserver(()=>{if(!mbox.querySelector('#s3,#h3')||mbox.querySelector('#tltmshop'))return;const cl=mbox.querySelector('#sc,#h4');if(!cl)return;
+  const b=document.createElement('button');b.className='btn grn';b.id='tltmshop';b.innerHTML='💿 מכונות מהלך<small>מלמדות מהלכים חדשים · חדש!</small>';b.onclick=tmShop;cl.parentNode.insertBefore(b,cl)}).observe(mbox,{childList:true});
+ // ---- four champions ----
+ const E4=[{id:'elite1',n:'נעמי · אלופת הכפור',txt:'הקור שלי חד יותר מכל סערה. נראה אם הצוות שלכם מחזיק מעמד!',requires:'champion2',team:['crys2:40','hare2:41','ball2:42','wbird3:44'],reward:600},
+  {id:'elite2',n:'גיל · אלוף הצללים',txt:'אתם לא רואים אותי, אבל אני רואה אתכם. בואו נתחיל.',requires:'elite1',team:['cat2:43','gh2:43','cubD:44','bell2:45'],reward:700},
+  {id:'elite3',n:'מיכל · אלופת האור והלחימה',txt:'אור חזק ואגרוף חזק. מי ינצח?',requires:'elite2',team:['lion2:44','star2:44','monk3:46','roos2:46'],reward:800},
+  {id:'elite4',n:'רועי · אלוף הדרקונים',txt:'ארבעת האלופים מסתיימים כאן. הראו לי מה למדתם במסע!',requires:'elite3',boss:true,team:['drk3:48','iron3:47','snk2:46','scor2:46','moth:45'],reward:1500}];
+ E4.forEach(t=>{t.team=t.team.map(s=>{const[a,b]=s.split(':');return[KEY[a],+b]})});
+ function elite(){
+  const F=K.F,d=F.defeated||{};
+  if(!d.champion2){K.Ie(`<h2>🏛️ ארבעת האלופים</h2><div class="flav">ארבעה אלופי על מחכים לטלטלן שניצח את אלוף היכל הסופה. קודם מנצחים אותו, ואז חוזרים לכאן.</div><button class="btn sec" id="tlx" style="width:100%">סגור</button>`,m=>m.querySelector('#tlx').onclick=closeM);return}
+  K.Ie(`<h2>🏛️ ארבעת האלופים</h2><div class="flav">ארבעה קרבות ברצף, בלי תגים, בלי רחמים (אבל עם ריפוי חינם בין הקרבות). הקרב האחרון נותן מקום בהיכל התהילה.</div>`+
+   E4.map((t,i)=>{const ok=!!d[t.id],can=!ok&&(!t.requires||d[t.requires]);return `<div class="tlrow"><div><b>${ok?'✅':can?'⚔️':'🔒'} ${t.n}</b><br><small>${t.team.map(p=>f[p[0]].n+' '+p[1]).join(' · ')}</small></div>${can?`<button class="btn grn" data-e="${i}">לקרב</button>`:''}</div>`}).join('')+
+   `<button class="btn" id="tlheal" style="width:100%;margin-top:6px">💚 ריפוי חינם לצוות</button><button class="btn sec" id="tlx" style="width:100%;margin-top:6px">סגור</button>`,
+   m=>{m.querySelector('#tlx').onclick=closeM;m.querySelector('#tlheal').onclick=()=>{K.F.party.forEach(p=>{p.hp=K.x(p);p.status=null});K.Y('heal');K._();K.Bt('💚 הצוות מלא כוח',1800)};
+    m.querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{const t=E4[+b.dataset.e];K.He();K.Et='map';K.Re(t)})});
+ }
+ setInterval(()=>{try{const F=K.F;if(!F||!F.started||!F.defeated)return;F.hof=F.hof||[];if(F.defeated.elite4&&!F.hof.some(h=>h.id==='elite4')){F.hof.push({id:'elite4',ts:Date.now(),title:'אלוף ארבעת האלופים',team:F.party.slice(0,6).map(p=>({sp:p.sp,lv:p.lv,shiny:!!p.shiny,nick:p.nick||''}))});K._();K.Bt('🏆 ניצחתם את ארבעת האלופים!',3500)}}catch(e){}},2000);
+ // ---- line-of-sight trainers ----
+ let busy=false,cool={},lastChk=0;
+ function losScan(ts){requestAnimationFrame(losScan);
+  try{if(ts-lastChk<150)return;lastChk=ts;const F=K.F;if(busy||!F||!F.started||F.los===false||K.Et!=='map'||K.Rt.moving)return;
+   const m=K.an();if(m.indoor||!m.npcs)return;const R=K.Rt,now=Date.now();
+   for(const n of m.npcs){if(n.kind!=='trainer')continue;const tr=K.Ha.find(t=>t.id===n.ref);if(!tr||tr.gym||tr.boss||F.defeated[tr.id]||(tr.requires&&!F.defeated[tr.requires])||(cool[tr.id]&&now<cool[tr.id]))continue;
+    const dx=R.x-n.x,dy=R.y-n.y;if(dx&&dy)continue;const dist=Math.abs(dx)+Math.abs(dy);if(dist<2||dist>5)continue;
+    const dir=dx>0?'right':dx<0?'left':dy>0?'down':'up';if(n.dir!==dir)continue;
+    const sx=Math.sign(dx),sy=Math.sign(dy);let clear=true;for(let i=1;i<dist;i++){const x=n.x+sx*i,y=n.y+sy*i;if(!K.ct[y]||K.ut.has(K.ct[y][x])||m.npcs.some(q=>q!==n&&q.x===x&&q.y===y)){clear=false;break}}
+    if(!clear)continue;
+    chase(n,tr,dist);return}
+  }catch(e){}}
+ async function chase(n,tr,dist){busy=true;cool[tr.id]=Date.now()+90000;
+  try{K.Et='menu';K.Bt('❗ '+tr.n+' הבחין בך!',1800);K.Y('enc');await K.i(900);
+   const R=K.Rt,sx=Math.sign(R.x-n.x),sy=Math.sign(R.y-n.y);
+   for(let d=dist;d>1;d--){n.x+=sx;n.y+=sy;await K.i(190)}
+   R.dir=sx>0?'right':sx<0?'left':sy>0?'down':'up';n.dir=sx>0?'left':sx<0?'right':sy>0?'up':'down';
+   await K.i(200);K.Et='map';$q('#abtn').click();
+  }catch(e){console.error(e);if(K.Et==='menu')K.Et='map'}
+  setTimeout(()=>{busy=false},2500)}
+ requestAnimationFrame(losScan);
+ // ---- fossil lab ----
+ const FOS=[{k:'f1',sp:'fos1',n:'מאובן סלע',i:'🪨',cost:300},{k:'f2',sp:'fos2',n:'מאובן קשקשים',i:'🦴',cost:300}],FT=10*60*1000;
+ function lab(){
+  const F=K.F,fz=F.fossil;
+  if(fz){const left=Math.max(0,fz.t0+FT-Date.now()),ready=left===0,t=FOS.find(q=>q.k===fz.k);
+   K.Ie(`<h2>🦴 מעבדת מאובנים</h2><div class="flav">${t.i} ${t.n} במכונת ההחייאה. ${ready?'מוכן!':'עוד כ-'+Math.ceil(left/60000)+' דקות אמיתיות (גם כשהמשחק סגור).'}</div>`+(ready?`<button class="btn grn" id="tlcol" style="width:100%">✨ להוציא את הטלטל</button>`:'')+`<button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,
+    m=>{m.querySelector('#tlx').onclick=closeM;const b=m.querySelector('#tlcol');if(b)b.onclick=()=>{const idx=KEY[t.sp],mon=K.T(idx,12);F.seen[idx]=1;F.caught[idx]=1;if(F.party.length<6)F.party.push(mon);else(F.box=F.box||[]).push(mon);F.fossil=null;K._();K.Y('lvl');K.He();K.Et='map';K.Bt('✨ '+f[idx].n+' התעורר'+(F.party.includes(mon)?'':' ונשלח לקופסה')+'!',3500)}});return}
+  K.Ie(`<h2>🦴 מעבדת מאובנים</h2><div class="flav">קונים מאובן והמכונה מחיה אותו ל־10 דקות אמיתיות. יוצא טלטל עתיק ברמה 12, שאי אפשר למצוא בשום מקום אחר! 🪙 ${F.coins}</div>`+
+   FOS.map(t=>`<div class="tlrow"><span style="font-size:30px">${t.i}</span><div><b>${t.n}</b><br><small>${f[KEY[t.sp]].n} ${K.E(f[KEY[t.sp]].t)}${f[KEY[t.sp]].t2?K.E(f[KEY[t.sp]].t2):''}</small></div><button class="btn" data-f="${t.k}" ${F.coins<t.cost?'disabled':''}>${t.cost} 🪙</button></div>`).join('')+`<button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,
+   m=>{m.querySelector('#tlx').onclick=closeM;m.querySelectorAll('[data-f]').forEach(b=>b.onclick=()=>{const t=FOS.find(q=>q.k===b.dataset.f);if(F.coins<t.cost)return;F.coins-=t.cost;F.fossil={k:t.k,t0:Date.now()};K.Y('buy');K.ie();K._();lab()})});
+ }
+ // ---- menu ----
+ const Xe2=K.getXe();
+ K.setXe(function(){Xe2();try{
+  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('#tlmenu3'))return;
+  const box=document.createElement('div');box.id='tlmenu3';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px';
+  const add=(t,fn,cls)=>{const b=document.createElement('button');b.className='btn '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};box.appendChild(b)};
+  add('💿 חנות מכונות מהלך',tmShop);add('🏛️ ארבעת האלופים',elite,'grn');add('🦴 מעבדת מאובנים',lab);
+  add('👀 מאמנים שמבחינים: '+(K.F.los===false?'כבוי':'פועל'),()=>{K.F.los=K.F.los===false;K._();K.Et='map';K.Bt(K.F.los===false?'👀 מאמנים לא ינסו לתפוס אתכם':'👀 מאמנים יבחינו בכם בקו ישר',2500)});
+  const ref=mn.querySelector('#tlmenu2')||mn.querySelector('#tlmenu');mn.insertBefore(box,ref?ref.nextSibling:mn.children[1])}catch(e){console.error(e)}});
+ // ---- what's new (6.4) ----
+ function wn(){const F=K.F;F.seen64=1;K._();
+  K.Ie(`<h2>🆕 גרסה 6.4 - עוד יותר טלטל!</h2><div style="text-align:right;font-size:14px;line-height:1.55">
+  <p>🧬 <b>סוגים כפולים:</b> לחלק מהטלטלים יש שני סוגים (שני תגים ליד השם). התקפה יעילה נגד אחד מהם מכפילה, והם גם מכים חזק יותר במהלכי שני הסוגים. (עד פי 2.5.)</p>
+  <p>📚 <b>מהלכים חדשים:</b> ברמה 16 כל טלטל לומד מהלך על, וטלטלים כפולי סוג לומדים גם מהלכים מהסוג השני.</p>
+  <p>💿 <b>מכונות מהלך</b> בחנות ובתפריט. מלמדות מהלכים חדשים, כולל 🛡 מגן (מעלה הגנה) ו־😱 בהלה (מוריד הגנה ליריב). מהלכים כאלו משתנים בקרב עד 3 דרגות.</p>
+  <p>🏛️ <b>ארבעת האלופים</b> בתפריט, אחרי שמנצחים את אלוף היכל הסופה. יש ריפוי חינם בין הקרבות.</p>
+  <p>👀 <b>מאמנים שמבחינים בכם:</b> מאמן שמסתכל עליכם בקו ישר יבוא לאתגר אתכם. אפשר לכבות בתפריט.</p>
+  <p>🦴 <b>מעבדת מאובנים:</b> מחיים טלטל עתיק (רק שם!) תוך 10 דקות אמיתיות.</p></div><button class="btn grn" id="tlwn2" style="width:100%;margin-top:10px">יוצאים להרפתקה!</button>`,m=>m.querySelector('#tlwn2').onclick=closeM)}
+ setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen63&&!F.seen64&&K.Et==='map'){K.Et='menu';wn()}},2500);
+};
+window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX);window.TL63_r2&&window.TL63_r2(K,window.TLX)};
 })();
