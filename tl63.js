@@ -880,6 +880,11 @@ window.TL63_r2=function(K,X){
 window.TL63_r3=function(K,X){
  const KEY=X.KEY,$q=s=>document.querySelector(s),esc=X.esc,closeM=()=>{K.He();K.Et='map'},f=K.f;
  const fm=()=>{const F=K.F;F.fm=F.fm||{};return F.fm};
+ const ED=()=>{const F=K.F;F.edits=F.edits||{};return F.edits};
+ const rec=(x,y,v)=>{try{const id=K.an().id;const E=ED();(E[id]=E[id]||{})[x+','+y]=v;K._()}catch(e){}};
+ let lastMap=null;
+ function applyEdits(){try{if(K.Et!=='map'||!K.an)return;const m=K.an();if(!m||!m.id)return;if(m.id!==lastMap){lastMap=m.id;ensureSigns(m);const E=ED()[m.id];if(E){const T=m.tiles;if(T)for(const k in E){const p=k.split(','),x=+p[0],y=+p[1];if(T[y]&&T[y][x]!==undefined){T[y][x]=E[k];if(E[k]!==3&&E[k]!==4)removeSignFor(m.id,x,y)}}}}}catch(e){}}
+ setInterval(applyEdits,150);
  // ---- field moves ----
  const FMV=[{k:'cut',ic:'🪓',n:'חיתוך',gym:'gym1',gname:'אלוף היכל הראשון',txt:'חותכים עץ שחוסם את הדרך: עומדים מולו ולוחצים לכיוונו.'},
   {k:'surf',ic:'🌊',n:'גלישה',gym:'gym2',gname:'אלוף היכל השני',txt:'אפשר ללכת על מים. מי שאוהב לטייל באגם יגלה פינות חדשות.'},
@@ -893,15 +898,72 @@ window.TL63_r3=function(K,X){
   for(const v of FMV){if(!m[v.k]&&d[v.gym]){m[v.k]=1;K._();K.Et='menu';K.Ie(`<h2>${v.ic} למדתם ${v.n}!</h2><div class="flav">${v.txt}</div><button class="btn grn" id="tlx" style="width:100%">מעולה!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM);return}}}
  setInterval(()=>{try{unlockPoll();
   const s=!!(K.F&&K.F.fm&&K.F.fm.surf);if(s!==seenSurf){seenSurf=s;if(s)K.ut.delete(2);else K.ut.add(2)}}catch(e){}},700);
+ // ---- field-move signs ----
+ const SGN=[];
+ const scannedSigns=new Set();
+ function signTxt(k){const m=fm();
+  if(k==='cut')return m.cut?'עץ עבה. יש לכם חיתוך! 🪓 עומדים מול העץ ולוחצים אליו כדי לחתוך אותו.':'עץ עבה. צריך חיתוך 🪓 חיתוך נפתח אחרי שמנצחים את אלוף היכל הראשון.';
+  if(k==='str')return m.str?'סלע כבד. יש לכם כוח! 💪 עומדים מול הסלע ולוחצים אליו כדי לדחוף אותו.':'סלע כבד. צריך כוח 💪 כוח נפתח אחרי שמנצחים את אלוף היכל השלישי.';
+  return m.surf?'מים עמוקים. יש לכם גלישה! 🌊 פשוט הולכים אל המים ושטים.':'מים עמוקים. צריך גלישה 🌊 גלישה נפתחת אחרי שמנצחים את אלוף היכל השני.'}
+ function refreshSigns(){for(const r of SGN)r.sgn.msg=signTxt(r.type)}
+ function removeSignFor(mid,ox,oy){for(let i=SGN.length-1;i>=0;i--){const r=SGN[i];if(r.map===mid&&r.ox===ox&&r.oy===oy){const mp=K.ua[mid];if(mp){if(mp.tiles[r.y]&&mp.tiles[r.y][r.x]===9)mp.tiles[r.y][r.x]=r.orig;const j=(mp.signs||[]).indexOf(r.sgn);if(j>=0)mp.signs.splice(j,1)}SGN.splice(i,1)}}}
+ function safeBlock(T,x,y){const H=T.length,W=T[0].length,R=4;
+  const walk=(a,b)=>T[b]&&T[b][a]!==undefined&&!K.ut.has(T[b][a])&&!(a===x&&b===y);
+  const inW=(a,b)=>Math.abs(a-x)<=R&&Math.abs(b-y)<=R;
+  const key=(a,b)=>a+','+b;const vis=new Set(),q=[];
+  const x0=Math.max(0,x-R),x1=Math.min(W-1,x+R),y0=Math.max(0,y-R),y1=Math.min(H-1,y+R);
+  let total=0;
+  for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++)if(walk(a,b)){total++;if(a===x0||a===x1||b===y0||b===y1){const k=key(a,b);if(!vis.has(k)){vis.add(k);q.push([a,b])}}}
+  while(q.length){const [a,b]=q.pop();for(const [da,db] of [[1,0],[-1,0],[0,1],[0,-1]]){const a2=a+da,b2=b+db;if(!inW(a2,b2))continue;const k=key(a2,b2);if(!vis.has(k)&&walk(a2,b2)){vis.add(k);q.push([a2,b2])}}}
+  return vis.size===total}
+ function placeSign(mp,ox,oy,type){
+  const T=mp.tiles;if(!T)return false;const H=T.length,W=T[0].length;
+  const walk=(x,y)=>T[y]&&T[y][x]!==undefined&&!K.ut.has(T[y][x]);
+  const free=(x,y)=>walk(x,y)&&!(mp.npcs||[]).some(n=>n.x===x&&n.y===y)&&!(mp.links||[]).some(l=>l.x===x&&l.y===y)&&!(mp.signs||[]).some(q=>q.x===x&&q.y===y)&&!(mp.doors||[]).some(d=>d.x===x&&d.y===y)&&!(mp.fields||[]).some(f2=>f2.x===x&&f2.y===y);
+  const D4=[[1,0],[-1,0],[0,1],[0,-1]];
+  const A=D4.map(([a,b])=>[ox+a,oy+b]).filter(([x,y])=>walk(x,y));
+  if(!A.length)return false;
+  const nbc=(x,y)=>D4.filter(([a,b])=>walk(x+a,y+b)).length;
+  const inA=(x,y)=>A.some(([a,b])=>a===x&&b===y);
+  const nearA=(x,y)=>A.some(([a,b])=>Math.abs(a-x)+Math.abs(b-y)===1);
+  const C=[];
+  for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){if(!dx&&!dy)continue;const x=ox+dx,y=oy+dy;if(!free(x,y))continue;
+   let sc=nbc(x,y);if(inA(x,y))sc+=0;else if(nearA(x,y))sc+=200;else sc+=100;
+   C.push([x,y,sc])}
+  C.sort((p,q)=>q[2]-p[2]);
+  for(const [x,y] of C){
+   if(inA(x,y)&&A.length<2)continue; // never block the only approach
+   if(!safeBlock(T,x,y))continue;
+   const orig=T[y][x];T[y][x]=9;
+   const sgn={x,y,msg:signTxt(type)};
+   (mp.signs=mp.signs||[]).push(sgn);SGN.push({sgn,type,map:mp.id,ox,oy,orig,x,y});
+   return true}
+  return false}
+ function covered(mp,ox,oy,r){return SGN.some(g=>g.map===mp.id&&Math.abs(g.ox-ox)<=r&&Math.abs(g.oy-oy)<=r)}
+ function ensureSigns(mp){if(!mp||!mp.id||scannedSigns.has(mp.id)||!mp.tiles)return;scannedSigns.add(mp.id);
+  const T=mp.tiles,H=T.length,W=T[0].length;
+  const walk=(x,y)=>T[y]&&T[y][x]!==undefined&&!K.ut.has(T[y][x]);
+  for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const v=T[y][x];
+   if(v===3||v===4){if(walk(x+1,y)||walk(x-1,y)||walk(x,y+1)||walk(x,y-1)){if(!covered(mp,x,y,2))placeSign(mp,x,y,v===3?'cut':'str')}}
+   else if(v===2){let cross=false;
+    for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){if(!walk(x-a,y-b))continue;
+     for(let d=1;d<=6;d++){const vv=(T[y+b*d]||[])[x+a*d];if(vv===2)continue;if(vv!==undefined&&!K.ut.has(vv)){if(d>1)cross=true}break}
+     if(cross)break}
+    if(cross&&!covered(mp,x,y,3))placeSign(mp,x,y,'surf')}}}
+ // scan all ready maps now; lazy maps on entry (applyEdits interval)
+ function scanAllSigns(){try{if(!K.ua)return;for(const id in K.ua)ensureSigns(K.ua[id])}catch(e){}}
+ setInterval(scanAllSigns,3000);scanAllSigns();
+ // keep sign texts in sync with unlocked moves
+ let lastFmKey='';setInterval(()=>{try{const m=fm();const k=(m.cut?1:0)+''+(m.surf?1:0)+''+(m.str?1:0);if(k!==lastFmKey){lastFmKey=k;refreshSigns()}}catch(e){}},800);
  // act on bumps
  let lastB=0;
  const DIR={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
  function act(){try{const R=K.Rt;if(K.Et!=='map'||R.moving||!R.bump||R.bump===lastB||performance.now()-R.bump>450)return;
   lastB=R.bump;const d=DIR[R.dir];if(!d)return;const x=R.x+d[0],y=R.y+d[1],ct=K.ct;if(!ct[y]||ct[y][x]===undefined)return;const t=ct[y][x],m=fm();
-  if(t===3){if(m.cut){ct[y][x]=0;K.Y('lvl');K.Bt('🪓 חתכתם את העץ!',1800)}else K.Bt('🌳 עץ עבה. אולי יעזור אלוף היכל ראשון... (תפריט ☰ ← מהלכי שדה)',2600)}
+  if(t===3){if(m.cut){ct[y][x]=0;rec(x,y,0);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('🪓 חתכתם את העץ!',1800)}else K.Bt('🌳 עץ עבה. אולי יעזור אלוף היכל ראשון... (תפריט ☰ ← מהלכי שדה)',2600)}
   else if(t===4){if(!m.str){K.Bt('🪨 סלע כבד מדי. כוח נפתח בניצחון על אלוף היכל שלישי.',2600);return}
    const x2=x+d[0],y2=y+d[1];const free=ct[y2]&&ct[y2][x2]!==undefined&&!K.ut.has(ct[y2][x2])&&ct[y2][x2]!==4&&!K.an().npcs.some(n=>n.x===x2&&n.y===y2)&&!(K.an().links||[]).some(l=>l.x===x2&&l.y===y2)&&(ct[y2][x2]===0||ct[y2][x2]===1);
-   if(free){ct[y2][x2]=4;ct[y][x]=0;K.Y('lvl');K.Bt('💪 דחפתם את הסלע!',1500)}else K.Bt('💪 אין מקום לדחוף את הסלע לשם.',1800)}
+   if(free){ct[y2][x2]=4;ct[y][x]=0;rec(x,y,0);rec(x2,y2,4);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('💪 דחפתם את הסלע!',1500)}else K.Bt('💪 אין מקום לדחוף את הסלע לשם.',1800)}
   else if(t===2&&!m.surf&&K.ut.has(2)){K.Bt('🌊 מים עמוקים. גלישה נפתחת בניצחון על אלוף היכל שני.',2600)}
  }catch(e){}}
  setInterval(act,120);
@@ -935,6 +997,7 @@ window.TL63_r3=function(K,X){
   const add=(id,t,fn)=>{const x=document.createElement('button');x.className='btn';x.id=id;x.innerHTML=t;x.onclick=()=>{K.Pe('mnu');fn()};b.appendChild(x)};
   add('tlfm','🌊 מהלכי שדה',fmModal);add('tlgang','🕶️ כנופיית הצל',gang)}catch(e){}},500);
  setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen64&&!F.seen65&&K.Et==='map'){F.seen65=1;K._();K.Et='menu';K.Ie(`<h2>🆕 גרסה 6.5</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪓💪🌊 <b>מהלכי שדה:</b> מנצחים אלופי היכל ופותחים חיתוך, גלישה וכוח. עוצרים מול עץ או סלע ולוחצים אליו. הסבר בתפריט ☰.</p><p>🕶️ <b>כנופיית הצל:</b> שישה שומרי צל בשבילים ומנהיג אחד בגבעות. אחרי שמנצחים את כולם הוא מופיע.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}},3000);
+ setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen65&&!F.seen66&&K.Et==='map'){F.seen66=1;K._();K.Et='menu';K.Ie(`<h2>🆕 גרסה 6.6 - שלטים ותיקונים</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪧 <b>שלטים חדשים:</b> ליד כל עץ שאפשר לחתוך, סלע שאפשר לדחוף ומים שאפשר לשוט בהם יש שלט קטן. השלט מסביר מה צריך ואיך - קרבו אליו ולחצו בדיקה!</p><p>🪓💪 עצים שחתכתם וסלעים שדחפתם <b>נשארים ככה לתמיד</b>, גם אחרי שסוגרים את המשחק וחוזרים.</p><p>🕶️ תוקן הפרס אחרי הקרב מול ראש הצל: עכשיו מקבלים בדיוק את מה שמובטח - 1200 מטבעות.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}},3100);
 };
 window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX);window.TL63_r2&&window.TL63_r2(K,window.TLX);window.TL63_r3&&window.TL63_r3(K,window.TLX)};
 })();
