@@ -1,6 +1,6 @@
 // Family gatekeeper: network first, cached copy so installed games can start offline.
 self.addEventListener('fetch',e=>{if(new URL(e.request.url).pathname==='/family-hub/gatekeeper.js'){e.respondWith(fetch(e.request,{cache:'reload'}).then(r=>{if(r.ok){const cp=r.clone();caches.open('fc-gatekeeper').then(c=>c.put(e.request,cp));}return r;}).catch(()=>caches.open('fc-gatekeeper').then(c=>c.match(e.request))));return;}});
-const CACHE='talatlim-6.5.0-family1';
+const CACHE='talatlim-6.6.0-family1';
 const ROOT=new URL('./',self.location.href).href;
 const ASSETS=['./','./index.html','./game6.js','./manifest.webmanifest','./arena-stadium.svg','./tl63.js'].map(p=>new URL(p,ROOT).href);
 self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))));
