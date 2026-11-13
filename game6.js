@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.3.0",
+  const e = "6.6.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -5379,7 +5379,7 @@ const t = [
               : ((F.gballs = (F.gballs || 0) + 2),
                 await ee("🔵 מתנת ההיכל: 2 כדורים משופרים!", 1800))),
         ie(),
-        Nt.trainer.boss && !Nt.trainer.gym && e
+        "boss" === Nt.trainer.id && e
           ? ((F.badges = 1),
             await ee("ניצחת את אלוף הגבעות! קיבלת את תג הגביש! ", 2200))
           : await ee(
@@ -5505,7 +5505,7 @@ const t = [
       (!e.requires || F.defeated[e.requires]
         ? ((Et = "menu"),
           Ie(
-            `<h2>${(e.gym || e.boss, "")} ${e.n}</h2><p>${e.txt}</p><p>הצוות של היריב: ${e.team.map((t) => f[t[0]].n + " " + E(f[t[0]].t) + " " + t[1]).join(" · ")}</p><p class="flav">טיפ: הכינו צוות עם סוגים שחזקים נגדם, ותנו פריטים לטלטלים דרך כרטיס הטלטל באוסף.</p><p>${F.defeated[e.id] ? "כבר ניצחת! באימון חוזר תקבלו " + Math.floor(0.3 * e.reward) + " מטבעות." : e.gym ? "רמות " + e.team[0][1] + "–" + e.team[e.team.length - 1][1] + " · פרס: " + e.badge : e.boss ? "רמות 13–16 · פרס: תג הגביש" : "פרס: " + e.reward + t[94]}</p><button class="btn grn" id="tf" style="width:100%">לקרב!</button><button class="btn sec" id="tc" style="width:100%;margin-top:10px">לא עכשיו</button>`,
+            `<h2>${(e.gym || e.boss, "")} ${e.n}</h2><p>${e.txt}</p><p>הצוות של היריב: ${e.team.map((t) => f[t[0]].n + " " + E(f[t[0]].t) + " " + t[1]).join(" · ")}</p><p class="flav">טיפ: הכינו צוות עם סוגים שחזקים נגדם, ותנו פריטים לטלטלים דרך כרטיס הטלטל באוסף.</p><p>${F.defeated[e.id] ? "כבר ניצחת! באימון חוזר תקבלו " + Math.floor(0.3 * e.reward) + " מטבעות." : e.gym ? "רמות " + e.team[0][1] + "–" + e.team[e.team.length - 1][1] + " · פרס: " + e.badge : "boss" === e.id ? "רמות 13–16 · פרס: תג הגביש" : "פרס: " + e.reward + t[94]}</p><button class="btn grn" id="tf" style="width:100%">לקרב!</button><button class="btn sec" id="tc" style="width:100%;margin-top:10px">לא עכשיו</button>`,
             (t) => {
               ((t.querySelector("#tc").onclick = () => {
                 (He(), (Et = "map"));
