@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.6.0",
+  const e = "6.7.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -3880,7 +3880,7 @@ const t = [
       from: null,
       to: null,
     };
-  const At = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+  const At = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0], upleft: [-1, -1], upright: [1, -1], downleft: [-1, 1], downright: [1, 1] }; const DIR8C = { right: 0, downright: 45, down: 90, downleft: 135, left: 180, upleft: -135, up: -90, upright: -45 }; function dir8way(t, e) { const a = (Math.atan2(e, t) * 180) / Math.PI, n = ["right", "downright", "down", "downleft", "left", "upleft", "up", "upright"]; let s = Math.round(a / 45); s = ((s % 8) + 8) % 8; if (Pt && null != DIR8C[Pt]) { let t = Math.abs(a - DIR8C[Pt]); if ((t > 180 && (t = 360 - t), t <= 26)) return Pt; } return n[s]; }
   let Pt = null,
     jt = !1,
     It = "",
@@ -3927,7 +3927,7 @@ const t = [
         R(e, o + 2.6 * t, r - 22 - c, 0.9, 1, "#222"));
     }
   }
-  const Gt = () => (F.symbols || []).length < 3,
+  function LtS(t, e, a, n, s) { const l = e + 16, i = a + 28; (R(t, l, i + 1, 8, 3, "rgba(8,6,18,.4)"), A(t, [l - 7, i, l - 5, i - 13, l, i - 17, l + 5, i - 13, l + 7, i], "#322452"), A(t, [l - 5, i, l - 3.5, i - 11, l, i - 14, l + 3.5, i - 11, l + 5, i], "#44316e"), R(t, l, i - 16, 7.2, 6.6, "#4a3380"), R(t, l, i - 15.6, 6.2, 5.8, "#241840"), "up" !== n && (R(t, l, i - 15.8, 4.6, 2.1, "#0e0a18"), R(t, l - 2, i - 15.8, 1, 1.2, "#c9a2ff"), R(t, l + 2, i - 15.8, 1, 1.2, "#c9a2ff")), s && (R(t, l, i - 7, 2.2, 2.8, "#c05aff"), R(t, l, i - 19.5, 4, 1.2, "#d0a018"))); } const Gt = () => (F.symbols || []).length < 3,
     Wt = () => (F.party.length ? Math.max(...F.party.map((t) => t.lv)) : 0);
   function Ft(e) {
     if ("map" !== Et) return;
@@ -3949,7 +3949,7 @@ const t = [
       ie(),
       Rt.moving)
     ) {
-      Rt.mt += e / (0.17 / (0.55 + 0.45 * Ht));
+      Rt.mt += e / (((Rt.diag ? 1.4142 : 1) * 0.17) / (0.55 + 0.45 * Ht));
       const a = Math.min(Rt.mt, 1);
       ((Rt.px = Rt.from.x + (Rt.to.x - Rt.from.x) * a),
         (Rt.py = Rt.from.y + (Rt.to.y - Rt.from.y) * a),
@@ -4134,72 +4134,7 @@ const t = [
       Pt &&
       (function (t) {
         if (Rt.moving || "map" !== Et) return;
-        Rt.dir = t;
-        const e = At[t],
-          a = Rt.x + e[0],
-          n = Rt.y + e[1];
-        if (a < 0 || n < 0 || a >= dt || n >= ft)
-          (!Rt.bump || performance.now() - Rt.bump > 400) &&
-            ((Rt.bump = performance.now()), Y("bump"));
-        else {
-          if (
-            (function (t, e) {
-              if (t < 0 || e < 0 || t >= dt || e >= ft) return !0;
-              const a = ct[e][t];
-              if (29 === a) return Gt();
-              if (ut.has(a)) return !0;
-              if (ln().some((a) => a.x === t && a.y === e)) return !0;
-              if (Va.some((a) => a.map === en && a.x === t && a.y === e))
-                return !0;
-              if (
-                Fa.map === en &&
-                Fa.x === t &&
-                Fa.y === e &&
-                1 === F.quests.lostq &&
-                !(F.story || {}).lostFound
-              )
-                return !0;
-              const n = on(t, e);
-              if (n) {
-                const t = rn(n);
-                if (t && !t.ok()) return !0;
-              }
-              return !1;
-            })(a, n)
-          ) {
-            if (29 === ct[n][a] && Gt())
-              return void (
-                (!Rt.bump || performance.now() - Rt.bump > 1200) &&
-                ((Rt.bump = performance.now()),
-                Y("bump"),
-                Bt(
-                  "🔒 דלת הסמלים נעולה! מצאו שלושה סמלים נסתרים 🔺🔷⭐ (" +
-                    (F.symbols || []).length +
-                    "/3)",
-                  3500,
-                ))
-              );
-            const t = on(a, n);
-            if (t) {
-              const e = rn(t);
-              if (e && !e.ok())
-                return void (
-                  (!Rt.bump || performance.now() - Rt.bump > 1200) &&
-                  ((Rt.bump = performance.now()),
-                  Y("bump"),
-                  Bt(e.msg || t.msg || "🔒 הדרך חסומה!", 3500))
-                );
-            }
-            return void (
-              (!Rt.bump || performance.now() - Rt.bump > 400) &&
-              ((Rt.bump = performance.now()), Y("bump"))
-            );
-          }
-          ((Rt.moving = !0),
-            (Rt.mt = 0),
-            (Rt.from = { x: Rt.x, y: Rt.y }),
-            (Rt.to = { x: a, y: n }));
-        }
+        const e = At[t]; if (!e) return; const dg = 0 !== e[0] && 0 !== e[1]; Rt.dir = dg ? (e[0] > 0 ? "right" : "left") : t; const a0 = Rt.x + e[0], n0 = Rt.y + e[1], blk = function (t, e) { if (t < 0 || e < 0 || t >= dt || e >= ft) return !0; const a = ct[e][t]; if (29 === a) return Gt(); if (ut.has(a)) return !0; if (ln().some((a) => a.x === t && a.y === e)) return !0; if (Va.some((a) => a.map === en && a.x === t && a.y === e)) return !0; if ( Fa.map === en && Fa.x === t && Fa.y === e && 1 === F.quests.lostq && !(F.story || {}).lostFound ) return !0; const n = on(t, e); if (n) { const t = rn(n); if (t && !t.ok()) return !0; } return !1; }; let a = a0, n = n0; if (blk(a0, n0) || (dg && (blk(a0, Rt.y) || blk(Rt.x, n0)))) { if (dg && !blk(a0, Rt.y)) ((a = a0), (n = Rt.y)); else if (dg && !blk(Rt.x, n0)) ((a = Rt.x), (n = n0)); else { const inb = a0 >= 0 && n0 >= 0 && a0 < dt && n0 < ft; if (inb && 29 === ct[n0][a0] && Gt()) return void ( (!Rt.bump || performance.now() - Rt.bump > 1200) && ((Rt.bump = performance.now()), Y("bump"), Bt( "🔒 דלת הסמלים נעולה! מצאו שלושה סמלים נסתרים 🔺🔷⭐ (" + (F.symbols || []).length + "/3)", 3500, )) ); const t = inb ? on(a0, n0) : null; if (t) { const e = rn(t); if (e && !e.ok()) return void ( (!Rt.bump || performance.now() - Rt.bump > 1200) && ((Rt.bump = performance.now()), Y("bump"), Bt(e.msg || t.msg || "🔒 הדרך חסומה!", 3500)) ); } return void ( (!Rt.bump || performance.now() - Rt.bump > 400) && ((Rt.bump = performance.now()), Y("bump")) ); } } ((Rt.diag = dg && a === a0 && n === n0), (Rt.moving = !0), (Rt.mt = 0), (Rt.from = { x: Rt.x, y: Rt.y }), (Rt.to = { x: a, y: n }));
       })(Pt),
       jt &&
         ((jt = !1),
@@ -6929,16 +6864,7 @@ const t = [
     ((ca.querySelector("i").style.transform =
       `translate(${a * o}px,${n * o}px)`),
       (Ht = l(s / i, 0, 1)),
-      (Pt =
-        s < 0.12 * e.width
-          ? null
-          : Math.abs(a) > Math.abs(n)
-            ? a > 0
-              ? "right"
-              : "left"
-            : n > 0
-              ? "down"
-              : "up"));
+(Pt = s < 0.12 * e.width ? null : dir8way(a, n)));
   }
   function ya() {
     const t = (F && F.ctrl) || "arrows";
@@ -7005,16 +6931,7 @@ const t = [
           ((c = Math.max(c, n)),
             (s.style.transform = `translate(${e * u}px,${a * u}px)`),
             (Ht = l(n / d, 0, 1)),
-            (Pt =
-              n < 12
-                ? null
-                : Math.abs(e) > Math.abs(a)
-                  ? e > 0
-                    ? "right"
-                    : "left"
-                  : a > 0
-                    ? "down"
-                    : "up"));
+(Pt = n < 12 ? null : dir8way(e, a)));
         }),
         ["pointerup", "pointercancel", t[161]].forEach((a) =>
           n.addEventListener(a, (a) => {
@@ -12519,17 +12436,9 @@ const t = [
     Wn = new Map();
   function Fn(t, e) {
     const a = (function (t) {
-        return t.into?.startsWith("hosp-")
-          ? "hospital"
-          : t.into?.startsWith("shop-")
-            ? "shop"
-            : t.gym ||
-                t.into?.startsWith("gym") ||
-                t.into?.startsWith("stadium")
-              ? "gym"
-              : "house";
+        return t.shadow ? "shadow" : t.into?.startsWith("hosp-") ? "hospital" : t.into?.startsWith("shop-") ? "shop" : t.gym || t.into?.startsWith("gym") || t.into?.startsWith("stadium") ? "gym" : "house";
       })(t),
-      n = Gn[e] || Gn.A,
+      n0 = Gn[e] || Gn.A,       n = "shadow" === a ? Object.assign({}, n0, { roof: "#3a2a5e", wall: "#584a7e", trim: "#241738", style: "stone", plant: "#3e2f63", }) : n0,
       s = [e, a, t.w, t.h, t.into].join(":");
     if (Wn.has(s)) return Wn.get(s);
     const l = 32 * t.w,
@@ -12542,14 +12451,7 @@ const t = [
       d = 24,
       f = i - 1,
       p = 32 * (t.doorX - t.x) + 16,
-      y =
-        "hospital" === a
-          ? "#be5865"
-          : "shop" === a
-            ? n.trim
-            : "gym" === a
-              ? Me(n.roof)
-              : n.roof,
+      y = "shadow" === a ? "#46307a" : "hospital" === a ? "#be5865" : "shop" === a ? n.trim : "gym" === a ? Me(n.roof) : n.roof,
       m = (t, e, a, n, s) => {
         ((r.fillStyle = s), r.fillRect(t, e, a, n));
       },
@@ -12655,7 +12557,7 @@ const t = [
         18,
         31,
         5,
-        "hospital" === a ? "#6eac9d" : "shop" === a ? "#4e7e88" : "#8c654e",
+        "shadow" === a ? "#33235a" : "hospital" === a ? "#6eac9d" : "shop" === a ? "#4e7e88" : "#8c654e",
       ),
       m(p - 6, v + 3, 12, 10, "#a5d2d6"),
       h(p, v + 3, p, v + 13, n.trim, 1),
@@ -12730,8 +12632,7 @@ const t = [
               ? A(r, [0, -9, 8, 1, 0, 9, -8, 1], "#9f704c")
               : (R(r, 0, 0, 4, 8, "#508d5b", 0.65),
                 h(-4, 6, 5, -5, "#d7ecc0", 1)),
-        r.restore());
-    } else {
+        r.restore()); } else if ("shadow" === a) { (m(9, 33, l - 18, 10, "#1c1230"), h(9, 43, l - 9, 43, "#6a4ac0", 2), (r.font = "10px system-ui"), (r.textAlign = "center"), r.fillText("🕶️", l / 2, 42), u(p - 26, v - 16, 52, 9, 2, "#1c1230"), (r.fillStyle = "#cdb4ff"), (r.font = "bold 6.5px Arial"), r.fillText("מפקדת הצל", p, v - 9)); for (const t of [p - 18, p + 18]) (m(t - 1, v + 8, 2, 12, "#2a1a3a"), R(r, t, v + 6, 3, 4.5, "#8a5aff"), R(r, t, v + 6.5, 1.6, 2.4, "#d8bcff")); } else {
       for (const t of [13, l - 34]) {
         m(t, i - 14, 21, 6, "#a56a53");
         for (let e = 0; e < 3; e++)
@@ -12834,7 +12735,7 @@ const t = [
                         i = e.y * Z - s;
                       if (l < -32 || i < -32 || l > 352 || i > Ct.height / 2)
                         return;
-                      Lt(a, l, i, e.dir || "down", 0, !1);
+                      (/^shadow/.test(e.ref || "") ? LtS(a, l, i, e.dir || "down", "shadowboss" === e.ref) : Lt(a, l, i, e.dir || "down", 0, !1));
                       const o = (function (e) {
                         switch (e.kind) {
                           case "trainer":
