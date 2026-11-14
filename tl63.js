@@ -1079,7 +1079,7 @@ window.TL63_r4=function(K,X){
  const iv=setInterval(()=>{if(mkHQ()||++tries>20)clearInterval(iv)},1500);mkHQ();
  // 6.7 whats-new
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen66&&!F.seen67&&K.Et==='map'){F.seen67=1;K._();K.Et='menu';
-  K.Ie(`<h2>🆕 גרסה 6.7 - מפקדת הצל</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🕶️ <b>מפקדת הצל:</b> לכנופיית הצל יש בניין סגול בגבעות! בפנים מחכים שני שומרים, מטמון - ואחרי שמנצחים את שישה שומרי הצל, גם ראש הכנופיה.</p><p>🥷 שומרי הצל קיבלו תלבושת מיוחדת: גלימה ומסכה סגולים. קל לזהות אותם!</p><p>🕹️ <b>ג'ויסטיק חלק יותר:</b> עכשיו אפשר ללכת גם באלכסון, והתנועה זורמת יותר.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}catch(e){}},3200);
+  K.Ie(`<h2>🆕 גרסה 6.7 - מפקדת הצל</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🕶️ <b>מפקדת הצל:</b> לכנופיית הצל יש בניין סגול בגבעות! בפנים מחכים שני שומרים, מטמון - ואחרי שמנצחים את שישה שומרי הצל, גם ראש הכנופיה.</p><p>🥷 שומרי הצל קיבלו תלבושת מיוחדת: גלימה ומסכה סגולים. קל לזהות אותם!</p><p>🕹️ <b>ג'ויסטיק חלק יותר:</b> עכשיו אפשר ללכת גם באלכסון, והתנועה זורמת יותר.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3200);
 };
 window.TL63=(function(prev){return function(K){prev(K);window.TL63_r4&&window.TL63_r4(K,window.TLX)}})(window.TL63);
 
