@@ -960,6 +960,7 @@ window.TL63_r3=function(K,X){
  const DIR={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
  function act(){try{const R=K.Rt;if(K.Et!=='map'||R.moving||!R.bump||R.bump===lastB||performance.now()-R.bump>450)return;
   lastB=R.bump;const d=DIR[R.dir];if(!d)return;const x=R.x+d[0],y=R.y+d[1],ct=K.ct;if(!ct[y]||ct[y][x]===undefined)return;const t=ct[y][x],m=fm();
+  if(t===33&&K.en==='shadow-hq'){const F=K.F;F.chests=F.chests||{};if(F.chests['shadow-hq']){K.Bt('התיבה ריקה - המטמון כבר אצלכם!',1800);return}F.chests['shadow-hq']=1;F.uballs=(F.uballs||0)+3;F.coins=(F.coins||0)+300;ct[y][x]=25;K.Y('ok');K._();K.Bt('🎁 המטמון של הכנופיה! קיבלתם 3 כדורי על 🟡 ו-300 מטבעות 🪙!',4000);return}
   if(t===3){if(m.cut){ct[y][x]=0;rec(x,y,0);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('🪓 חתכתם את העץ!',1800)}else K.Bt('🌳 עץ עבה. אולי יעזור אלוף היכל ראשון... (תפריט ☰ ← מהלכי שדה)',2600)}
   else if(t===4){if(!m.str){K.Bt('🪨 סלע כבד מדי. כוח נפתח בניצחון על אלוף היכל שלישי.',2600);return}
    const x2=x+d[0],y2=y+d[1];const free=ct[y2]&&ct[y2][x2]!==undefined&&!K.ut.has(ct[y2][x2])&&ct[y2][x2]!==4&&!K.an().npcs.some(n=>n.x===x2&&n.y===y2)&&!(K.an().links||[]).some(l=>l.x===x2&&l.y===y2)&&(ct[y2][x2]===0||ct[y2][x2]===1);
@@ -983,12 +984,14 @@ window.TL63_r3=function(K,X){
  }
  const BOSS={id:'shadowboss',n:'ראש הצל',map:'hills',x:0,y:0,team:['cat2:38','gh2:39','cubD:40','bell2:40','moth:41'].map(s=>{const[a,b]=s.split(':');return[KEY[a],+b]}),reward:1200,txt:'כל הכבוד, ניצחתם את שומרי הצל שלי. אבל אני עדיין לא נכנע. אני הצל האמיתי!',boss:true,shadow:true};
  function bossPoll(){const F=K.F;if(!F||!F.started||!K.ua)return;const d=F.defeated||{};const n=[1,2,3,4,5,6].filter(i=>d['shadow'+i]).length;
-  if(n>=6&&!K.Ha.some(h=>h.id==='shadowboss')){const mp=K.ua['hills'];if(!mp)return;const T=mp.tiles;let found=null;
+  if(n>=6&&!K.Ha.some(h=>h.id==='shadowboss')){const hq=K.ua['shadow-hq'];
+   if(hq){BOSS.map='shadow-hq';BOSS.x=6;BOSS.y=2;K.Ha.push(BOSS);hq.npcs.push({kind:'trainer',ref:'shadowboss',map:'shadow-hq',x:6,y:2,dir:'down',pal:'t'})}
+   else{const mp=K.ua['hills'];if(!mp)return;const T=mp.tiles;let found=null;
    for(let y=3;y<T.length-3&&!found;y++)for(let x=4;x<T[0].length-4&&!found;x++)if((K.bt.has(T[y][x])||T[y][x]===1)&&[[1,0],[-1,0],[0,1],[0,-1]].every(([a,b])=>!K.ut.has(T[y+b][x+a])&&T[y+b][x+a]!==9)&&![...(mp.npcs||[]),...(mp.links||[])].some(u=>Math.abs(u.x-x)<3&&Math.abs(u.y-y)<3))found={x,y};
-   if(!found)return;BOSS.x=found.x;BOSS.y=found.y;K.Ha.push(BOSS);mp.npcs.push({kind:'trainer',ref:'shadowboss',map:'hills',x:found.x,y:found.y,dir:'down',pal:'t'});
-   K.Et='menu';K.Ie(`<h2>🕶️ ראש הצל מופיע!</h2><div class="flav">ניצחתם את כל שומרי הצל. ראש הכנופיה ממתין בגבעות. הוא חזק. הביאו צוות מלא וריפוי.</div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}
+   if(!found)return;BOSS.x=found.x;BOSS.y=found.y;K.Ha.push(BOSS);mp.npcs.push({kind:'trainer',ref:'shadowboss',map:'hills',x:found.x,y:found.y,dir:'down',pal:'t'})}
+   K.Et='menu';K.Ie(`<h2>🕶️ ראש הצל מופיע!</h2><div class="flav">ניצחתם את כל שומרי הצל. ראש הכנופיה ממתין במפקדת הצל בגבעות. הוא חזק. הביאו צוות מלא וריפוי.</div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}
  function gang(){const F=K.F,d=F.defeated||{};
-  K.Ie(`<h2>🕶️ כנופיית הצל</h2><div class="flav">כנופיה מקומית נוסעת בין האזורים ומנסה לדחוף ילדים מהדרך. שישה שומרי צל מסתובבים בשבילים ובדרכים (מחפשים אותם: הם מחכים בקו ישר). מנצחים את כולם והמנהיג יופיע בגבעות.</div>`+
+  K.Ie(`<h2>🕶️ כנופיית הצל</h2><div class="flav">כנופיה מקומית נוסעת בין האזורים ומנסה לדחוף ילדים מהדרך. שישה שומרי צל מסתובבים בשבילים ובדרכים (מחפשים אותם: הם מחכים בקו ישר). מנצחים את כולם והמנהיג יופיע במפקדת הצל - הבניין הסגול בגבעות. במפקדה מחכים עוד שני שומרים ומטמון.</div>`+
    SH.map(([mid,n],i)=>`<div class="tlrow"><div><b>${d['shadow'+(i+1)]?'✅':'⚔️'} ${n}</b><br><small>${mid}</small></div></div>`).join('')+
    `<div class="tlrow"><div><b>${d.shadowboss?'✅':K.Ha.some(h=>h.id==='shadowboss')?'⚔️':'🔒'} ראש הצל</b><br><small>גבעות</small></div></div><button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}
  setInterval(()=>{try{place();bossPoll()}catch(e){console.error(e)}},2000);
@@ -1001,3 +1004,81 @@ window.TL63_r3=function(K,X){
 };
 window.TL63=function(K){TL63main(K);window.TL63_more&&window.TL63_more(K,window.TLX);window.TL63_r2&&window.TL63_r2(K,window.TLX);window.TL63_r3&&window.TL63_r3(K,window.TLX)};
 })();
+// ===== 6.7: shadow HQ interior, indoor guards, HQ chest handled in act() =====
+window.TL63_r4=function(K,X){
+ const KEY=X.KEY||{};
+ const sp=k=>KEY[k]!==undefined?KEY[k]:KEY['cat2'];
+ const ROWS=[
+  '#############',
+  '#...........#',
+  '#..P.....P..#',
+  '#...........#',
+  '#..P.....P..#',
+  '#...........#',
+  '#...........#',
+  '#..P.....P..#',
+  '#...........#',
+  '#....C......#',
+  '#...........#',
+  '######X######'];
+ const CH={'#':27,'.':25,'P':27,'C':33,'X':35};
+ function mkHQ(){try{
+  if(!K.ua||!K.ua.hills)return false;
+  const hills=K.ua.hills;
+  if(!K.ua['shadow-hq']){
+   const tiles=ROWS.map(r=>[...r].map(c=>CH[c]));
+   const mp={id:'shadow-hq',n:'מפקדת הצל',zone:'C',w:13,h:12,indoor:!0,town:!1,
+    buildings:[],npcs:[],links:[],spots:[],items:[],signs:[],doors:[],fields:[],deco:[],tiles};
+   K.ua['shadow-hq']=mp;
+   // indoor guards
+   K.Ha.push({id:'shadow7',n:'שומרת צל מהמפקדה',map:'shadow-hq',x:3,y:3,team:[[sp('gh'),20],[sp('cubD'),21]],reward:180,txt:'איך מצאתם את המפקדה שלנו?! לא משנה - מכאן אתם לא עוברים!',shadow:true});
+   K.Ha.push({id:'shadow8',n:'שומר צל מהמפקדה',map:'shadow-hq',x:9,y:3,team:[[sp('cat'),22],[sp('gh2'),23]],reward:220,txt:'המנהיג ישמע על החדירה הזאת! אני עוצר אתכם כאן!',shadow:true});
+   mp.npcs.push({kind:'trainer',ref:'shadow7',map:'shadow-hq',x:3,y:3,dir:'down',pal:'t'});
+   mp.npcs.push({kind:'trainer',ref:'shadow8',map:'shadow-hq',x:9,y:3,dir:'down',pal:'t'});
+  }
+  const hq=K.ua['shadow-hq'];
+  // place the building on hills once; remember the spot in the save
+  const F=K.F;
+  if(!hills.buildings.some(b=>b.into==='shadow-hq')){
+   let pos=F&&F.hqPos;
+   if(!pos){
+    const T=hills.tiles,H=T.length,W=T[0].length;
+    const used=[...(hills.npcs||[]),...(hills.links||[]),...(hills.signs||[]),...(hills.items||[]),...(hills.spots||[])];
+    const free=(x,y)=>{const v=T[y]&&T[y][x];return v===0||v===12};
+    outer:for(let y=2;y<H-6;y++)for(let x=13;x<W-7;x++){
+     let ok=true;
+     for(let dy=0;dy<4&&ok;dy++)for(let dx=0;dx<5&&ok;dx++)if(!free(x+dx,y+dy))ok=false;
+     if(ok&&used.some(u=>u.x>=x-1&&u.x<x+6&&u.y>=y-1&&u.y<y+5))ok=false;
+     if(ok){pos={x,y};break outer}
+    }
+    if(!pos){for(let y=2;y<H-6&&!pos;y++)for(let x=13;x<W-7&&!pos;x++){let ok=true;
+     for(let dy=0;dy<4&&ok;dy++)for(let dx=0;dx<5&&ok;dx++)if(!free(x+dx,y+dy))ok=false;
+     if(ok)pos={x,y}}}
+    if(!pos)return false;
+    if(F){F.hqPos=pos;K._()}
+   }
+   const bx=pos.x,by=pos.y,n=bx+2;
+   hills.buildings.push({x:bx,y:by,w:5,h:3,roof:'#3a2a5e',wall:'#584a7e',icon:'🕶️',name:'מפקדת הצל',into:'shadow-hq',shadow:!0,doorX:n,frontY:by+3});
+   for(let x=bx;x<bx+5;x++)hills.tiles[by][x]=x===n?13:6;
+   for(let y=by+1;y<by+3;y++)for(let x=bx;x<bx+5;x++)hills.tiles[y][x]=7;
+   hills.tiles[by+2][n]=8;
+   if(hills.tiles[by+3]&&hills.tiles[by+3][n]!=null)hills.tiles[by+3][n]=1;
+   hills.doors=hills.doors||[];hills.doors.push({x:n,y:by+2,into:'shadow-hq'});
+   hills.signs.push({x:bx+1,y:by+3,msg:'🕶️ מפקדת הצל: הבניין הסגול של הכנופיה. מי שנכנס - צריך צוות חזק! המנהיג מחכה בפנים אחרי שמנצחים את שישה שומרי הצל שבשבילים.'});
+   hills.tiles[by+3][bx+1]=9;
+  }
+  const b=hills.buildings.find(b=>b.into==='shadow-hq');
+  hq.back={map:'hills',x:b.doorX,y:b.frontY};hq.spawn={x:6,y:10};hq.exit=1;
+  // relocate an already-spawned outdoor boss into the HQ
+  const bb=K.Ha.find(h=>h.id==='shadowboss');
+  if(bb&&bb.map==='hills'){hills.npcs=(hills.npcs||[]).filter(q=>q.ref!=='shadowboss');bb.map='shadow-hq';bb.x=6;bb.y=2;
+   if(!hq.npcs.some(q=>q.ref==='shadowboss'))hq.npcs.push({kind:'trainer',ref:'shadowboss',map:'shadow-hq',x:6,y:2,dir:'down',pal:'t'})}
+  return true;
+ }catch(e){console.error('hq',e);return false}}
+ let tries=0;
+ const iv=setInterval(()=>{if(mkHQ()||++tries>20)clearInterval(iv)},1500);mkHQ();
+ // 6.7 whats-new
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen66&&!F.seen67&&K.Et==='map'){F.seen67=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.7 - מפקדת הצל</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🕶️ <b>מפקדת הצל:</b> לכנופיית הצל יש בניין סגול בגבעות! בפנים מחכים שני שומרים, מטמון - ואחרי שמנצחים את שישה שומרי הצל, גם ראש הכנופיה.</p><p>🥷 שומרי הצל קיבלו תלבושת מיוחדת: גלימה ומסכה סגולים. קל לזהות אותם!</p><p>🕹️ <b>ג'ויסטיק חלק יותר:</b> עכשיו אפשר ללכת גם באלכסון, והתנועה זורמת יותר.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}catch(e){}},3200);
+};
+window.TL63=(function(prev){return function(K){prev(K);window.TL63_r4&&window.TL63_r4(K,window.TLX)}})(window.TL63);
