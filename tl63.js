@@ -1082,3 +1082,101 @@ window.TL63_r4=function(K,X){
   K.Ie(`<h2>🆕 גרסה 6.7 - מפקדת הצל</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🕶️ <b>מפקדת הצל:</b> לכנופיית הצל יש בניין סגול בגבעות! בפנים מחכים שני שומרים, מטמון - ואחרי שמנצחים את שישה שומרי הצל, גם ראש הכנופיה.</p><p>🥷 שומרי הצל קיבלו תלבושת מיוחדת: גלימה ומסכה סגולים. קל לזהות אותם!</p><p>🕹️ <b>ג'ויסטיק חלק יותר:</b> עכשיו אפשר ללכת גם באלכסון, והתנועה זורמת יותר.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}}catch(e){}},3200);
 };
 window.TL63=(function(prev){return function(K){prev(K);window.TL63_r4&&window.TL63_r4(K,window.TLX)}})(window.TL63);
+
+// === 6.8.0 Cloud save - גיבוי ענן עם קוד PIN ===
+window.TL63_r5=function(K,X){
+ try{
+  const DB='https://talatlim-adventure-default-rtdb.europe-west1.firebasedatabase.app';
+  const te=new TextEncoder(),td=new TextDecoder();
+  const b64=a=>btoa(String.fromCharCode.apply(null,new Uint8Array(a)));
+  const ub64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+  const keyOf=n=>{const by=te.encode(String(n).trim());return btoa(String.fromCharCode.apply(null,by)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')};
+  async function derive(n,p){const km=await crypto.subtle.importKey('raw',te.encode(String(p)),'PBKDF2',false,['deriveKey']);return crypto.subtle.deriveKey({name:'PBKDF2',salt:te.encode('tl68:'+String(n).trim()),iterations:6e4,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt'])}
+  async function encS(n,p,st){const k=await derive(n,p),iv=crypto.getRandomValues(new Uint8Array(12));const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},k,te.encode(JSON.stringify(st)));return{v:1,iv:b64(iv),data:b64(ct),at:Date.now()}}
+  async function decS(n,p,rec){const k=await derive(n,p);const pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:ub64(rec.iv)},k,ub64(rec.data));return JSON.parse(td.decode(pt))}
+  async function rGet(k){const r=await fetch(DB+'/saves/'+encodeURIComponent(k)+'.json',{cache:'no-store'});if(!r.ok)throw new Error('net');return r.json()}
+  async function rPut(k,rec){const r=await fetch(DB+'/saves/'+encodeURIComponent(k)+'.json',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(rec)});if(!r.ok)throw new Error('net')}
+  const modalOpen=()=>{const m=document.querySelector('#modal');return m&&m.style.display==='flex'};
+  const cur=()=>{try{return K.D&&K.D()}catch(e){return null}};
+  let upT=0,pullDone=0;
+  async function upload(){
+   const p=cur();if(!p||!p.cloud||!K.F||!K.F.started)return;
+   try{const rec=await encS(p.cloud.name,p.cloud.pin&&atob(p.cloud.pin),K.F);rec.at=Date.now();await rPut(p.cloud.key,rec);p.cloud.at=rec.at;p.cloud.dirty=0;origSave()}catch(e){try{const q=cur();if(q&&q.cloud)q.cloud.dirty=1}catch(_){}}
+  }
+  function schedUp(){if(upT)return;upT=setTimeout(()=>{upT=0;upload()},2000)}
+  const origSave=K._;
+  K._=function(){const r=origSave.apply(this,arguments);try{const p=cur();if(p&&p.cloud)schedUp()}catch(e){}return r};
+  addEventListener('online',()=>{try{const p=cur();if(p&&p.cloud&&p.cloud.dirty)upload()}catch(e){}});
+  // boot pull: if active profile is cloud-linked and remote is newer, take remote
+  (async()=>{
+   try{
+    const p=cur();if(!p||!p.cloud)return;
+    const rec=await rGet(p.cloud.key);if(!rec||!rec.at||rec.at<=(p.cloud.at||0))return;
+    const st=await decS(p.cloud.name,atob(p.cloud.pin),rec);
+    p.state=st;p.cloud.at=rec.at;pullDone=1;
+    try{const reg=JSON.parse(localStorage.getItem(K.B));const q=reg&&reg.players&&reg.players.find(q=>q.id===p.id);if(q){q.state=st;q.cloud=p.cloud;localStorage.setItem(K.B,JSON.stringify(reg))}}catch(e){}
+    if(K.Et==='title'||!K.F){try{K.F=st}catch(e){}K.Bt&&K.Bt('☁️ נטענה שמירה עדכנית מהענן',3500)}
+    else{K.Ie('<h2>☁️ נמצאה שמירה חדשה</h2><p style="text-align:right">במכשיר אחר שיחקו בהרפתקה הזו לאחרונה. טוענים את השמירה העדכנית...</p>',()=>{});setTimeout(()=>location.reload(),1800)}
+   }catch(e){}
+  })();
+  // PIN setup
+  function pinModal(p){
+   K.Ie(`<h2>☁️ גיבוי בענן</h2><div style="text-align:right;font-size:14px;line-height:1.6"><p>אפשר להמשיך את ההרפתקה של <b>${K.Vt(p.name)}</b> מכל מכשיר - טאבלט, מחשב או טלפון אחר!</p><p>בחרו קוד סודי מספרי (4 ספרות). בלי הקוד, אף אחד אחר לא יכול לטעון או לדרוס את השמירה:</p></div><input class="nick" id="clP1" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="4 ספרות" style="text-align:center;letter-spacing:8px;font-size:22px"><input class="nick" id="clP2" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="שוב אותן 4 ספרות" style="text-align:center;letter-spacing:8px;font-size:22px"><div id="clPE" style="color:#ffd080;min-height:24px;font-size:14px"></div><button class="btn grn" id="clGo" style="width:100%">שמירה בענן</button><button class="btn sec" id="clNo" style="width:100%;margin-top:8px">לא עכשיו</button>`,mm=>{
+    mm.querySelector('#clNo').onclick=()=>{p.noCloud=1;try{origSave()}catch(e){}K.He()};
+    mm.querySelector('#clGo').onclick=async()=>{
+     const p1=mm.querySelector('#clP1').value.trim(),p2=mm.querySelector('#clP2').value.trim(),er=mm.querySelector('#clPE');
+     if(!/^\d{4}$/.test(p1))return void(er.textContent='הקוד צריך להיות בדיוק 4 ספרות');
+     if(p1!==p2)return void(er.textContent='הקודים לא זהים - כותבים שוב');
+     const btn=mm.querySelector('#clGo');btn.disabled=true;btn.textContent='שומר...';
+     try{
+      const key=keyOf(p.name),ex=await rGet(key);
+      if(ex&&ex.data){try{await decS(p.name,p1,ex)}catch(e){btn.disabled=false;btn.textContent='שמירה בענן';return void(er.textContent='השם הזה כבר נשמר בענן עם קוד אחר. אפשר לבחור קוד אחר? לא - כדאי שם אחר או לטעון מהענן במסך הפתיחה')}}
+      p.cloud={key:key,name:p.name,pin:btoa(p1),at:ex&&ex.at||0,dirty:0};origSave();
+      btn.textContent='☁️ מעלה לענן...';await upload();
+      K.He();K.Bt('✓ ההרפתקה נשמרה בענן! מעכשיו היא נשמרת אוטומטית',4500)
+     }catch(e){btn.disabled=false;btn.textContent='שמירה בענן';er.textContent='אין חיבור לענן כרגע. המשחק נשמר במכשיר, ננסה שוב אחר כך'}
+    };
+   });
+  }
+  // one-time opt-in prompt while walking on the map
+  setInterval(()=>{try{const p=cur();if(p&&K.F&&K.F.started&&K.Et==='map'&&!p.cloud&&!p.noCloud&&!modalOpen()){p.cloudAsked=1;pinModal(p)}}catch(e){}},2500);
+  // restore-from-cloud button on the title screen
+  function injectBtn(){
+   try{
+    const t=document.querySelector('#title');if(!t||t.style.display==='none')return;
+    if(t.querySelector('#cloudLoad'))return;
+    const imp=t.querySelector('#importProfile');if(!imp)return;
+    const b=document.createElement('button');b.className='btn';b.id='cloudLoad';b.textContent='☁️ טעינת שחקן מהענן';
+    b.onclick=()=>{
+     K.Ie(`<h2>☁️ טעינה מהענן</h2><div style="text-align:right;font-size:14px;line-height:1.6"><p>אם ההרפתקה נשמרה בענן במכשיר אחר, כותבים כאן את שם השחקן והקוד הסודי:</p></div><input class="nick" id="clN" maxlength="16" placeholder="שם השחקן"><input class="nick" id="clP" inputmode="numeric" pattern="[0-9]*" maxlength="4" placeholder="הקוד הסודי (4 ספרות)" style="text-align:center;letter-spacing:8px;font-size:22px"><div id="clE" style="color:#ffd080;min-height:24px;font-size:14px"></div><button class="btn grn" id="clDo" style="width:100%">טעינה</button><button class="btn sec" id="clB" style="width:100%;margin-top:8px">חזרה</button>`,mm=>{
+      mm.querySelector('#clB').onclick=K.He;
+      mm.querySelector('#clDo').onclick=async()=>{
+       const nm=mm.querySelector('#clN').value.trim(),pn=mm.querySelector('#clP').value.trim(),er=mm.querySelector('#clE'),btn=mm.querySelector('#clDo');
+       if(!nm)return void(er.textContent='כותבים את שם השחקן');
+       if(!/^\d{4}$/.test(pn))return void(er.textContent='הקוד הסודי הוא 4 ספרות');
+       btn.disabled=true;btn.textContent='מחפש בענן...';
+       try{
+        const key=keyOf(nm),rec=await rGet(key);
+        if(!rec||!rec.data){btn.disabled=false;btn.textContent='טעינה';return void(er.textContent='לא נמצאה שמירה בענן בשם הזה')}
+        let st;try{st=await decS(nm,pn,rec)}catch(e){btn.disabled=false;btn.textContent='טעינה';return void(er.textContent='הקוד שגוי')}
+        let ln=nm,s=2;const reg=JSON.parse(localStorage.getItem(K.B))||{version:1,active:null,players:[]};
+        for(;reg.players.some(q=>q.name===ln);)ln=nm+' ('+s++ +')';
+        reg.players.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,8),name:ln,state:st,cloud:{key:key,name:nm,pin:btoa(pn),at:rec.at||0,dirty:0}});
+        localStorage.setItem(K.B,JSON.stringify(reg));
+        btn.textContent='✓ נטען!';setTimeout(()=>location.reload(),900)
+       }catch(e){btn.disabled=false;btn.textContent='טעינה';er.textContent='אין חיבור לענן כרגע. מנסים שוב כשיש רשת'}
+      };
+     });
+    };
+    imp.after(b);
+   }catch(e){}
+  }
+  const tt=document.querySelector('#title');
+  if(tt)new MutationObserver(injectBtn).observe(tt,{childList:true});
+  setInterval(injectBtn,1500);injectBtn();
+  // 6.8 whats-new
+  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen67&&!F.seen68&&K.Et==='map'&&!modalOpen()){F.seen68=1;origSave();K.Et='menu';
+   K.Ie(`<h2>🆕 גרסה 6.8 - שמירה בענן!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>☁️ <b>גיבוי בענן:</b> עכשיו אפשר להמשיך את ההרפתקה מכל מכשיר! המשחק יציע לשמור עותק בענן עם קוד סודי בן 4 ספרות.</p><p>📥 במסך הפתיחה יש כפתור חדש: <b>טעינת שחקן מהענן</b> - כותבים את השם והקוד, וההרפתקה ממשיכה גם בטאבלט או במחשב.</p><p>🔒 בלי הקוד הסודי אף אחד לא יכול לטעון או לדרוס את השמירה שלכם.</p></div><button class="btn grn" id="tlx68" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx68').onclick=K.He)}}catch(e){}},3300);
+ }catch(e){console.error('cloud',e)}
+};
+window.TL63=(function(prev){return function(K){prev(K);window.TL63_r5&&window.TL63_r5(K,window.TLX)}})(window.TL63);
