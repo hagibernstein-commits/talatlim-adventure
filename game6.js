@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.7.0",
+  const e = "6.8.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
