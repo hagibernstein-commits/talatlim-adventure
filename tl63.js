@@ -1176,7 +1176,7 @@ window.TL63_r5=function(K,X){
   setInterval(injectBtn,1500);injectBtn();
   // 6.8 whats-new
   setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen67&&!F.seen68&&K.Et==='map'&&!modalOpen()){F.seen68=1;origSave();K.Et='menu';
-   K.Ie(`<h2>🆕 גרסה 6.8 - שמירה בענן!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>☁️ <b>גיבוי בענן:</b> עכשיו אפשר להמשיך את ההרפתקה מכל מכשיר! המשחק יציע לשמור עותק בענן עם קוד סודי בן 4 ספרות.</p><p>📥 במסך הפתיחה יש כפתור חדש: <b>טעינת שחקן מהענן</b> - כותבים את השם והקוד, וההרפתקה ממשיכה גם בטאבלט או במחשב.</p><p>🔒 בלי הקוד הסודי אף אחד לא יכול לטעון או לדרוס את השמירה שלכם.</p></div><button class="btn grn" id="tlx68" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx68').onclick=K.He)}}catch(e){}},3300);
+   K.Ie(`<h2>🆕 גרסה 6.8 - שמירה בענן!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>☁️ <b>גיבוי בענן:</b> עכשיו אפשר להמשיך את ההרפתקה מכל מכשיר! המשחק יציע לשמור עותק בענן עם קוד סודי בן 4 ספרות.</p><p>📥 במסך הפתיחה יש כפתור חדש: <b>טעינת שחקן מהענן</b> - כותבים את השם והקוד, וההרפתקה ממשיכה גם בטאבלט או במחשב.</p><p>🔒 בלי הקוד הסודי אף אחד לא יכול לטעון או לדרוס את השמירה שלכם.</p></div><button class="btn grn" id="tlx68" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx68').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3300);
  }catch(e){console.error('cloud',e)}
 };
 window.TL63=(function(prev){return function(K){prev(K);window.TL63_r5&&window.TL63_r5(K,window.TLX)}})(window.TL63);
