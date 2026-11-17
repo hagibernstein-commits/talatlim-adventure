@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.8.0",
+  const e = "6.9.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -5934,7 +5934,7 @@ const t = [
     if ("map" !== Et) return;
     Et = "menu";
     const t = a("#mnu");
-    ((t.innerHTML = `<div class="top"><h2>תפריט · ${Vt(D()?.name || "")}</h2><button class="x" id="mx">✕</button></div>\n <div style="display:grid;gap:10px;margin-top:10px"><button class="btn" id="mq"> יומן משימות</button><button class="btn" id="mw"> מפת העולם</button><button class="btn" id="mg"> מסע התגים</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn sec" id="mh"> מפת המסע ומה חדש</button><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn" id="m2">🔊 סאונד: ${F.snd ? "פועל" : "מושתק"}</button><button class="btn" id="mc">🎮 שליטה: ${"stick" === F.ctrl ? "ג׳ויסטיק" : "float" === F.ctrl ? "מגע חופשי" : "כפתורי חיצים"}</button><button class="btn sec" id="m3"> ${F.badges ? "תג הגביש" : "אין תגים עדיין"} ·  ⚪ ${F.balls} ·  ${F.pots}/${F.spots || 0}/${F.upots || 0} · 🪙 ${F.coins}</button><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn sec" id="mr">✏️ שינוי שם השחקן</button><button class="btn grn" id="mi"> התקנה בטלפון</button><button class="btn red" id="m4">🗑 התחלה מחדש</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${e}</button></div>`),
+    ((t.innerHTML = `<div class="top"><h2>תפריט · ${Vt(D()?.name || "")}</h2><button class="x" id="mx">✕</button></div>\n <div style="display:grid;gap:10px;margin-top:10px"><button class="btn grn" id="m1">📖 האוסף והטלטלים שלי</button><button class="btn grn" id="m3">🎒 התיק שלי<small>⚪ ${F.balls} · 🔵 ${F.gballs || 0} · 🟡 ${F.uballs || 0} · 🧪 ${F.pots + (F.spots || 0) + (F.upots || 0)} · 🪙 ${F.coins}</small></button><div class="msecl" style="margin:6px 0 -4px;font-size:13px;opacity:.7;text-align:right">🗺️ המסע</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="mgJ"><button class="btn" id="mq">📜 יומן משימות</button><button class="btn" id="mw">🗺️ מפת העולם</button><button class="btn" id="mg">🏅 מסע התגים</button><button class="btn" id="mh">🆕 מפת המסע ומה חדש</button></div><div class="msecl" style="margin:6px 0 -4px;font-size:13px;opacity:.7;text-align:right">🧰 ציוד וחנויות</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="mgG"></div><div class="msecl" style="margin:6px 0 -4px;font-size:13px;opacity:.7;text-align:right">⚙️ הגדרות</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="mgS"><button class="btn" id="m2">🔊 סאונד: ${F.snd ? "פועל" : "מושתק"}</button><button class="btn" id="mc">🎮 שליטה: ${"stick" === F.ctrl ? "ג׳ויסטיק" : "float" === F.ctrl ? "מגע חופשי" : "כפתורי חיצים"}</button></div><button class="btn sec" id="m6">⋯ עוד</button><div style="display:none;grid-template-columns:1fr 1fr;gap:8px" id="mgM"><button class="btn" id="mp">👥 החלפת שחקן</button><button class="btn" id="mr">✏️ שינוי שם השחקן</button><button class="btn" id="mt">📤 העברת שחקן וגיבוי</button><button class="btn" id="mi">📲 התקנה בטלפון</button><button class="btn sec" id="m5" style="min-height:40px">גרסה ${e}</button><button class="btn red" id="m4">🗑 התחלה מחדש</button></div></div>`),
       Ae("mnu"),
       (t.querySelector("#mw").onclick = vn),
       (t.querySelector("#mq").onclick = Ln),
@@ -5955,6 +5955,12 @@ const t = [
       }),
       (t.querySelector("#mc").onclick = () => {
         ((F.ctrl = "arrows" === (F.ctrl || "arrows") ? "stick" : "stick" === F.ctrl ? "float" : "arrows"), _(), ya(), Je());
+      }),
+      (t.querySelector("#m6").onclick = () => {
+        const g = t.querySelector("#mgM");
+        ((g.style.display = "none" === g.style.display ? "grid" : "none"),
+          (t.querySelector("#m6").textContent =
+            "none" === g.style.display ? "⋯ עוד" : "⋯ סגירה"));
       }));
     let n = !1;
     t.querySelector("#m4").onclick = (t) => {
@@ -10038,7 +10044,40 @@ const t = [
           t.fillRect(12, 26, 2, 2),
           t.fillRect(28, 28, 2, 2));
       }),
-    ]));
+    ]),
+      ($t[54] = [
+        xt((t) => {
+          (kt(t, 1),
+            R(t, 16, 29, 11, 4, "rgba(0,0,0,.22)"),
+            (t.fillStyle = "#8a6a3e"),
+            t.fillRect(13, 13, 6, 16),
+            (t.fillStyle = "#6b4e2a"),
+            t.fillRect(17, 13, 2, 16),
+            (t.strokeStyle = "#7a5832"),
+            (t.lineWidth = 2.6),
+            t.beginPath(),
+            t.moveTo(15, 17),
+            t.lineTo(6, 8),
+            t.moveTo(17, 15),
+            t.lineTo(26, 6),
+            t.moveTo(14, 11),
+            t.lineTo(10, 3),
+            t.stroke(),
+            (t.lineWidth = 1.6),
+            t.beginPath(),
+            t.moveTo(6, 8),
+            t.lineTo(3, 5),
+            t.moveTo(26, 6),
+            t.lineTo(29, 3),
+            t.stroke(),
+            R(t, 5, 7, 2.6, 2.2, "#c98f2e"),
+            R(t, 26, 5, 2.6, 2.2, "#b87f26"),
+            R(t, 10, 2, 2.2, 1.8, "#d9a83f"),
+            (t.fillStyle = "#4e3018"),
+            t.fillRect(14, 20, 1.6, 4),
+            t.fillRect(16, 25, 1.6, 3));
+        }),
+      ]));
   const Ya = {
     boss: { ok: () => F.badges > 0, msg: t[6] },
     lv10: {
