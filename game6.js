@@ -179,7 +179,7 @@ const t = [
 ];
 (() => {
   "use strict";
-  const e = "6.9.0",
+  const e = "6.10.0",
     a = (t) => document.querySelector(t),
     n = (t, e) => t + Math.floor(Math.random() * (e - t + 1)),
     s = (t) => t[Math.floor(Math.random() * t.length)],
@@ -866,7 +866,7 @@ const t = [
         n: "תה מרפא",
         icon: "",
         cost: 20,
-        d: "מרפא כוויה, שינה, רעל ושיתוק בקרב",
+        d: "מרפא כוויה, שינה, רעל, שיתוק, קיפאון ובלבול בקרב",
       },
       berry: {
         n: "פרי מרפא",
@@ -1281,6 +1281,30 @@ const t = [
     return (
       (a.width = a.height = 2 * e),
       z(a.getContext("2d"), t, e, 1.02 * e, 1.8 * e, 0.5),
+      a
+    );
+  }
+  function Lan(t, e) {
+    const a = document.createElement("canvas");
+    a.width = a.height = 2 * e;
+    const n = a.getContext("2d");
+    return (
+      requestAnimationFrame(function s(l) {
+        if (!a.isConnected) return;
+        const i = l / 1000;
+        (n.setTransform(1, 0, 0, 1, 0, 0),
+          n.clearRect(0, 0, 2 * e, 2 * e),
+          z(
+            n,
+            t,
+            e,
+            1.02 * e + 0.05 * e * Math.sin(2.6 * i),
+            1.8 * e * (1 + 0.03 * Math.cos(2.6 * i)),
+            i,
+            1,
+          ));
+        requestAnimationFrame(s);
+      }),
       a
     );
   }
@@ -4072,7 +4096,7 @@ const t = [
                   else if (l < 48) (F.gballs++, (i = t[69]));
                   else if (l < 58)
                     ((F.tea = (F.tea || 0) + 1),
-                      (i = "מצאת תה מרפא! 🍵 מרפא כוויה, שינה, רעל ושיתוק"));
+                      (i = "מצאת תה מרפא! 🍵 מרפא כוויה, שינה, רעל, שיתוק, קיפאון ובלבול"));
                   else if (l < 68)
                     ((F.spots = (F.spots || 0) + 1),
                       (i = "מצאת סופר שיקוי! 🧪"));
@@ -4449,13 +4473,17 @@ const t = [
     Kt = (t) =>
       "sleep" === t.status
         ? " שינה"
-        : "burn" === t.status
-          ? " כוויה"
-          : "poison" === t.status
-            ? " רעל"
-            : "para" === t.status
-              ? "⚡ שיתוק"
-              : "",
+        : "freeze" === t.status
+          ? "🧊 קיפאון"
+          : "confuse" === t.status
+            ? "💫 בלבול"
+            : "burn" === t.status
+              ? " כוויה"
+              : "poison" === t.status
+                ? " רעל"
+                : "para" === t.status
+                  ? "⚡ שיתוק"
+                  : "",
     Qt = () => F.party[Nt.pi],
     Zt = () => F.party.filter((t) => t.hp > 0).length;
   let te = null;
@@ -4576,7 +4604,7 @@ const t = [
       if (e.wild) {
         const t = e.mon;
         ((l.innerHTML = `<h2>${t.shiny ? "✨ טלטל בוהק נדיר! ✨" : "מפגש פראי!"}</h2><div class="reveal"><div class="pc"></div></div><div class="nm" style="font-size:20px">${Yt(t)} · רמה ${t.lv}</div>${i}<div class="flash" style="animation:bflash .45s ease-out forwards"></div>`),
-          l.querySelector(".pc").appendChild(L(t, 96)));
+          l.querySelector(".pc").appendChild(Lan(t, 96)));
         const a = t.shiny ? 10 : 6;
         for (let t = 0; t < a; t++) {
           const t = document.createElement("span");
@@ -4657,6 +4685,30 @@ const t = [
           1200,
         ));
       ((e.status = null), le(), await ee(`${Yt(e)} התעורר!`, 800));
+    }
+    if ("freeze" === e.status) {
+      if (((e.turns = (e.turns || 1) - 1), e.turns > 0))
+        return void (await ee(
+          `${Yt(e)} קפוא ולא יכול לזוז! 🧊 תה מרפא  או החלפה יעזרו`,
+          1200,
+        ));
+      ((e.status = null), le(), await ee(`${Yt(e)} הפשיר!`, 800));
+    }
+    if ("confuse" === e.status) {
+      if (((e.turns = (e.turns || 1) - 1), e.turns < 0))
+        ((e.status = null), le(), await ee(`${Yt(e)} התפקח מהבלבול!`, 800));
+      else if (Math.random() < 0.34) {
+        const d = Math.max(1, Math.floor(x(e) / 10));
+        if (
+          ((e.hp = Math.max(0, e.hp - d)),
+          (Nt.shk = 1),
+          le(),
+          await ee(`${Yt(e)} מבולבל ופגע בעצמו! 💫`, 1100),
+          e.hp <= 0)
+        )
+          return "selfko";
+        return;
+      }
     }
     if ("para" === e.status && Math.random() < 0.25)
       return void (await ee(
@@ -4792,10 +4844,18 @@ const t = [
             ? ((t = "poison"),
               (e = 0.15),
               (n = "הורעל!  הרעל מוריד הרבה חיים בכל סיבוב"))
-            : "spark" === l.t &&
-              ((t = "para"),
-              (e = 0.15),
-              (n = "שותק! ⚡ השיתוק מונע תקיפה לפעמים ומאט")),
+            : "ice" === l.t
+              ? ((t = "freeze"),
+                (e = 0.15),
+                (n = "קפא! 🧊 הקיפאון מונע תקיפה עד שהטלטל מפשיר"))
+              : "sound" === l.t
+                ? ((t = "confuse"),
+                  (e = 0.2),
+                  (n = "התבלבל! 💫 הבלבול גורם לטלטל לפגוע בעצמו לפעמים"))
+                : "spark" === l.t &&
+                  ((t = "para"),
+                  (e = 0.15),
+                  (n = "שותק! ⚡ השיתוק מונע תקיפה לפעמים ומאט")),
         t &&
           Math.random() < e &&
           ((a.status = t),
@@ -4966,7 +5026,7 @@ const t = [
             },
             {
               k: "tea",
-              h: ` תה מרפא<small>נשארו ${F.tea || 0}${a || " · מרפא כוויה, שינה, רעל ושיתוק"}</small>`,
+              h: ` תה מרפא<small>נשארו ${F.tea || 0}${a || " · מרפא כוויה, שינה, רעל, שיתוק, קיפאון ובלבול"}</small>`,
               dis: !(F.tea > 0 && e.status),
             },
             { k: "back", h: t[113], cls: "sec", span: 1 },
@@ -5015,9 +5075,9 @@ const t = [
           })
           .join("");
       Ie(
-        `<h2>📖 מידע על היריב</h2><div id="bdx"></div><h3 style="margin:6px 0">${Yt(a)} ${E(s)} · רמה ${a.lv}</h3><div class="flav">${F.caught[a.sp] ? n.f : "עוד לא תפסתם את הטלטל הזה. תפסו אותו כדי לפתוח את כל המידע!"}</div><div style="text-align:right"><b>מה חזק נגדו:</b> ${o.map(E).join(" ") || "—"}<br><b>מה חלש נגדו:</b> ${d.map(E).join(" ") || "—"}<br><b>המכות שלו חזקות נגד:</b> ${p.map(E).join(" ") || "—"}</div><h3 style="margin:10px 0 4px">המכות של ${Yt(l)} מולו:</h3>${y}<div class="flav" style="margin-top:8px"><b>מצבים מיוחדים בקרב:</b><br> כוויה (מכות אש): מורידה חיים בכל סיבוב ומחלישה את ההתקפה.  רעל (מכות אדמה): מוריד הרבה חיים בכל סיבוב.  שינה (מכות צמח): הטלטל מפסיד תורות עד שהוא מתעורר. ⚡ שיתוק (מכות ברק): מונע תקיפה לפעמים ומאט. איך מתמודדים? תה מרפא  מהתפריט בקרב, החלפה לטלטל אחר, או ריפוי חינם בבקתה האדומה. הכל חולף בסוף הקרב.</div><div style="display:grid;gap:8px;margin-top:10px"><button class="btn" id="bdt">📊 טבלת סוגים מלאה</button><button class="btn grn" id="bdc">חזרה לקרב!</button></div>`,
+        `<h2>📖 מידע על היריב</h2><div id="bdx"></div><h3 style="margin:6px 0">${Yt(a)} ${E(s)} · רמה ${a.lv}</h3><div class="flav">${F.caught[a.sp] ? n.f : "עוד לא תפסתם את הטלטל הזה. תפסו אותו כדי לפתוח את כל המידע!"}</div><div style="text-align:right"><b>מה חזק נגדו:</b> ${o.map(E).join(" ") || "—"}<br><b>מה חלש נגדו:</b> ${d.map(E).join(" ") || "—"}<br><b>המכות שלו חזקות נגד:</b> ${p.map(E).join(" ") || "—"}</div><h3 style="margin:10px 0 4px">המכות של ${Yt(l)} מולו:</h3>${y}<div class="flav" style="margin-top:8px"><b>מצבים מיוחדים בקרב:</b><br> כוויה (מכות אש): מורידה חיים בכל סיבוב ומחלישה את ההתקפה.  רעל (מכות אדמה): מוריד הרבה חיים בכל סיבוב.  שינה (מכות צמח): הטלטל מפסיד תורות עד שהוא מתעורר. ⚡ שיתוק (מכות ברק): מונע תקיפה לפעמים ומאט. 🧊 קיפאון (מכות קרח): הטלטל קפוא ומפסיד תורות עד שהוא מפשיר. 💫 בלבול (מכות קול): הטלטל עלול לפגוע בעצמו במקום לתקוף. איך מתמודדים? תה מרפא  מהתפריט בקרב, החלפה לטלטל אחר, או ריפוי חינם בבקתה האדומה. הכל חולף בסוף הקרב.</div><div style="display:grid;gap:8px;margin-top:10px"><button class="btn" id="bdt">📊 טבלת סוגים מלאה</button><button class="btn grn" id="bdc">חזרה לקרב!</button></div>`,
         (n) => {
-          (n.querySelector("#bdx").appendChild(L(a, 64)),
+          (n.querySelector("#bdx").appendChild(Lan(a, 64)),
             (n.querySelector("#bdt").onclick = () =>
               Ie(
                 `<h2>📊 טבלת סוגים</h2>${(function () {
@@ -5242,7 +5302,12 @@ const t = [
           );
         await ee("לא הצלחת לברוח!", 900);
       }
-      return (await me(n, Qt(), o, !1), Qt().hp <= 0 ? await qe() : await Te());
+      const sk = await me(n, Qt(), o, !1);
+      return "selfko" === sk
+        ? await $e()
+        : Qt().hp <= 0
+          ? await qe()
+          : await Te();
     }
     const d =
       he(a) > he(n) || (he(a) === he(n) && Math.random() < 0.5)
@@ -5256,7 +5321,9 @@ const t = [
           ];
     for (const [t, e, a, n] of d) {
       if (t.hp <= 0) break;
-      if ((await me(t, e, a, n), e.hp <= 0)) return n ? await $e() : await qe();
+      const sk = await me(t, e, a, n);
+      if (e.hp <= 0) return n ? await $e() : await qe();
+      if ("selfko" === sk) return n ? await qe() : await $e();
     }
     return await Te();
   }
@@ -5427,7 +5494,7 @@ const t = [
       (t.hp = Math.min(x(t), t.hp + x(t) - n)),
       (F.seen[t.sp] = 1),
       (F.caught[t.sp] = 1),
-      l.replaceWith(L(t, 100)),
+      l.replaceWith(Lan(t, 100)),
       (o.textContent = f[t.sp].n),
       Y("ok"),
       _(),
@@ -5691,7 +5758,7 @@ const t = [
         Ie(
           `<h2>✨ התפתחות! ✨</h2><div id="evb" style="display:flex;justify-content:center"></div><p>${e.n} מתפתח...</p>`,
           (s) => {
-            (s.querySelector("#evb").appendChild(L(t, 80)),
+            (s.querySelector("#evb").appendChild(Lan(t, 80)),
               Y("lvl"),
               setTimeout(() => {
                 ((t.sp = e.evo),
@@ -5704,7 +5771,7 @@ const t = [
                   Ie(
                     `<h2>✨ ${e.n} התפתח! ✨</h2><div id="eva" style="display:flex;justify-content:center"></div><p>עכשיו זה ${f[t.sp].n}! הכוח והחיים עלו!</p><button class="btn grn" id="evok" style="width:100%">מעולה!</button>`,
                     (e) => {
-                      (e.querySelector("#eva").appendChild(L(t, 90)),
+                      (e.querySelector("#eva").appendChild(Lan(t, 90)),
                         (e.querySelector("#evok").onclick = () => {
                           (He(), n());
                         }));
@@ -5750,7 +5817,7 @@ const t = [
           "",
         )}\n <div class="flav">${a.f}</div>${null != a.evo ? `<div class="flav">✨ מתפתח ל${f[a.evo].n} ברמה ${a.at}</div>` : ""}\n <div style="display:grid;gap:8px"><button class="btn grn" id="d1" ${F.party[0] === e ? t[40] : ""}>⭐ הפוך למוביל בקרב</button>\n <button class="btn" id="d2" ${(!n && F.party.length >= 6) || (n && F.party.length <= 1) ? t[40] : ""}>${n ? "📦 העבר לקופסה" : "👥 העבר לצוות"}</button><button class="btn" id="di"> פריט אישי: ${e.item ? $[e.item].icon + " " + $[e.item].n : "אין"}</button><button class="btn" id="dn">✏️ שם חיבה</button><button class="btn" id="d4" ${n && F.party.length <= 1 ? t[40] : ""}>🕊 שחרר לחופשי · +${5 * e.lv} 🪙</button><button class="btn sec" id="d3">סגור</button></div>`,
       (a) => {
-        (a.querySelector("#mc").appendChild(L(e, 70)),
+        (a.querySelector("#mc").appendChild(Lan(e, 70)),
           (a.querySelector("#d1").onclick = () => {
             let t = F.party.indexOf(e);
             if (t < 0) {
@@ -13121,8 +13188,8 @@ const t = [
                   R(a, 104, 226, 74, 15, t[143]),
                   m() &&
                     ((a.fillStyle = "#0c144955"), a.fillRect(0, 0, 352, 288)));
-                const i = 2 * Math.sin(2.5 * n),
-                  o = 2 * Math.sin(2.2 * n + 1);
+                const i = 3.2 * Math.sin(2.5 * n),
+                  o = 3.2 * Math.sin(2.2 * n + 1);
                 Nt.ea > 0 &&
                   !Nt.flash.e &&
                   z(
@@ -13130,7 +13197,7 @@ const t = [
                     Nt.e,
                     240 + Nt.eo.x,
                     88 + Nt.eo.y + i,
-                    80 * Nt.es,
+                    80 * Nt.es * (1 + 0.025 * Math.sin(2.5 * n + 0.7)),
                     n,
                     Nt.ea,
                   );
@@ -13143,7 +13210,7 @@ const t = [
                     r,
                     104 + Nt.po.x,
                     184 + Nt.po.y + o,
-                    104 * Nt.ps,
+                    104 * Nt.ps * (1 + 0.025 * Math.sin(2.2 * n + 1.7)),
                     n,
                     Nt.pa,
                   ),
