@@ -1198,6 +1198,12 @@ window.TL63=(function(prev){return function(K){prev(K);try{
   K.Ie(`<h2>🆕 גרסה 6.9 - העצים היבשים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪓 <b>עצים יבשים וסדוקים</b> (חומים, בלי עלים) מסתירים מקומות סודיים! כדי לכרות עץ יבש צריך קודם <b>לנצח את אלוף ההיכל הראשון</b> ולפתוח את כוח החיתוך - ואז עומדים מול העץ ולוחצים אליו, הוא נשבר והדרך נפתחת. ליד כל עץ יבש יש שלט שמסביר.</p><p>🌳 <b>שימו לב:</b> עצים ירוקים רגילים כבר לא נכרתים - הם חלק מהנוף ונשארים לתמיד.</p><p>🧭 <b>גם התפריט ☰ השתדרג:</b> הכל מסודר בקטגוריות - המסע, ציוד וחנויות והגדרות. ויש מסך 🎒 <b>התיק שלי</b> חדש שמראה כמה כדורים, שיקויים ומטבעות יש לכם! פעולות נדירות זזו לכפתור "עוד".</p><p>🎁 רמז: בכפר הפרחים, משמאל לשביל הראשי למטה, יש חורשה קטנה עם עץ יבש חשוד. מה מסתתר בפנים?</p></div><button class="btn grn" id="tlx69" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx69').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3400);
 }catch(e){console.error(e)}}})(window.TL63);
 
+/* ---- 6.10 whats-new: statuses + animations ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen69&&!F.seen610&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen610=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.10 - הקרבות מתעוררים לחיים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🧊 <b>קיפאון</b> - מכות קרח עלולות לקפוא את הטלטל: הוא מפסיד תורות עד שהוא מפשיר.</p><p>💫 <b>בלבול</b> - מכות קול עלולות לבלבל: טלטל מבולבל לפעמים פוגע בעצמו במקום לתקוף!</p><p>  עכשיו יש 6 מצבים מיוחדים: כוויה, רעל, שינה, שיתוק, קיפאון ובלבול. <b>תה מרפא </b> מרפא את כולם, והכל חולף בסוף הקרב. כל ההסברים גם בתפריט "?" באמצע קרב.</p><p>✨ <b>והטלטלים זזים!</b> בקרב, במסך הלכידה, בהתפתחות ובכרטיס הטלטל - הם נעים ונושמים.</p></div><button class="btn grn" id="tlx610" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx610').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3400);
+}catch(e){console.error(e)}}})(window.TL63);
+
 /* ---- 6.9: bag screen + category-menu polish ---- */
 window.TL63=(function(prev){return function(K){prev(K);try{
  const $q=s=>document.querySelector(s);
