@@ -612,14 +612,13 @@ window.TL63_extras=function(K,X){
   m=>{m.querySelector('#tlwn').onclick=()=>{if(K.Et==='menu'&&first)K.Et='map';K.He();K.Et='map'};
    m.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{const st=stones();st[b.dataset.g]=(st[b.dataset.g]||0)+1;F.gift63=1;K._();K.Y('buy');whatsNew(first)})});
  }
- // ---- menu injection ----
+ // ---- menu injection (6.9 category menu) ----
  const Xe0=K.getXe();
  K.setXe(function(){Xe0();try{
-  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('#tlmenu'))return;
-  const box=document.createElement('div');box.id='tlmenu';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px';
-  const add=(t,fn,cls)=>{const b=document.createElement('button');b.className='btn '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};box.appendChild(b)};
-  add('🪪 כרטיס מאמן והיכל תהילה',trainerCard,'grn');add('💾 שמירות בשם',savesUI);add('⚙️ מוזיקה, חבר ומזג אוויר',settings);add('🆕 מה חדש בגרסה 6.3',()=>whatsNew(false),'grn');add('💎 חנות אבני התפתחות',()=>{K.Et='menu';openStore()});
-  mn.insertBefore(box,mn.children[1])}catch(e){console.error(e)}});
+  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('.tlmi1'))return;
+  const add=(t,fn,cls,tg)=>{const b=document.createElement('button');b.className='btn tlmi1 '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};(mn.querySelector(tg)||mn).appendChild(b)};
+  add('🪪 כרטיס מאמן והיכל תהילה',trainerCard,'grn','#mgJ');add('💾 שמירות בשם',savesUI,'','#mgM');add('⚙️ מוזיקה, חבר ומזג אוויר',settings,'','#mgS');add('💎 חנות אבני התפתחות',()=>{K.Et='menu';openStore()},'','#mgG');
+ }catch(e){console.error(e)}});
  // the closers return to the menu: re-open menu panel when modals close from menu context
  const He0=K.He;
  // first-run notice
@@ -744,11 +743,10 @@ window.TL63_more=function(K,X){
  // ---- menu ----
  const Xe1=K.getXe();
  K.setXe(function(){Xe1();try{
-  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('#tlmenu2'))return;
-  const box=document.createElement('div');box.id='tlmenu2';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px';
-  const add=(t,fn,cls)=>{const b=document.createElement('button');b.className='btn '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};box.appendChild(b)};
-  add('🎒 ציוד: חכה ואופניים',gear);add('🏡 מעון היום',daycare);
-  const ref=mn.querySelector('#tlmenu');mn.insertBefore(box,ref?ref.nextSibling:mn.children[1])}catch(e){console.error(e)}});
+  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('.tlmi2'))return;
+  const add=(t,fn,cls,tg)=>{const b=document.createElement('button');b.className='btn tlmi2 '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};(mn.querySelector(tg)||mn).appendChild(b)};
+  add('🎒 ציוד: חכה ואופניים',gear,'','#mgG');add('🏡 מעון היום',daycare,'','#mgJ');
+ }catch(e){console.error(e)}});
 };
 /* ---- round 2: dual types, learnsets, TMs, stat stages, four champions, line-of-sight trainers, fossil lab ---- */
 window.TL63_r2=function(K,X){
@@ -860,12 +858,11 @@ window.TL63_r2=function(K,X){
  // ---- menu ----
  const Xe2=K.getXe();
  K.setXe(function(){Xe2();try{
-  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('#tlmenu3'))return;
-  const box=document.createElement('div');box.id='tlmenu3';box.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px';
-  const add=(t,fn,cls)=>{const b=document.createElement('button');b.className='btn '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};box.appendChild(b)};
-  add('💿 חנות מכונות מהלך',tmShop);add('🏛️ ארבעת האלופים',elite,'grn');add('🦴 מעבדת מאובנים',lab);
-  add('👀 מאמנים שמבחינים: '+(K.F.los===false?'כבוי':'פועל'),()=>{K.F.los=K.F.los===false;K._();K.Et='map';K.Bt(K.F.los===false?'👀 מאמנים לא ינסו לתפוס אתכם':'👀 מאמנים יבחינו בכם בקו ישר',2500)});
-  const ref=mn.querySelector('#tlmenu2')||mn.querySelector('#tlmenu');mn.insertBefore(box,ref?ref.nextSibling:mn.children[1])}catch(e){console.error(e)}});
+  if(K.Et!=='menu')return;const mn=$q('#mnu');if(mn.querySelector('.tlmi3'))return;
+  const add=(t,fn,cls,tg)=>{const b=document.createElement('button');b.className='btn tlmi3 '+(cls||'');b.innerHTML=t;b.onclick=()=>{K.Pe('mnu');fn()};(mn.querySelector(tg)||mn).appendChild(b)};
+  add('💿 חנות מכונות מהלך',tmShop,'','#mgG');add('🏛️ ארבעת האלופים',elite,'grn','#mgJ');add('🦴 מעבדת מאובנים',lab,'','#mgJ');
+  add('👀 מאמנים שמבחינים: '+(K.F.los===false?'כבוי':'פועל'),()=>{K.F.los=K.F.los===false;K._();K.Et='map';K.Bt(K.F.los===false?'👀 מאמנים לא ינסו לתפוס אתכם':'👀 מאמנים יבחינו בכם בקו ישר',2500)},'','#mgS');
+ }catch(e){console.error(e)}});
  // ---- what's new (6.4) ----
  function wn(){const F=K.F;F.seen64=1;K._();
   K.Ie(`<h2>🆕 גרסה 6.4 - עוד יותר טלטל!</h2><div style="text-align:right;font-size:14px;line-height:1.55">
@@ -886,9 +883,11 @@ window.TL63_r3=function(K,X){
  function applyEdits(){try{if(K.Et!=='map'||!K.an)return;const m=K.an();if(!m||!m.id)return;if(m.id!==lastMap){lastMap=m.id;ensureSigns(m);const E=ED()[m.id];if(E){const T=m.tiles;if(T)for(const k in E){const p=k.split(','),x=+p[0],y=+p[1];if(T[y]&&T[y][x]!==undefined){T[y][x]=E[k];if(E[k]!==3&&E[k]!==4)removeSignFor(m.id,x,y)}}}}}catch(e){}}
  setInterval(applyEdits,150);
  // ---- field moves ----
- const FMV=[{k:'cut',ic:'🪓',n:'חיתוך',gym:'gym1',gname:'אלוף היכל הראשון',txt:'חותכים עץ שחוסם את הדרך: עומדים מולו ולוחצים לכיוונו.'},
+ const CUTNEEDSBADGE=true; // dry trees (tile 54): false = anyone can chop; true = needs gym1 cut
+ const FMV0=[{k:'cut',ic:'🪓',n:'חיתוך',gym:'gym1',gname:'אלוף היכל הראשון',txt:'חותכים עץ שחוסם את הדרך: עומדים מולו ולוחצים לכיוונו.'},
   {k:'surf',ic:'🌊',n:'גלישה',gym:'gym2',gname:'אלוף היכל השני',txt:'אפשר ללכת על מים. מי שאוהב לטייל באגם יגלה פינות חדשות.'},
   {k:'str',ic:'💪',n:'כוח',gym:'gym3',gname:'אלוף היכל השלישי',txt:'דוחפים סלע גדול ממקומו: עומדים מולו ולוחצים לכיוונו, אם יש מקום פנוי מאחוריו.'}];
+ const FMV=FMV0.filter(v=>CUTNEEDSBADGE||v.k!=='cut');
  let seenSurf=null;
  function fmModal(){const F=K.F,d=F.defeated||{},m=fm();
   K.Ie(`<h2>🌊 מהלכי שדה</h2><div class="flav">הטלטלים שלכם לומדים כוחות מיוחדים לטיול. כל כוח נפתח כשמנצחים אלוף היכל, וקיים לכל הצוות.</div>`+
@@ -902,7 +901,7 @@ window.TL63_r3=function(K,X){
  const SGN=[];
  const scannedSigns=new Set();
  function signTxt(k){const m=fm();
-  if(k==='cut')return m.cut?'עץ עבה. יש לכם חיתוך! 🪓 עומדים מול העץ ולוחצים אליו כדי לחתוך אותו.':'עץ עבה. צריך חיתוך 🪓 חיתוך נפתח אחרי שמנצחים את אלוף היכל הראשון.';
+  if(k==='cut')return CUTNEEDSBADGE?(m.cut?'עץ יבש וסדוק. יש לכם חיתוך! 🪓 עומדים מול העץ ולוחצים אליו והוא נשבר.':'עץ יבש וסדוק. צריך חיתוך 🪓 חיתוך נפתח אחרי שמנצחים את אלוף היכל הראשון.'):'עץ יבש וסדוק 🪓 עומדים מול העץ ולוחצים אליו - הוא נשבר והדרך נפתחת!';
   if(k==='str')return m.str?'סלע כבד. יש לכם כוח! 💪 עומדים מול הסלע ולוחצים אליו כדי לדחוף אותו.':'סלע כבד. צריך כוח 💪 כוח נפתח אחרי שמנצחים את אלוף היכל השלישי.';
   return m.surf?'מים עמוקים. יש לכם גלישה! 🌊 פשוט הולכים אל המים ושטים.':'מים עמוקים. צריך גלישה 🌊 גלישה נפתחת אחרי שמנצחים את אלוף היכל השני.'}
  function refreshSigns(){for(const r of SGN)r.sgn.msg=signTxt(r.type)}
@@ -944,12 +943,22 @@ window.TL63_r3=function(K,X){
   const T=mp.tiles,H=T.length,W=T[0].length;
   const walk=(x,y)=>T[y]&&T[y][x]!==undefined&&!K.ut.has(T[y][x]);
   for(let y=1;y<H-1;y++)for(let x=1;x<W-1;x++){const v=T[y][x];
-   if(v===3||v===4){if(walk(x+1,y)||walk(x-1,y)||walk(x,y+1)||walk(x,y-1)){if(!covered(mp,x,y,2))placeSign(mp,x,y,v===3?'cut':'str')}}
+   if(v===54||v===4){if(walk(x+1,y)||walk(x-1,y)||walk(x,y+1)||walk(x,y-1)){if(!covered(mp,x,y,2))placeSign(mp,x,y,v===54?'cut':'str')}}
    else if(v===2){let cross=false;
     for(const [a,b] of [[1,0],[-1,0],[0,1],[0,-1]]){if(!walk(x-a,y-b))continue;
      for(let d=1;d<=6;d++){const vv=(T[y+b*d]||[])[x+a*d];if(vv===2)continue;if(vv!==undefined&&!K.ut.has(vv)){if(d>1)cross=true}break}
      if(cross)break}
     if(cross&&!covered(mp,x,y,3))placeSign(mp,x,y,'surf')}}}
+ // dry trees (tile 54): new grove in meadow-town + convert old cut-gates to dry trees
+ function placeDry(){try{K.ut.add(54);
+  const mt=K.ua['meadow-town'];if(mt&&mt.tiles){const T=mt.tiles;
+   for(const [x,y] of [[1,16],[2,16],[3,16],[4,16],[1,17],[1,18],[2,18],[3,18],[4,18]])if(T[y]&&T[y][x]!==undefined)T[y][x]=3;
+   if(T[17]&&T[17][4]!==undefined)T[17][4]=54;
+   if(T[17]&&T[17][2]!==undefined)T[17][2]=33;
+   if(T[17]&&T[17][3]!==undefined)T[17][3]=5}
+  for(const [id,x,y] of [['hills',15,1],['swamp',9,2],['swamp',1,3]]){const m=K.ua[id];if(m&&m.tiles&&m.tiles[y]&&m.tiles[y][x]===3)m.tiles[y][x]=54}
+ }catch(e){console.error(e)}}
+ placeDry();
  // scan all ready maps now; lazy maps on entry (applyEdits interval)
  function scanAllSigns(){try{if(!K.ua)return;for(const id in K.ua)ensureSigns(K.ua[id])}catch(e){}}
  setInterval(scanAllSigns,3000);scanAllSigns();
@@ -960,8 +969,10 @@ window.TL63_r3=function(K,X){
  const DIR={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]};
  function act(){try{const R=K.Rt;if(K.Et!=='map'||R.moving||!R.bump||R.bump===lastB||performance.now()-R.bump>450)return;
   lastB=R.bump;const d=DIR[R.dir];if(!d)return;const x=R.x+d[0],y=R.y+d[1],ct=K.ct;if(!ct[y]||ct[y][x]===undefined)return;const t=ct[y][x],m=fm();
+  if(t===33&&K.en==='meadow-town'){const F=K.F;F.chests=F.chests||{};if(F.chests['grove-meadow']){K.Bt('התיבה ריקה - המטמון כבר אצלכם!',1800);return}F.chests['grove-meadow']=1;F.uballs=(F.uballs||0)+1;F.coins=(F.coins||0)+250;ct[y][x]=25;rec(x,y,25);K.Y('ok');K._();K.Bt('🎁 המטמון של החורשה! קיבלתם כדור על 🟡 ו-250 מטבעות 🪙!',4000);return}
   if(t===33&&K.en==='shadow-hq'){const F=K.F;F.chests=F.chests||{};if(F.chests['shadow-hq']){K.Bt('התיבה ריקה - המטמון כבר אצלכם!',1800);return}F.chests['shadow-hq']=1;F.uballs=(F.uballs||0)+3;F.coins=(F.coins||0)+300;ct[y][x]=25;K.Y('ok');K._();K.Bt('🎁 המטמון של הכנופיה! קיבלתם 3 כדורי על 🟡 ו-300 מטבעות 🪙!',4000);return}
-  if(t===3){if(m.cut){ct[y][x]=0;rec(x,y,0);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('🪓 חתכתם את העץ!',1800)}else K.Bt('🌳 עץ עבה. אולי יעזור אלוף היכל ראשון... (תפריט ☰ ← מהלכי שדה)',2600)}
+  if(t===54){if(!CUTNEEDSBADGE||m.cut){ct[y][x]=0;rec(x,y,0);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('🪓 העץ היבש נשבר! הדרך פתוחה!',2200)}else K.Bt('🪓 עץ יבש. צריך חיתוך - נפתח אחרי שמנצחים את אלוף היכל הראשון.',2600)}
+  else if(t===3){K.Bt('🌳 עץ ירוק ובריא - אי אפשר לכרות אותו. רק עצים יבשים וסדוקים נשברים!',2400)}
   else if(t===4){if(!m.str){K.Bt('🪨 סלע כבד מדי. כוח נפתח בניצחון על אלוף היכל שלישי.',2600);return}
    const x2=x+d[0],y2=y+d[1];const free=ct[y2]&&ct[y2][x2]!==undefined&&!K.ut.has(ct[y2][x2])&&ct[y2][x2]!==4&&!K.an().npcs.some(n=>n.x===x2&&n.y===y2)&&!(K.an().links||[]).some(l=>l.x===x2&&l.y===y2)&&(ct[y2][x2]===0||ct[y2][x2]===1);
    if(free){ct[y2][x2]=4;ct[y][x]=0;rec(x,y,0);rec(x2,y2,4);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('💪 דחפתם את הסלע!',1500)}else K.Bt('💪 אין מקום לדחוף את הסלע לשם.',1800)}
@@ -996,9 +1007,9 @@ window.TL63_r3=function(K,X){
    `<div class="tlrow"><div><b>${d.shadowboss?'✅':K.Ha.some(h=>h.id==='shadowboss')?'⚔️':'🔒'} ראש הצל</b><br><small>גבעות</small></div></div><button class="btn sec" id="tlx" style="width:100%;margin-top:8px">סגור</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}
  setInterval(()=>{try{place();bossPoll()}catch(e){console.error(e)}},2000);
  // menu buttons
- setInterval(()=>{try{if(K.Et!=='menu')return;const b=$q('#tlmenu3');if(!b||b.querySelector('#tlfm'))return;
-  const add=(id,t,fn)=>{const x=document.createElement('button');x.className='btn';x.id=id;x.innerHTML=t;x.onclick=()=>{K.Pe('mnu');fn()};b.appendChild(x)};
-  add('tlfm','🌊 מהלכי שדה',fmModal);add('tlgang','🕶️ כנופיית הצל',gang)}catch(e){}},500);
+ setInterval(()=>{try{if(K.Et!=='menu')return;const mn=$q('#mnu');if(!mn)return;
+  const add=(id,t,fn,tg)=>{const g=mn.querySelector(tg)||mn;if(g.querySelector('#'+id))return;const x=document.createElement('button');x.className='btn';x.id=id;x.innerHTML=t;x.onclick=()=>{K.Pe('mnu');fn()};g.appendChild(x)};
+  add('tlfm','🌊 מהלכי שדה',fmModal,'#mgG');add('tlgang','🕶️ כנופיית הצל',gang,'#mgJ')}catch(e){}},500);
  setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen64&&!F.seen65&&K.Et==='map'){F.seen65=1;K._();K.Et='menu';K.Ie(`<h2>🆕 גרסה 6.5</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪓💪🌊 <b>מהלכי שדה:</b> מנצחים אלופי היכל ופותחים חיתוך, גלישה וכוח. עוצרים מול עץ או סלע ולוחצים אליו. הסבר בתפריט ☰.</p><p>🕶️ <b>כנופיית הצל:</b> שישה שומרי צל בשבילים ומנהיג אחד בגבעות. אחרי שמנצחים את כולם הוא מופיע.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}},3000);
  setInterval(()=>{const F=K.F;if(F&&F.started&&F.seen65&&!F.seen66&&K.Et==='map'){F.seen66=1;K._();K.Et='menu';K.Ie(`<h2>🆕 גרסה 6.6 - שלטים ותיקונים</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪧 <b>שלטים חדשים:</b> ליד כל עץ שאפשר לחתוך, סלע שאפשר לדחוף ומים שאפשר לשוט בהם יש שלט קטן. השלט מסביר מה צריך ואיך - קרבו אליו ולחצו בדיקה!</p><p>🪓💪 עצים שחתכתם וסלעים שדחפתם <b>נשארים ככה לתמיד</b>, גם אחרי שסוגרים את המשחק וחוזרים.</p><p>🕶️ תוקן הפרס אחרי הקרב מול ראש הצל: עכשיו מקבלים בדיוק את מה שמובטח - 1200 מטבעות.</p></div><button class="btn grn" id="tlx" style="width:100%">יוצאים!</button>`,mm=>mm.querySelector('#tlx').onclick=closeM)}},3100);
 };
@@ -1180,3 +1191,35 @@ window.TL63_r5=function(K,X){
  }catch(e){console.error('cloud',e)}
 };
 window.TL63=(function(prev){return function(K){prev(K);window.TL63_r5&&window.TL63_r5(K,window.TLX)}})(window.TL63);
+
+/* ---- 6.9 whats-new: dry trees ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen68&&!F.seen69&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen69=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.9 - העצים היבשים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🪓 <b>עצים יבשים וסדוקים</b> (חומים, בלי עלים) מסתירים מקומות סודיים! כדי לכרות עץ יבש צריך קודם <b>לנצח את אלוף ההיכל הראשון</b> ולפתוח את כוח החיתוך - ואז עומדים מול העץ ולוחצים אליו, הוא נשבר והדרך נפתחת. ליד כל עץ יבש יש שלט שמסביר.</p><p>🌳 <b>שימו לב:</b> עצים ירוקים רגילים כבר לא נכרתים - הם חלק מהנוף ונשארים לתמיד.</p><p>🧭 <b>גם התפריט ☰ השתדרג:</b> הכל מסודר בקטגוריות - המסע, ציוד וחנויות והגדרות. ויש מסך 🎒 <b>התיק שלי</b> חדש שמראה כמה כדורים, שיקויים ומטבעות יש לכם! פעולות נדירות זזו לכפתור "עוד".</p><p>🎁 רמז: בכפר הפרחים, משמאל לשביל הראשי למטה, יש חורשה קטנה עם עץ יבש חשוד. מה מסתתר בפנים?</p></div><button class="btn grn" id="tlx69" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx69').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3400);
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.9: bag screen + category-menu polish ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const $q=s=>document.querySelector(s);
+ function bagUI(){const F=K.F,fm=F.fm||{};
+  const MV=[{k:'cut',ic:'🪓',n:'חיתוך'},{k:'surf',ic:'🌊',n:'גלישה'},{k:'str',ic:'💪',n:'כוח'}];
+  const row=(ic,n,d)=>'<div class="tlrow"><span style="font-size:26px">'+ic+'</span><div><b>'+n+'</b><br><small>'+d+'</small></div></div>';
+  K.Et='menu';
+  K.Ie('<h2>🎒 התיק שלי</h2><div style="text-align:right">'
+   +row('⚪','כדורי לכידה: '+F.balls+' רגילים · '+(F.gballs||0)+' כחולים · '+(F.uballs||0)+' כדורי על','תופסים איתם טלטלים חדשים בקרב')
+   +row('🧪','שיקויים: '+F.pots+' קטנים · '+(F.spots||0)+' סופר · '+(F.upots||0)+' אולטרה','מרפאים טלטלים בזמן קרב')
+   +row('🪙',F.coins+' מטבעות','קונים במכולת, בחנות האבנים ובחנות מכונות המהלך')
+   +row('🏅','תגים: '+(F.badges||0)+' מתוך 8','כל תג מעלה את רמת הציות של הטלטלים')
+   +'<h3 style="margin:10px 0 4px">🧰 ציוד הרפתקנים</h3>'
+   +row('🎣','חכת דייגים',F.rod?'יש לכם ✓ עומדים מול מים ולוחצים כדי לדוג':'עוד אין - קונים בתפריט ← ציוד וחנויות')
+   +row('🚲','אופניים מתקפלים',F.bike?(F.bikeOn?'פועלות ✓ הולכים מהר יותר בחוץ':'כבויות - מדליקים מציוד וחנויות'):'עוד אין - קונים בתפריט ← ציוד וחנויות')
+   +'<h3 style="margin:10px 0 4px">💪 כוחות שדה</h3>'
+   +MV.map(v=>row(v.ic,v.n,(fm[v.k]||v.free)?'פתוח ✓':'נפתח כשמנצחים אלוף היכל')).join('')
+   +'</div><button class="btn sec" id="tlbagx" style="width:100%;margin-top:8px">סגור</button>',mm=>mm.querySelector('#tlbagx').onclick=()=>{K.He();K.Et='map'})}
+ const Xe9=K.getXe();
+ K.setXe(function(){Xe9();try{
+  if(K.Et!=='menu')return;const mn=$q('#mnu');if(!mn)return;
+  const b3=mn.querySelector('#m3');if(b3)b3.onclick=()=>{K.Pe('mnu');bagUI()};
+  mn.querySelectorAll('.msecl').forEach(l=>{const g=l.nextElementSibling;l.style.display=(g&&g.children.length)?'':'none'});
+ }catch(e){console.error(e)}});
+}catch(e){console.error('bag69',e)}}})(window.TL63);
