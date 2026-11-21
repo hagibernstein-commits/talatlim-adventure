@@ -386,7 +386,7 @@ function TL63main(K){
  // ===== species =====
  const base0=f.length,KEY={},KI=[];
  NEWSP.forEach((s,i)=>{KEY[s[0]]=base0+i;KI[base0+i]=s[0]});
- const ZONE={};for(const m in ua)ZONE[m]=ua[m].zone;
+ const ZONE={},MAPN={};for(const m in ua)ZONE[m]=ua[m].zone,MAPN[m]=ua[m].n;
  const SPAWN=[];
  NEWSP.forEach((s,i)=>{const idx=base0+i,st=s[5];
   const e={n:s[1],t:s[2],b:[s[6],s[7],s[8],s[9]],cr:st===0?.62:st===1?.32:.18,xp:st===0?60:st===1?118:170,f:s[10],h:'A'};
@@ -396,7 +396,7 @@ function TL63main(K){
  NEWSP.forEach((s,i)=>{const idx=base0+i,e=f[idx],ev=EVO[s[0]];
   if(ev){e.evo=KEY[ev[0]];e.at=ev[1];y[idx]=e.evo;f[KEY[ev[0]]].base=idx;$n[KEY[ev[0]]]='התפתחות של '+s[1]+' ברמה '+ev[1]}
   if(STONEEVO[s[0]]){e.stone=STONEEVO[s[0]];for(const sk in e.stone){const tg=KEY[e.stone[sk]];f[tg].base=idx;const st=STONES.find(q=>q.k===sk);$n[tg]='מתפתח מ'+s[1]+' בעזרת '+st.n+' '+st.i}}
-  if(s[11]){const tm=s[11][1];$n[idx]='בשטח: '+s[11][0].join(', ')+(tm==='day'?' · יום במשחק':tm==='night'?' · לילה במשחק':' · כל היום');SPAWN.push({sp:idx,maps:s[11][0],time:tm})}
+  if(s[11]){const tm=s[11][1];$n[idx]='בשטח: '+s[11][0].map(m=>MAPN[m]||m).join(', ')+(tm==='day'?' · יום במשחק':tm==='night'?' · לילה במשחק':' · כל היום');SPAWN.push({sp:idx,maps:s[11][0],time:tm})}
  });
  $n[KEY.fos1]='מעבדת המאובנים 🦴 (כפתור בתפריט · 300 מטבעות)';$n[KEY.fos2]='מעבדת המאובנים 🦴 (כפתור בתפריט · 300 מטבעות)';
  // sprites
@@ -706,7 +706,7 @@ window.TL63_more=function(K,X){
   try{
    if(K.Et!=='map'||K.Rt.moving||fishing)return;
    const d=DIR[K.Rt.dir];if(!d)return;const x=K.Rt.x+d[0],y=K.Rt.y+d[1];
-   if(!K.ct[y]||K.ct[y][x]!==2)return;
+   const ft0=K.ct[y]&&K.ct[y][x];if(ft0===33||ft0===54||ft0===4||ft0===3){K.Rt.bump=performance.now();act();return}if(ft0!==2)return;
    // an NPC or sign in front takes priority is not needed: water tiles have none
    ev.stopImmediatePropagation();ev.preventDefault();
    const F=K.F;
