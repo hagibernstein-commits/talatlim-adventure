@@ -907,18 +907,22 @@ window.TL63_r3=function(K,X){
  function refreshSigns(){for(const r of SGN)r.sgn.msg=signTxt(r.type)}
  function removeSignFor(mid,ox,oy){for(let i=SGN.length-1;i>=0;i--){const r=SGN[i];if(r.map===mid&&r.ox===ox&&r.oy===oy){const mp=K.ua[mid];if(mp){if(mp.tiles[r.y]&&mp.tiles[r.y][r.x]===9)mp.tiles[r.y][r.x]=r.orig;const j=(mp.signs||[]).indexOf(r.sgn);if(j>=0)mp.signs.splice(j,1)}SGN.splice(i,1)}}}
  function safeBlock(T,x,y){const H=T.length,W=T[0].length,R=4;
-  const walk=(a,b)=>T[b]&&T[b][a]!==undefined&&!K.ut.has(T[b][a])&&!(a===x&&b===y);
+  const walk=(a,b)=>T[b]&&T[b][a]!==undefined&&!K.ut.has(T[b][a]);
   const inW=(a,b)=>Math.abs(a-x)<=R&&Math.abs(b-y)<=R;
-  const key=(a,b)=>a+','+b;const vis=new Set(),q=[];
+  const key=(a,b)=>a+','+b;
   const x0=Math.max(0,x-R),x1=Math.min(W-1,x+R),y0=Math.max(0,y-R),y1=Math.min(H-1,y+R);
-  let total=0;
-  for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++)if(walk(a,b)){total++;if(a===x0||a===x1||b===y0||b===y1){const k=key(a,b);if(!vis.has(k)){vis.add(k);q.push([a,b])}}}
-  while(q.length){const [a,b]=q.pop();for(const [da,db] of [[1,0],[-1,0],[0,1],[0,-1]]){const a2=a+da,b2=b+db;if(!inW(a2,b2))continue;const k=key(a2,b2);if(!vis.has(k)&&walk(a2,b2)){vis.add(k);q.push([a2,b2])}}}
-  return vis.size===total}
+  const bfs=(skip)=>{const vis=new Set(),q=[];
+   for(let b=y0;b<=y1;b++)for(let a=x0;a<=x1;a++)if((a===x0||a===x1||b===y0||b===y1)&&walk(a,b)&&!(skip&&a===x&&b===y)){vis.add(key(a,b));q.push([a,b])}
+   while(q.length){const [a,b]=q.pop();for(const [da,db] of [[1,0],[-1,0],[0,1],[0,-1]]){const a2=a+da,b2=b+db;if(!inW(a2,b2))continue;const k=key(a2,b2);if(!vis.has(k)&&walk(a2,b2)&&!(skip&&a2===x&&b2===y)){vis.add(k);q.push([a2,b2])}}}
+   return vis.size};
+  return bfs(true)===bfs(false)-1}
  function placeSign(mp,ox,oy,type){
   const T=mp.tiles;if(!T)return false;const H=T.length,W=T[0].length;
   const walk=(x,y)=>T[y]&&T[y][x]!==undefined&&!K.ut.has(T[y][x]);
-  const free=(x,y)=>walk(x,y)&&!(mp.npcs||[]).some(n=>n.x===x&&n.y===y)&&!(mp.links||[]).some(l=>l.x===x&&l.y===y)&&!(mp.signs||[]).some(q=>q.x===x&&q.y===y)&&!(mp.doors||[]).some(d=>d.x===x&&d.y===y)&&!(mp.fields||[]).some(f2=>f2.x===x&&f2.y===y);
+  const special=v=>v>=27; // never overwrite special tiles: 27 wall, 28 portal, 29 door, 30 cave entrance, 31/32/33 cave treasure, 35 exit
+  const isLanding=(x,y)=>{for(const id in K.ua){const m2=K.ua[id];if(!m2)continue;for(const l of (m2.links||[]))if(l.to===mp.id&&l.tx===x&&l.ty===y)return true;}return false};
+  const chestAdj=(x,y)=>D4.some(([a,b])=>(T[y+b]||[])[x+a]===33); // never block the path to a treasure chest
+  const free=(x,y)=>walk(x,y)&&!special(T[y][x])&&!isLanding(x,y)&&!chestAdj(x,y)&&!(mp.npcs||[]).some(n=>n.x===x&&n.y===y)&&!(mp.links||[]).some(l=>l.x===x&&l.y===y)&&!(mp.signs||[]).some(q=>q.x===x&&q.y===y)&&!(mp.doors||[]).some(d=>d.x===x&&(d.y===y||d.y+1===y))&&!(mp.fields||[]).some(f2=>f2.x===x&&f2.y===y);
   const D4=[[1,0],[-1,0],[0,1],[0,-1]];
   const A=D4.map(([a,b])=>[ox+a,oy+b]).filter(([x,y])=>walk(x,y));
   if(!A.length)return false;
