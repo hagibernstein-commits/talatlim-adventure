@@ -263,7 +263,7 @@ function drawCreature(c,sp){
 // [key,name,type,tpl,variant,stage,hp,atk,def,spd,flavor,habitat]
 // habitat: [maps...] + time ('day'|'night'|'any') or null (not wild)
 const NEWSP=[
- ['cub','קפיצון','norm','fox','cub',0,52,50,48,58,'גור מקפץ עם זנב פרוותי. הוא נולד בלי סוג מיוחד, וקורה משהו קסום כשהוא נוגע באבן התפתחות. כל אבן מוציאה ממנו צורה אחרת!',[['meadow-town','route-flower','lake-town'],'day']],
+ ['cub','קפיצון','norm','fox','cub',0,52,50,48,58,'גור מקפץ עם זנב פרוותי. הוא נולד בלי סוג מיוחד, וקורה משהו קסום כשהוא נוגע באבן התפתחות. כל אבן מוציאה ממנו צורה אחרת!',[['route-flower','lake-town'],'day']],
  ['cubF','להבזנב','fire','fox','lion',1,70,82,62,76,'הזנב שלו בוער בלהבה חמה ונעימה שלא שורפת חברים.',null],
  ['cubW','גלזנב','water','fox','cub',1,86,66,70,62,'הזנב שלו זורם כמו גל קטן. הוא אוהב לשחות עם החברים.',null],
  ['cubP','עלזנב','plant','fox','cub',1,76,64,78,60,'על הזנב שלו צומחים עלים ירוקים שמסתובבים אחרי השמש.',null],
@@ -272,9 +272,9 @@ const NEWSP=[
  ['cubL','אורזנב','light','fox','cat',1,72,70,72,78,'הזנב שלו זוהר בלילה כמו פנס קטן שמראה את הדרך.',null],
  ['cubD','צלזנב','shadow','fox','cat',1,70,80,66,80,'הוא מתחבא בצללים וצלו נראה גדול ממנו. חבר נאמן ושקט.',null],
 
- ['hare','פתיתון','ice','hare','',0,48,48,44,66,'ארנבון שלג קטן שקשה לראות על השלג. אוזניו מזהות כל צעד.',[['route-frost','frost-village'],'day']],
+ ['hare','ארנשלג','ice','hare','',0,48,48,44,66,'ארנבון שלג קטן שקשה לראות על השלג. אוזניו מזהות כל צעד.',[['route-frost'],'day']],
  ['hare2','שלגרנב','ice','hare','',1,74,76,66,90,'רץ על הקרח בקלילות ונשאר ללא שריטה. אוזניו ארוכות במיוחד.',null],
- ['crys','גבישוש','ice','orb','crystal',0,50,54,56,46,'גביש חי קטן שמרחף בין הסלעים בכפור. הוא מצלצל כשהוא שמח.',[['route-frost','frost-village'],'night']],
+ ['crys','גבישוש','ice','orb','crystal',0,50,54,56,46,'גביש חי קטן שמרחף בין הסלעים בכפור. הוא מצלצל כשהוא שמח.',[['route-frost'],'night']],
  ['crys2','גבישאל','ice','orb','crystal',1,78,84,82,60,'כשגבישוש נוגע באבן הכפור, הוא גדל לקריסטל גדול ומבריק.',null],
 
  ['wbird','צופית','wind','bird','',0,44,46,42,70,'ציפור קטנה שנישאת על כל משב רוח. שרה כשהיא מרוצה.',[['route-storm','storm-city','route-flower'],'day']],
@@ -283,8 +283,8 @@ const NEWSP=[
  ['ball','בלונון','wind','orb','balloon',0,60,40,50,52,'בלון חי ועגול. מרחף ברוח ומחייך לכל מי שעובר.',[['route-storm','lake-town','route-desert'],'day']],
  ['ball2','ענננון','wind','orb','balloon',1,92,58,78,60,'בלון ענק ורך. חברים קטנים נחים עליו כמו על ענן.',null],
 
- ['worm','זחלי','bug','insect','worm',0,46,40,48,40,'זחל ירוק ושמח שאוכל עלים כל היום. חולם יום אחד לעוף.',[['route-flower','meadow-town','route-forest'],'day']],
- ['cocoon','פקעון','bug','insect','cocoon',1,60,36,74,28,'עטוף בפקעת רכה. מבפנים כבר נשמעים נפנופי כנפיים קטנים.',null],
+ ['worm','זחלי','bug','insect','worm',0,46,40,48,40,'זחל ירוק ושמח שאוכל עלים כל היום. חולם יום אחד לעוף.',[['route-flower','route-forest'],'day']],
+ ['cocoon','גולמון','bug','insect','cocoon',1,60,36,74,28,'עטוף בפקעת רכה. מבפנים כבר נשמעים נפנופי כנפיים קטנים.',null],
  ['moth','כנפרור','bug','insect','moth',2,72,78,62,84,'כנפיים גדולות ומנצנצות. אבקה נוצצת נופלת בכל נפנוף.',null],
  ['ant','נמלון','bug','insect','ant',0,52,56,50,50,'נמלה חזקה שסוחבת פי עשרים ממשקלה. אף פעם לא מוותרת.',[['hills','route-desert','forest-village'],'day']],
  ['ant2','נמלגל','bug','insect','ant',1,76,82,72,64,'המלכה של הנמלים. כתר קטן על ראשה והיא מנהיגה מצוינת.',null],
@@ -308,14 +308,14 @@ const NEWSP=[
  ['monk','אגרופי','fight','biped','monkey',0,50,60,44,64,'קוף קטן שמתאמן בכל בוקר. הכפות שלו קטנות אבל מהירות.',[['hills','route-volcano','route-forest'],'day']],
  ['monk2','אגרופן','fight','biped','monkey',1,72,84,62,82,'אמן אגרוף צעיר. הוא מכבד את כל מי שנלחם בהגינות.',null],
  ['monk3','מתאגרף','fight','biped','monkey',2,92,106,78,92,'אלוף אגרוף. הצעדים שלו קלים והאגרוף שלו נעצר רגע לפני.',null],
- ['roos','תרנגולון','fight','biped','rooster',0,54,62,50,56,'תרנגול גאה שקורא בבוקר. מאמן את הקול ואת האגרופים.',[['meadow-town','route-flower','route-desert'],'day']],
+ ['roos','תרנגולון','fight','biped','rooster',0,54,62,50,56,'תרנגול גאה שקורא בבוקר. מאמן את הקול ואת האגרופים.',[['route-flower','route-desert'],'day']],
  ['roos2','לוחמוש','fight','biped','rooster',1,80,92,70,72,'לוחם הנוצות. יוצא לקרב רק כדי להגן על המשפחה שלו.',null],
 
  ['drk','דרקוני','dragon','drake','',0,56,58,52,52,'דרקון קטן וסקרן. מנפח עשן כשהוא נרגש, בלי אש.',[['route-storm','storm-city'],'night']],
  ['drk2','דרקונר','dragon','drake','',1,80,86,76,70,'כנפיים נפתחות. עף נמוך מעל ההרים ומסתכל על הנוף.',null],
  ['drk3','דרקונדור','dragon','drake','',2,100,108,96,86,'מלך הדרקונים. נדיר מאוד ורק מאמנים אמיצים פוגשים אותו.',null],
 
- ['bell','פעמונית','sound','bell','bell',0,50,44,52,56,'פעמון קטן שמצלצל כשהוא צוחק. הצליל מרגיע כל טלטל.',[['lake-town','meadow-town','route-flower'],'day']],
+ ['bell','פעמונית','sound','bell','bell',0,50,44,52,56,'פעמון קטן שמצלצל כשהוא צוחק. הצליל מרגיע כל טלטל.',[['lake-town','route-flower'],'day']],
  ['bell2','פעמונצל','sound','bell','bell',1,80,70,78,64,'הצלצול שלו נשמע לכל הכפר. ילדים באים להקשיב.',null],
  ['frog','צפרדוף','sound','bell','frog',0,56,52,50,48,'צפרדע תופים. מתופפת על הבטן שלה בקצב מצחיק.',[['swamp','route-swamp','lake-town'],'any']],
  ['frog2','תופרדע','sound','bell','frog',1,86,78,74,60,'מתופפת על בטן גדולה ושרה. כל הביצה רוקדת איתה.',null],
@@ -398,6 +398,7 @@ function TL63main(K){
   if(STONEEVO[s[0]]){e.stone=STONEEVO[s[0]];for(const sk in e.stone){const tg=KEY[e.stone[sk]];f[tg].base=idx;const st=STONES.find(q=>q.k===sk);$n[tg]='מתפתח מ'+s[1]+' בעזרת '+st.n+' '+st.i}}
   if(s[11]){const tm=s[11][1];$n[idx]='בשטח: '+s[11][0].join(', ')+(tm==='day'?' · יום במשחק':tm==='night'?' · לילה במשחק':' · כל היום');SPAWN.push({sp:idx,maps:s[11][0],time:tm})}
  });
+ $n[KEY.fos1]='מעבדת המאובנים 🦴 (כפתור בתפריט · 300 מטבעות)';$n[KEY.fos2]='מעבדת המאובנים 🦴 (כפתור בתפריט · 300 מטבעות)';
  // sprites
  NEWSP.forEach((s,i)=>{const idx=base0+i,cv=document.createElement('canvas');cv.width=cv.height=192;const g=cv.getContext('2d');
   g.translate(96,98);const k=s[5]?2.4:2.05;g.scale(k,k);drawCreature(g,{tpl:s[3],v:s[4],st:s[5],t:s[2]});
@@ -835,12 +836,14 @@ window.TL63_r2=function(K,X){
     if(!clear)continue;
     chase(n,tr,dist);return}
   }catch(e){}}
+ const LOSREST=[];setInterval(()=>{try{if(K.Et==='map'&&LOSREST.length)for(const r of LOSREST.splice(0)){r.n.x=r.ox;r.n.y=r.oy}}catch(e){}},700);
  async function chase(n,tr,dist){busy=true;cool[tr.id]=Date.now()+90000;
   try{K.Et='menu';K.Bt('❗ '+tr.n+' הבחין בך!',1800);K.Y('enc');await K.i(900);
    const R=K.Rt,sx=Math.sign(R.x-n.x),sy=Math.sign(R.y-n.y);
+   const ox=n.x,oy=n.y;
    for(let d=dist;d>1;d--){n.x+=sx;n.y+=sy;await K.i(190)}
    R.dir=sx>0?'right':sx<0?'left':sy>0?'down':'up';n.dir=sx>0?'left':sx<0?'right':sy>0?'up':'down';
-   await K.i(200);K.Et='map';$q('#abtn').click();
+   await K.i(200);K.Et='map';$q('#abtn').click();LOSREST.push({n,ox,oy});
   }catch(e){console.error(e);if(K.Et==='menu')K.Et='map'}
   setTimeout(()=>{busy=false},2500)}
  requestAnimationFrame(losScan);
@@ -963,6 +966,8 @@ window.TL63_r3=function(K,X){
   for(const [id,x,y] of [['hills',15,1],['swamp',9,2],['swamp',1,3]]){const m=K.ua[id];if(m&&m.tiles&&m.tiles[y]&&m.tiles[y][x]===3)m.tiles[y][x]=54}
  }catch(e){console.error(e)}}
  placeDry();
+ // v6.12: shore grass patch in lake-town (zone B had no encounter tiles at all)
+ try{const lt=K.ua['lake-town'];if(lt&&lt.tiles){for(const [gx,gy] of [[16,9],[17,9],[16,10],[17,10],[16,11],[17,11]])if(lt.tiles[gy]&&lt.tiles[gy][gx]===0)lt.tiles[gy][gx]=11}}catch(e){console.error(e)}
  // scan all ready maps now; lazy maps on entry (applyEdits interval)
  function scanAllSigns(){try{if(!K.ua)return;for(const id in K.ua)ensureSigns(K.ua[id])}catch(e){}}
  setInterval(scanAllSigns,3000);scanAllSigns();
@@ -974,6 +979,7 @@ window.TL63_r3=function(K,X){
  function act(){try{const R=K.Rt;if(K.Et!=='map'||R.moving||!R.bump||R.bump===lastB||performance.now()-R.bump>450)return;
   lastB=R.bump;const d=DIR[R.dir];if(!d)return;const x=R.x+d[0],y=R.y+d[1],ct=K.ct;if(!ct[y]||ct[y][x]===undefined)return;const t=ct[y][x],m=fm();
   if(t===33&&K.en==='meadow-town'){const F=K.F;F.chests=F.chests||{};if(F.chests['grove-meadow']){K.Bt('התיבה ריקה - המטמון כבר אצלכם!',1800);return}F.chests['grove-meadow']=1;F.uballs=(F.uballs||0)+1;F.coins=(F.coins||0)+250;ct[y][x]=25;rec(x,y,25);K.Y('ok');K._();K.Bt('🎁 המטמון של החורשה! קיבלתם כדור על 🟡 ו-250 מטבעות 🪙!',4000);return}
+  if(t===33&&(K.en==='grove-swamp'||K.en==='grove-forest')){const F=K.F;F.chests=F.chests||{};const ck=K.en+':'+x+','+y;if(F.chests[ck]){K.Bt('התיבה ריקה - האוצר כבר אצלכם!',1800);return}F.chests[ck]=1;F.gballs=(F.gballs||0)+2;F.uballs=(F.uballs||0)+1;F.coins=(F.coins||0)+300;ct[y][x]=25;rec(x,y,25);K.Y('ok');K._();K.Bt('🎁 אוצר החורשה הסודית! קיבלתם כדור על 🟡 ו-2 כדורים גדולים 🔵 ו-300 מטבעות 🪙!',4000);return}
   if(t===33&&K.en==='shadow-hq'){const F=K.F;F.chests=F.chests||{};if(F.chests['shadow-hq']){K.Bt('התיבה ריקה - המטמון כבר אצלכם!',1800);return}F.chests['shadow-hq']=1;F.uballs=(F.uballs||0)+3;F.coins=(F.coins||0)+300;ct[y][x]=25;K.Y('ok');K._();K.Bt('🎁 המטמון של הכנופיה! קיבלתם 3 כדורי על 🟡 ו-300 מטבעות 🪙!',4000);return}
   if(t===54){if(!CUTNEEDSBADGE||m.cut){ct[y][x]=0;rec(x,y,0);removeSignFor(K.an().id,x,y);K.Y('lvl');K.Bt('🪓 העץ היבש נשבר! הדרך פתוחה!',2200)}else K.Bt('🪓 עץ יבש. צריך חיתוך - נפתח אחרי שמנצחים את אלוף היכל הראשון.',2600)}
   else if(t===3){K.Bt('🌳 עץ ירוק ובריא - אי אפשר לכרות אותו. רק עצים יבשים וסדוקים נשברים!',2400)}
@@ -1219,7 +1225,7 @@ window.TL63=(function(prev){return function(K){prev(K);try{
    +row('⚪','כדורי לכידה: '+F.balls+' רגילים · '+(F.gballs||0)+' כחולים · '+(F.uballs||0)+' כדורי על','תופסים איתם טלטלים חדשים בקרב')
    +row('🧪','שיקויים: '+F.pots+' קטנים · '+(F.spots||0)+' סופר · '+(F.upots||0)+' אולטרה','מרפאים טלטלים בזמן קרב')
    +row('🪙',F.coins+' מטבעות','קונים במכולת, בחנות האבנים ובחנות מכונות המהלך')
-   +row('🏅','תגים: '+(F.badges||0)+' מתוך 8','כל תג מעלה את רמת הציות של הטלטלים')
+   +row('🏅','תגים: '+bcount(F)+' מתוך 8','כל תג מעלה את רמת הציות של הטלטלים')
    +'<h3 style="margin:10px 0 4px">🧰 ציוד הרפתקנים</h3>'
    +row('🎣','חכת דייגים',F.rod?'יש לכם ✓ עומדים מול מים ולוחצים כדי לדוג':'עוד אין - קונים בתפריט ← ציוד וחנויות')
    +row('🚲','אופניים מתקפלים',F.bike?(F.bikeOn?'פועלות ✓ הולכים מהר יותר בחוץ':'כבויות - מדליקים מציוד וחנויות'):'עוד אין - קונים בתפריט ← ציוד וחנויות')
@@ -1233,3 +1239,9 @@ window.TL63=(function(prev){return function(K){prev(K);try{
   mn.querySelectorAll('.msecl').forEach(l=>{const g=l.nextElementSibling;l.style.display=(g&&g.children.length)?'':'none'});
  }catch(e){console.error(e)}});
 }catch(e){console.error('bag69',e)}}})(window.TL63);
+
+/* ---- 6.12 whats-new: big fix night ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen610&&!F.seen612&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen612=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.12 - ליל תיקונים גדול!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🌿 <b>חדש: עשב ליד הברכה!</b> בעיירת הברכה צמח עשב גבוה על שפת האגם - שם מחכים טלטלים שלא היה אפשר לפגוש קודם, כמו תדרון וברקי!</p><p>🎁 תיבות האוצר בחורשות הסודיות מאחורי דלתות הסמלים נפתחות עכשיו באמת.</p><p>🕶️ הדמות המסתורית בביצה עברה לעמוד ליד השביל - אפשר להמשיך את שרשרת המתנות שלה.</p><p>📖 אוגדן התגליות מציג עכשיו את כל 103 המינים החדשים, והמונה בתיק סופר תגים נכון.</p><p>🎒 העברת שחקן למכשיר אחר שומרת עכשיו הכל: אבנים, מכונות מהלך, חכה, אופניים, מעון יום, מאובנים וכוחות שדה.</p></div><button class="btn grn" id="tlx612" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx612').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
