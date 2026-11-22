@@ -706,7 +706,7 @@ window.TL63_more=function(K,X){
   try{
    if(K.Et!=='map'||K.Rt.moving||fishing)return;
    const d=DIR[K.Rt.dir];if(!d)return;const x=K.Rt.x+d[0],y=K.Rt.y+d[1];
-   const ft0=K.ct[y]&&K.ct[y][x];if(ft0===33||ft0===54||ft0===4||ft0===3){K.Rt.bump=performance.now();act();return}if(ft0!==2)return;
+   if(!K.ct[y]||K.ct[y][x]!==2)return;
    // an NPC or sign in front takes priority is not needed: water tiles have none
    ev.stopImmediatePropagation();ev.preventDefault();
    const F=K.F;
@@ -989,6 +989,7 @@ window.TL63_r3=function(K,X){
   else if(t===2&&!m.surf&&K.ut.has(2)){K.Bt('🌊 מים עמוקים. גלישה נפתחת בניצחון על אלוף היכל שני.',2600)}
  }catch(e){}}
  setInterval(act,120);
+ $q('#abtn').addEventListener('click',ev=>{try{if(K.Et!=='map'||K.Rt.moving)return;const d=DIR[K.Rt.dir];if(!d)return;const x=K.Rt.x+d[0],y=K.Rt.y+d[1];const t0=K.ct[y]&&K.ct[y][x];if(t0===33||t0===54||t0===4||t0===3){K.Rt.bump=performance.now();act()}}catch(e){}});
  // ---- shadow gang ----
  const SH=[['route-flower','שומר צל ראשון'],['route-swamp','שומרת צל מהביצה'],['route-forest','שומר צל מהיער'],['route-desert','שומר צל מהמדבר'],['route-storm','שומרת צל מהסופה'],['route-volcano','שומר צל מההר']];
  const lines=['המנהיג שלנו ידע שתבואו. אנחנו לא נותנים לילדים לעבור בלי להוכיח את עצמם!','ליקטנו טלטלים נדירים... לא, לא גנבנו. ממש לא. נו, בואו נילחם!','הצל הוא הבית שלנו. אתם נכנסים בלי לבקש רשות!'];
