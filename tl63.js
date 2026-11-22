@@ -1246,3 +1246,53 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen610&&!F.seen612&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen612=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.12 - ליל תיקונים גדול!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🌿 <b>חדש: עשב ליד הברכה!</b> בעיירת הברכה צמח עשב גבוה על שפת האגם - שם מחכים טלטלים שלא היה אפשר לפגוש קודם, כמו תדרון וברקי!</p><p>🎁 תיבות האוצר בחורשות הסודיות מאחורי דלתות הסמלים נפתחות עכשיו באמת.</p><p>🕶️ הדמות המסתורית בביצה עברה לעמוד ליד השביל - אפשר להמשיך את שרשרת המתנות שלה.</p><p>📖 אוגדן התגליות מציג עכשיו את כל 103 המינים החדשים, והמונה בתיק סופר תגים נכון.</p><p>🎒 העברת שחקן למכשיר אחר שומרת עכשיו הכל: אבנים, מכונות מהלך, חכה, אופניים, מעון יום, מאובנים וכוחות שדה.</p></div><button class="btn grn" id="tlx612" style="width:100%">קול!</button>`,mm=>mm.querySelector('#tlx612').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.14 world enlargement: outdoor maps x4 (Hagi 22.11: at least as big as HD) ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const BA={A:0,B:0,C:0,E:0,F:0,D:14,G:20,H:23,I:25};
+ const FX=4.2;
+ const FILL={
+  'meadow-town':[11,[[.05,3],[.09,5]]],'route-flower':[23,[[.05,3],[.1,5],[.35,10]]],
+  'hills':[31,[[.06,4],[.05,3],[.3,12]]],'lake-town':[41,[[.04,3],[.07,5]]],
+  'route-swamp':[53,[[.05,3],[.08,5],[.3,10]]],'swamp':[67,[[.05,3],[.06,2],[.32,16]]],
+  'route-frost':[71,[[.07,15]]],'frost-village':[79,[[.06,15]]],
+  'route-volcano':[83,[[.06,18],[.04,19],[.3,17]]],'volcano-village':[89,[[.06,18],[.03,19]]],
+  'route-forest':[97,[[.08,3],[.32,24]]],'forest-village':[101,[[.07,3],[.1,24]]],
+  'route-desert':[103,[[.06,22],[.04,4],[.3,21]]],'desert-town':[107,[[.06,22],[.04,5]]],
+  'route-storm':[109,[[.07,27],[.3,26]]],'storm-city':[113,[[.06,27],[.06,26]]]
+ };
+ for(const id in FILL){
+  const m=K.ua[id]; if(!m||!m.tiles||m.indoor) continue;
+  const T=m.tiles, oh=T.length, ow=T[0].length, border=T[0][0];
+  const z=m.zone, base=BA[z]!==undefined?BA[z]:0, pathT=(z==='D')?53:1;
+  const NW=Math.floor(ow*FX), NH=Math.floor(oh*FX), T2=[];
+  for(let y=0;y<NH;y++)T2.push(new Array(NW).fill(base));
+  for(let y=0;y<oh;y++)for(let x=0;x<ow;x++)T2[y][x]=T[y][x];
+  for(let y=1;y<oh-1;y++)T2[y][ow-1]=base;
+  for(let x=1;x<ow-1;x++)T2[oh-1][x]=base;
+  T2[oh-1][ow-1]=base;
+  let rng=FILL[id][0]*1000+7;
+  const weights=FILL[id][1];
+  for(let y=1;y<NH-1;y++)for(let x=1;x<NW-1;x++){
+   rng=(1664525*rng+1013904223)>>>0;
+   if(x<ow-1&&y<oh-1)continue;
+   if(T2[y][x]!==base)continue;
+   const r=rng/4294967296; let acc=0;
+   for(let wi=0;wi<weights.length;wi++){acc+=weights[wi][0]; if(r<acc){T2[y][x]=weights[wi][1]; break}}
+  }
+  for(let x=0;x<NW;x++){T2[0][x]=border;T2[NH-1][x]=border}
+  for(let y=0;y<NH;y++){T2[y][0]=border;T2[y][NW-1]=border}
+  const links=m.links||[];
+  for(let li=0;li<links.length;li++){const l=links[li];
+   if(l.x===ow-2){const ox=l.x; l.x=NW-2; for(let x=ox;x<=NW-2;x++)T2[l.y][x]=pathT}
+   if(l.y===oh-2){const oy=l.y; l.y=NH-2; for(let y=oy;y<=NH-2;y++)T2[y][l.x]=pathT}
+  }
+  m.tiles=T2; m.w=NW; m.h=NH;
+ }
+}catch(e){console.error('enlarge614',e)}}})(window.TL63);
+
+/* ---- 6.14 whats-new: giant world ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen612&&!F.seen614&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen614=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.14 - עולם ענק!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🗺️ <b>העולם שלכם גדל וגדל!</b> כל דרך, עיירה ואזור הפכו ענקיים - פי ארבעה וחצי מקודם! יש שטחים חדשים לגלות, דשא גבוה מלא בטלטלים ומקומות חדשים לטייל בהם.</p><p>✨ <b>טיפ חשוב:</b> השערים הקסומים מעבירים אתכם מיד לעיירות שכבר גיליתם - ככה לא צריך ללכת רחוק כל פעם. מפת המסע בתפריט תמיד מראית איפה אתם.</p><p>🌿 בשטחים החדשים מחכים המון טלטלים לתפוס. צאו לגלות!</p></div><button class="btn grn" id="tlx614" style="width:100%">יוצאים לגלות!</button>`,mm=>mm.querySelector('#tlx614').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
