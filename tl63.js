@@ -1296,3 +1296,89 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen612&&!F.seen614&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen614=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.14 - עולם ענק!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🗺️ <b>העולם שלכם גדל וגדל!</b> כל דרך, עיירה ואזור הפכו ענקיים - פי ארבעה וחצי מקודם! יש שטחים חדשים לגלות, דשא גבוה מלא בטלטלים ומקומות חדשים לטייל בהם.</p><p>✨ <b>טיפ חשוב:</b> השערים הקסומים מעבירים אתכם מיד לעיירות שכבר גיליתם - ככה לא צריך ללכת רחוק כל פעם. מפת המסע בתפריט תמיד מראית איפה אתם.</p><p>🌿 בשטחים החדשים מחכים המון טלטלים לתפוס. צאו לגלות!</p></div><button class="btn grn" id="tlx614" style="width:100%">יוצאים לגלות!</button>`,mm=>mm.querySelector('#tlx614').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.15 world fill: content for the enlarged areas (Hagi 22.11) ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const SPEC=new Set([27,28,29,30,31,32,33,35,54,13,8,7,6,38,41,45,46,47,51,52]);
+ const PLANS={
+  'meadow-town':{lv:6,dirs:'צפונה שביל הפרחים · ימינה שביל הביצה'},
+  'route-flower':{lv:8,dirs:'צפונה גבעות הגחלים · דרומה כפר הפרחים'},
+  'hills':{lv:14,dirs:'מערבה שביל הפרחים · ימינה עיירת הברכה'},
+  'lake-town':{lv:11,dirs:'שמאלה גבעות הגחלים · צפונה שביל הכפור'},
+  'route-swamp':{lv:10,dirs:'שמאלה כפר הפרחים · ימינה הביצה הירוקה'},
+  'swamp':{lv:13,dirs:'שמאלה שביל הביצה · פה מסתתרים טלטלים נדירים'},
+  'route-frost':{lv:14,dirs:'דרומה עיירת הברכה · צפונה כפר הכפור'},
+  'frost-village':{lv:16,dirs:'מטה שביל הכפור · ימינה שביל ההר'},
+  'route-volcano':{lv:22,dirs:'דרומה כפר הכפור · צפונה כפר ההר'},
+  'volcano-village':{lv:25,dirs:'מטה שביל ההר · שמאלה שביל היער'},
+  'route-forest':{lv:16,dirs:'ימינה כפר ההר · שמאלה כפר היער'},
+  'forest-village':{lv:31,dirs:'ימינה שביל היער · צפונה שביל המדבר'},
+  'route-desert':{lv:27,dirs:'מטה כפר היער · צפונה עיירת המדבר'},
+  'desert-town':{lv:29,dirs:'מטה שביל המדבר · ימינה שביל הסופה'},
+  'route-storm':{lv:34,dirs:'דרומה עיירת המדבר · צפונה עיר הסופה'},
+  'storm-city':{lv:40,dirs:'מטה שביל הסופה · פה נמצא היכל הסופה'}
+ };
+ const TIPS=[
+  'טיפ: כדור כחול תופס טלטלים בקלות רבה יותר מכדור לבן!',
+  'טיפ: אם טלטל הולם על ידי מעלה זמני, מתגברים עליו עם מהלך מטיפוס חזק נגדו!',
+  'טיפ: הטלטל הראשון בצוות מקבל ניסיון בכל קרב - החליפו סדר כדי לאמן גם אחרים!',
+  'טיפ: בית החולים מרפא את כל הצוות בחינם. תמיד שווה לקפוץ!',
+  'טיפ: כדורי על צופסים כמעט הכל - שומרים אותם לטלטלים נדירים באמת!',
+  'טיפ: בלילה ובבוקר יוצאים טלטלים אחרים לגמרי. נסו לשחק בשעות שונות!'
+ ];
+ const NAMES=['ניב','מהיר','ליטל','שני','עומר','גאיה','דניאל','מאיה','יובל','נועם','אלה','רותם','תומר','ליהי','איתמר','הילה','אורי','מיכל','יונתן','שירה','אביב','תהל','נריה','עמית','רונה','אדם','לנה','זיו','מאי','אלון','הדס','כפיר'];
+ const TTALK=[
+  'אני מחפש טלטלים נדירים בשטחים החדשים. יש פה המון מקום להסתתר!',
+  'מאז שהעולם גדל אני הולך כל יום למקום אחר. כיף גדול!',
+  'ראיתי טלטל מבריק בעשב הגבוה! נוצץ כזה, אחד ממאה!',
+  'אמא אמרה שאם אאמן את הטלטלים כמו שצריך, אקבל עוד כדורים. מתאמן כל יום!',
+  'בשביל החדש מצאתי מתנה! תמיד שווה לבדוק פינות חדשות.',
+  'הטלטל שלי אוהב לטייל איתי בשטחים הפתוחים. הוא כמעט לא נכנס לכדור!'
+ ];
+ const TTR=['בואו נראה אם אתם מספיק חזקים לשטחים החדשים!','האיזור הזה גדול ומסוכן - רק מאמנים טובים עוברים אותי!','אני מתאמן פה כל בוקר! בואו נלחם!','הטלטלים שלי גדלו בשטחים האלה. תראו כמה הם חזקים!'];
+ let seedBase=7717;
+ const rnd=()=>{seedBase=(1664525*seedBase+1013904223)>>>0;return seedBase/4294967296};
+ const pick=a=>a[Math.floor(rnd()*a.length)];
+ let nPick=0,nSign=0,nTalk=0,nTr=0;
+ for(const id in PLANS){
+  const m=K.ua[id]; if(!m||!m.tiles||m.indoor) continue;
+  const T=m.tiles,H=T.length,W=T[0].length,ow=Math.round(W/4.2),oh=Math.round(H/4.2);
+  const plan=PLANS[id];
+  const used=new Set();
+  const key=(x,y)=>x+','+y;
+  const taken=(x,y)=>used.has(key(x,y))||(m.npcs||[]).some(n=>n.x===x&&n.y===y)||(m.signs||[]).some(s=>s.x===x&&s.y===y)||(m.fields||[]).some(f=>f.x===x&&f.y===y)||(m.links||[]).some(l=>Math.abs(l.x-x)<3&&Math.abs(l.y-y)<3);
+  const freeTile=(x,y)=>T[y]&&T[y][x]!==undefined&&!K.ut.has(T[y][x])&&!SPEC.has(T[y][x]);
+  const freeOpen=(x,y)=>freeTile(x,y)&&T[y][x]!==1&&T[y][x]!==53;
+  const inNew=(x,y)=>x>=ow-1||y>=oh-1;
+  const findSpot=(nearPath)=>{for(let tries=0;tries<400;tries++){const x=1+Math.floor(rnd()*(W-2)),y=1+Math.floor(rnd()*(H-2));if(!inNew(x,y)||taken(x,y)||!freeTile(x,y))continue;
+    if(nearPath){if(!freeOpen(x,y))continue;let adj=false;for(const[a,b]of[[1,0],[-1,0],[0,1],[0,-1]]){const v=(T[y+b]||[])[x+a];if(v===1||v===53){adj=true;break}}if(!adj)continue}
+    used.add(key(x,y));return{x,y}}return null};
+  const findOpen=()=>{for(let tries=0;tries<400;tries++){const x=1+Math.floor(rnd()*(W-2)),y=1+Math.floor(rnd()*(H-2));if(!inNew(x,y)||taken(x,y)||!freeOpen(x,y))continue;used.add(key(x,y));return{x,y}}return null};
+  // pickups
+  (m.fields=m.fields||[]);
+  for(let i=0;i<8;i++){const p=findSpot(false);if(p){m.fields.push({type:'pickup',x:p.x,y:p.y});nPick++}}
+  // signs near paths
+  (m.signs=m.signs||[]);
+  const signMsgs=['🪧 שטחי טיול חדשים: '+plan.dirs,'🪧 '+pick(TIPS),'🪧 בעשב הגבוה בשטחים החדשים מסתתרים טלטלים פראיים - תכינו כדורים!'];
+  for(let i=0;i<3;i++){const p=findSpot(true);if(p){m.signs.push({x:p.x,y:p.y,msg:signMsgs[i]});T[p.y][p.x]=9;nSign++}}
+  // talk npcs
+  (m.npcs=m.npcs||[]);
+  for(let i=0;i<2;i++){const p=findOpen();if(p){m.npcs.push({kind:'talk',n:pick(NAMES)+' המטייל',x:p.x,y:p.y,dir:'down',pal:'c',txt:pick(TTALK)});nTalk++}}
+  // trainers
+  const zone=m.zone,pool=[];
+  for(let si=0;si<K.f.length;si++){const sp=K.f[si];if(sp&&sp.h&&String(sp.h).includes(zone)&&sp.base===undefined)pool.push(si)}
+  const pool2=pool.length?pool:K.f.map((s,i)=>s&&s.base===undefined?i:-1).filter(i=>i>0);
+  for(let i=0;i<2;i++){const p=findOpen();if(!p)continue;
+   const lv=plan.lv+i, t1=pick(pool2), t2=pick(pool2);
+   const tid='wf-'+id+'-'+i, tn=pick(NAMES)+' מאמן השטח';
+   K.Ha.push({id:tid,n:tn,map:id,x:p.x,y:p.y,team:[[t1,lv],[t2,lv+1]],reward:15*lv,txt:pick(TTR)});
+   m.npcs.push({kind:'trainer',ref:tid,map:id,x:p.x,y:p.y,dir:'down',pal:'t'});nTr++}
+ }
+ console.log('worldfill615 pickups:'+nPick+' signs:'+nSign+' talkers:'+nTalk+' trainers:'+nTr);
+}catch(e){console.error('worldfill615',e)}}})(window.TL63);
+
+/* ---- 6.15 whats-new: world full of life ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen614&&!F.seen615&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen615=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.15 - עולם מלא חיים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🎁 <b>השטחים החדשים מלאים בהפתשות!</b> פיזרנו בעולם כולו 128 מתנות חבויות - כדורים, שיקויים, פירות וקמעות. הן מתמלאות מחדש כל יום במשחק!</p><p>🪧 שלטי דרך חדשים ידריכו אתכם בשטחים הגדולים, עם טיפים שיעזרו לכם להפוך למאמנים טובים יותר.</p><p>🧑‍🤝‍🧑 32 מטיילים חדשים מספרים סיפורים וטיפים, ו-32 מאמנים חדשים מחכים לקרב בכל פינה - מי שינצח אותם יקבל מטבעות!</p></div><button class="btn grn" id="tlx615" style="width:100%">קדימה, לחקור!</button>`,mm=>mm.querySelector('#tlx615').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
