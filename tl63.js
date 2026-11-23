@@ -1382,3 +1382,85 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen614&&!F.seen615&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen615=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.15 - עולם מלא חיים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🎁 <b>השטחים החדשים מלאים בהפתשות!</b> פיזרנו בעולם כולו 128 מתנות חבויות - כדורים, שיקויים, פירות וקמעות. הן מתמלאות מחדש כל יום במשחק!</p><p>🪧 שלטי דרך חדשים ידריכו אתכם בשטחים הגדולים, עם טיפים שיעזרו לכם להפוך למאמנים טובים יותר.</p><p>🧑‍🤝‍🧑 32 מטיילים חדשים מספרים סיפורים וטיפים, ו-32 מאמנים חדשים מחכים לקרב בכל פינה - מי שינצח אותם יקבל מטבעות!</p></div><button class="btn grn" id="tlx615" style="width:100%">קדימה, לחקור!</button>`,mm=>mm.querySelector('#tlx615').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.16 memory game: משחק זיכרון טלטלים ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const $q=s=>document.querySelector(s);
+ // host NPC in meadow-town (12,2 - verified free, faceable, near path)
+ const mm=K.ua['meadow-town'];
+ if(mm&&!mm.npcs.some(n=>n.id==='memhost'))
+  mm.npcs.push({kind:'talk',id:'memhost',n:'נועה מארחת המשחקים',x:12,y:2,dir:'down',pal:'c',
+   txt:'שלום! אני מארחת כאן משחק זיכרון עם הטלטלים. במשחק מופיעים קלפים הפוכים - הופכים שניים בכל פעם ומחפשים זוגות של אותו טלטל. כדאי לזכור איפה כל אחד היה! מי שמוצא את כל הזוגות מקבל מטבעות, עד 3 פרסים ביום. רוצים לשחק? לחצו על הכפתור למטה!'});
+ // ---- pure game logic (testable) ----
+ function poolFor(F){
+  const base=i=>K.f[i]&&K.f[i].base===undefined;
+  const seen=Object.keys(F.seen||{}).map(Number).filter(base);
+  if(seen.length>=6)return seen;
+  return K.f.map((_,i)=>i).filter(base);
+ }
+ function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a}
+ function newGame(F){
+  const pool=poolFor(F),six=shuf(pool).slice(0,6),cards=shuf(six.concat(six));
+  return {cards,matched:[],first:-1,lock:false,moves:0,found:0,done:false,reward:0};
+ }
+ function flip(g,i){
+  if(g.lock||g.done||g.matched[i]||i===g.first)return null;
+  if(g.first<0){g.first=i;return {reveal:i}}
+  const a=g.first,b=i;g.first=-1;g.moves++;
+  if(g.cards[a]===g.cards[b]){g.matched[a]=g.matched[b]=1;g.found++;
+   if(g.found===6){g.done=true;g.reward=15+Math.max(0,20-g.moves)}return {match:[a,b],done:g.done,reward:g.reward}}
+  g.lock=true;return {mismatch:[a,b]};
+ }
+ function grant(F,g){
+  F.memWins=F.memWins||{cyc:-1,count:0};
+  const cyc=F.lastCyc||0;
+  if(F.memWins.cyc!==cyc)F.memWins={cyc:cyc,count:0};
+  const paid=F.memWins.count<3?g.reward:0;
+  if(paid>0){F.memWins.count++;F.coins=(F.coins||0)+paid}
+  if(!F.memBest||g.moves<F.memBest)F.memBest=g.moves;
+  return paid;
+ }
+ window.TLMemory={newGame,flip,grant,poolFor};
+ // ---- UI ----
+ function cardHTML(i){return `<button class="memcard" data-i="${i}" style="aspect-ratio:1;border-radius:10px;border:2px solid #3a5a8a;background:#16213a;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:26px;cursor:pointer;padding:2px"><span class="memq">❓</span></button>`}
+ function openGame(){
+  const F=K.F;if(!F.started)return;
+  K.Et='menu';
+  let g=newGame(F);
+  const wins=F.memWins&&F.memWins.cyc===(F.lastCyc||0)?F.memWins.count:0;
+  K.Ie(`<h2>🧠 משחק זיכרון טלטלים</h2><div class="flav">הופכים שני קלפים ומוצאים זוגות! מצאו את כל 6 הזוגות. ${wins>=3?'היום כבר קיבלתם 3 פרסים - משחקים לכיף 😊':'פרס: מטבעות לפי כמה מהר תצליחו! (נשארו '+(3-wins)+' פרסים היום)'}</div><div id="memgrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:10px 0">${g.cards.map((_,i)=>cardHTML(i)).join('')}</div><div id="memstat" style="font-size:14px;min-height:20px">מהלכים: 0${F.memBest?' · שיא: '+F.memBest:''}</div><button class="btn sec" id="memx" style="width:100%;margin-top:8px">יציאה</button>`,
+  m=>{
+   const stat=m.querySelector('#memstat'),grid=m.querySelector('#memgrid');
+   const show=(btn,sp)=>{btn.innerHTML='';btn.style.borderColor='#4ad07a';btn.appendChild(K.W(sp,34,false));const nm=document.createElement('small');nm.textContent=K.f[sp].n;nm.style.fontSize='11px';btn.appendChild(nm)};
+   const hide=btn=>{btn.innerHTML='<span class="memq">❓</span>';btn.style.borderColor='#3a5a8a'};
+   m.querySelector('#memx').onclick=()=>{K.He();K.Et='map'};
+   m.querySelectorAll('.memcard').forEach(btn=>{btn.onclick=()=>{
+    const i=+btn.dataset.i,r=flip(g,i);if(!r)return;K.Y('pop');
+    if(r.reveal!==undefined)show(btn,g.cards[i]);
+    if(r.match){m.querySelectorAll('.memcard').forEach(b=>{const j=+b.dataset.i;if(j===r.match[0]||j===r.match[1])show(b,g.cards[j])});K.Y('ok')}
+    if(r.mismatch){const a=r.mismatch,b1=grid.children[a[0]],b2=grid.children[a[1]];show(b1,g.cards[a[0]]);show(b2,g.cards[a[1]]);setTimeout(()=>{hide(b1);hide(b2);g.lock=false},900)}
+    stat.textContent='מהלכים: '+g.moves+(F.memBest?' · שיא: '+F.memBest:'');
+    if(r.done){const paid=grant(F,g);K._();K.Y('lvl');
+     stat.innerHTML=(paid>0?'🎉 כל הזוגות! קיבלתם '+paid+' 🪙':'🎉 כל הזוגות!')+' במשחק זיכרון ('+g.moves+' מהלכים)';
+     const again=document.createElement('button');again.className='btn grn';again.style.cssText='width:100%;margin-top:8px';again.textContent='🔄 עוד משחק';
+     again.onclick=()=>{K.He();openGame()};m.appendChild(again)}
+   }});
+  });
+ }
+ // inject play button into the host's talk dialog
+ const mbox=$q('#mbox');
+ new MutationObserver(()=>{
+  const h=mbox.querySelector('h2');if(!h||h.textContent!=='נועה מארחת המשחקים')return;
+  if(mbox.querySelector('#memplay'))return;
+  const tk=mbox.querySelector('#tk');if(!tk)return;
+  const b=document.createElement('button');b.className='btn grn';b.id='memplay';b.style.cssText='width:100%;margin-bottom:6px';b.innerHTML='🧠 בואו נשחק!<small>מצאו זוגות של טלטלים וזכו במטבעות</small>';
+  b.onclick=()=>{K.He();openGame()};
+  tk.parentNode.insertBefore(b,tk);
+ }).observe(mbox,{childList:true,subtree:true});
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.16 whats-new ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen615&&!F.seen616&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen616=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.16 - משחק זיכרון!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🧠 <b>משחק חדש בעיירת השדה!</b> נועה מארחת המשחקים מחכה ליד המפה הצפונית עם משחק זיכרון של טלטלים.</p><p>🃏 הופכים שני קלפים בכל פעם ומוצאים זוגות של אותו טלטל. כדאי לזכור איפה כל קלף היה!</p><p>🪙 מי שמוצא את כל הזוגות מקבל מטבעות - עד 3 פרסים ביום, ואפשר לשחק לכיף גם אחרי. הקלפים מראים טלטלים שכבר פגשתם, עם השמות שלהם - כך גם מתאמנים בזיכרון וגם בקריאה!</p></div><button class="btn grn" id="tlx616" style="width:100%">קדימה, לשחק!</button>`,mm=>mm.querySelector('#tlx616').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
