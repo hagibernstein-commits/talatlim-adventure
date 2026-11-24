@@ -1560,3 +1560,23 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen616&&!F.seen617&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen617=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.17 - חידון הטלטלים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🎓 <b>חידון חדש בעיירת האגם!</b> אורי שואל החידון מחכה שם עם 5 שאלות על הטלטלים שלנו.</p><p>❓ איזה טלטל מסוג מים? מי מתחיל באות צ? מי מתפתח מטיפי? על כל תשובה נכונה מקבלים מטבעות - עד 2 חידונים עם פרס ביום, ולכיף גם אחרי.</p><p>📚 החידון מלמד על הסוגים, האותיות וההתפתחויות של הטלטלים שאתם פוגשים!</p></div><button class="btn grn" id="tlx617" style="width:100%">קדימה, לחידון!</button>`,mm=>mm.querySelector('#tlx617').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.18 evolution completion: every spark telatlim evolves ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ // 9 single-stage spark species had no evolution (Ziv's bug report). Give each a stage-2 form.
+ const SPARK_EVOS=[["תדרון","תדראל",28],["זוהרור","זוהרמלך",34],["לילפז","לילזהב",30],["כוכבון","כוכבלך",30],["ערפילי","ערפלור",34],["סופטל","סופטור",32],["סערור","סערמלך",38],["דמדומון","דמדולקס",32],["סופאל","סופאר",36]];
+ for(const[bn,en,at] of SPARK_EVOS){
+  const i=K.f.findIndex(s=>s&&s.n===bn);
+  if(i<0)continue;
+  const base=K.f[i];
+  if(base.evo!=null||base.base!==undefined)continue; // already evolves
+  base.at=at;
+  base.evo=K.f.push({...base,n:en,b:base.b.map((v,j)=>v+(j===0?24:22)),cr:Math.max(5,Math.round(base.cr*.65)),xp:base.xp+45,evo:null,base:i})-1;
+ }
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.18 whats-new ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen617&&!F.seen618&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen618=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.18 - כל טלטל הברק מתפתח!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>⚡ <b>תיקון חשוב!</b> תשעה טלטלים מסוג ברק שלא יכלו להתפתח בכלל - תדרון, זוהרור, לילפז, כוכבון, ערפילי, סופטל, סערור, דמדומון וסופאל - מקבלים עכשיו צורות מפותחות חדשות!</p><p>✨ מעלים אותם רמה בקרבות, וברמה הנדרשת הם מתפתחים לצורה חזקה יותר, בדיוק כמו שאר הטלטלים.</p><p>🛒 וגם תיקנו את התקיעה במכולת - עכשיו אפשר לקנות בלי שהמשחק נתקע!</p></div><button class="btn grn" id="tlx618" style="width:100%">קדימה, לאמן!</button>`,mm=>mm.querySelector('#tlx618').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
