@@ -1464,3 +1464,99 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen615&&!F.seen616&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen616=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.16 - משחק זיכרון!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🧠 <b>משחק חדש בעיירת השדה!</b> נועה מארחת המשחקים מחכה ליד המפה הצפונית עם משחק זיכרון של טלטלים.</p><p>🃏 הופכים שני קלפים בכל פעם ומוצאים זוגות של אותו טלטל. כדאי לזכור איפה כל קלף היה!</p><p>🪙 מי שמוצא את כל הזוגות מקבל מטבעות - עד 3 פרסים ביום, ואפשר לשחק לכיף גם אחרי. הקלפים מראים טלטלים שכבר פגשתם, עם השמות שלהם - כך גם מתאמנים בזיכרון וגם בקריאה!</p></div><button class="btn grn" id="tlx616" style="width:100%">קדימה, לשחק!</button>`,mm=>mm.querySelector('#tlx616').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.17 quiz game: חידון הטלטלים ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const $q=s=>document.querySelector(s);
+ const tname=t=>{try{return K.E(t).replace(/<[^>]*>/g,'')}catch(e){return t}};
+ // host NPC in lake-town (14,3 - verified free, faceable, near path)
+ const lm=K.ua['lake-town'];
+ if(lm&&!lm.npcs.some(n=>n.id==='quizhost'))
+  lm.npcs.push({kind:'talk',id:'quizhost',n:'אורי שואל החידון',x:14,y:3,dir:'down',pal:'c',
+   txt:'שלום! אני אורי, ואני מכין חידונים על טלטלים! בחידון יש 5 שאלות על הטלטלים שבעולם שלנו - על הסוגים שלהם, על האותיות של השמות ועל ההתפתחויות. על כל תשובה נכונה מקבלים מטבעות, עד 2 חידונים עם פרס ביום. מוכנים? לחצו על הכפתור למטה!'});
+ // ---- pure logic (testable) ----
+ const pick=a=>a[Math.floor(Math.random()*a.length)];
+ const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t}return a};
+ const species=()=>K.f.map((s,i)=>({i,s})).filter(o=>o.s);
+ function qType(){
+  const big=['fire','water','plant','spark','earth','norm'],t=pick(big);
+  const inT=species().filter(o=>o.s.t===t),out=species().filter(o=>o.s.t!==t);
+  const ans=pick(inT),opts=shuf([ans].concat(shuf(out).slice(0,3)));
+  return {q:'איזה טלטל מסוג '+tname(t)+'?',opts:opts.map(o=>o.s.n),correct:opts.indexOf(ans),
+   why:'נכון! '+ans.s.n+' הוא טלטל מסוג '+tname(t)+'.',whyNo:ans.s.n+' הוא הטלטל מסוג '+tname(t)+'.'};
+ }
+ function qLetter(){
+  const all=species();const ans=pick(all);const letter=ans.s.n[0];
+  const out=all.filter(o=>o.s.n[0]!==letter);
+  const opts=shuf([ans].concat(shuf(out).slice(0,3)));
+  return {q:"איזה טלטל מתחיל באות '"+letter+"'?",opts:opts.map(o=>o.s.n),correct:opts.indexOf(ans),
+   why:"נכון! "+ans.s.n+" מתחיל באות '"+letter+"'.",whyNo:ans.s.n+" מתחיל באות '"+letter+"'."};
+ }
+ function qEvo(){
+  const evo=species().filter(o=>o.s.base!==undefined);
+  const ans=pick(evo);const pre=K.f[ans.s.base];
+  const out=shuf(evo.filter(o=>o.i!==ans.i)).slice(0,3);
+  const opts=shuf([ans].concat(out));
+  return {q:'מי מתפתח מ'+pre.n+'?',opts:opts.map(o=>o.s.n),correct:opts.indexOf(ans),
+   why:'נכון! '+pre.n+' מתפתח ל'+ans.s.n+'.',whyNo:pre.n+' מתפתח ל'+ans.s.n+'.'};
+ }
+ function genRound(){const gs=[qType,qLetter,qEvo];const qs=[];const used=new Set();
+  let guard=0;while(qs.length<5&&guard++<40){const q=pick(gs)();if(used.has(q.q))continue;used.add(q.q);qs.push(q)}
+  while(qs.length<5)qs.push(qType());
+  return {qs,score:0,idx:0,done:false,reward:0}}
+ function answer(r,pickIdx){const q=r.qs[r.idx];const okc=pickIdx===q.correct;if(okc)r.score++;
+  r.idx++;if(r.idx>=r.qs.length){r.done=true;r.reward=r.score*8}
+  return {ok:okc,why:okc?q.why:('לא בדיוק. '+q.whyNo),done:r.done,score:r.score,reward:r.reward}}
+ function grant(F,r){F.quizWins=F.quizWins||{cyc:-1,count:0};const cyc=F.lastCyc||0;
+  if(F.quizWins.cyc!==cyc)F.quizWins={cyc:cyc,count:0};
+  const paid=F.quizWins.count<2?r.reward:0;
+  if(paid>0){F.quizWins.count++;F.coins=(F.coins||0)+paid}
+  if(!F.quizBest||r.score>F.quizBest)F.quizBest=r.score;
+  return paid}
+ window.TLQuiz={genRound,answer,grant,qType,qLetter,qEvo};
+ // ---- UI ----
+ function openQuiz(){
+  const F=K.F;if(!F.started)return;K.Et='menu';
+  const wins=F.quizWins&&F.quizWins.cyc===(F.lastCyc||0)?F.quizWins.count:0;
+  const r=genRound();
+  function renderQ(m){
+   const q=r.qs[r.idx];
+   const box=m.querySelector('#qbody');
+   box.innerHTML=`<div style="font-size:13px;color:#8ab">שאלה ${r.idx+1} מתוך 5 · נכונות: ${r.score}</div><h3 style="margin:8px 0">${q.q}</h3>`+
+    q.opts.map((o,i)=>`<button class="btn qopt" data-i="${i}" style="width:100%;margin:4px 0;text-align:right">${o}</button>`).join('')+
+    `<div id="qfb" style="font-size:13px;min-height:36px;margin-top:4px"></div>`;
+   box.querySelectorAll('.qopt').forEach(b=>b.onclick=()=>{
+    const res=answer(r,+b.dataset.i);
+    box.querySelectorAll('.qopt').forEach(x=>{x.disabled=true;if(+x.dataset.i===q.correct)x.style.borderColor='#4ad07a'});
+    if(!res.ok)b.style.borderColor='#e05555';
+    K.Y(res.ok?'ok':'no');
+    const fb=box.querySelector('#qfb');fb.textContent=res.why;
+    setTimeout(()=>{
+     if(!res.done)renderQ(m);
+     else{const paid=grant(F,r);K._();K.Y('lvl');
+      box.innerHTML=`<h3>🎓 סוף החידון!</h3><div style="font-size:15px;line-height:1.7">עניתם נכון על ${r.score} מתוך 5 שאלות!${paid>0?'<br>🪙 קיבלתם '+paid+' מטבעות!':'<br>(היום כבר קיבלתם 2 פרסים - החידון לכיף 😊)'}${F.quizBest?'<br>🏅 שיא: '+F.quizBest+'/5':''}</div>
+      <button class="btn grn" id="qagain" style="width:100%;margin-top:10px">🔄 עוד חידון</button>`;
+      box.querySelector('#qagain').onclick=()=>{K.He();openQuiz()}}
+    },1700);
+   });
+  }
+  K.Ie(`<h2>🎓 חידון הטלטלים</h2><div class="flav">5 שאלות על הטלטלים שלנו. על כל תשובה נכונה - מטבעות! ${wins>=2?'(היום לכיף בלבד)':''}</div><div id="qbody"></div><button class="btn sec" id="qexit" style="width:100%;margin-top:8px">יציאה</button>`,
+  m=>{m.querySelector('#qexit').onclick=()=>{K.He();K.Et='map'};renderQ(m)});
+ }
+ // inject play button into the host's talk dialog
+ const mbox=$q('#mbox');
+ new MutationObserver(()=>{
+  const h=mbox.querySelector('h2');if(!h||h.textContent!=='אורי שואל החידון')return;
+  if(mbox.querySelector('#quizplay'))return;
+  const tk=mbox.querySelector('#tk');if(!tk)return;
+  const b=document.createElement('button');b.className='btn grn';b.id='quizplay';b.style.cssText='width:100%;margin-bottom:6px';b.innerHTML='🎓 בואו לחידון!<small>5 שאלות על טלטלים, מטבעות על תשובות נכונות</small>';
+  b.onclick=()=>{K.He();openQuiz()};
+  tk.parentNode.insertBefore(b,tk);
+ }).observe(mbox,{childList:true,subtree:true});
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.17 whats-new ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen616&&!F.seen617&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen617=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.17 - חידון הטלטלים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🎓 <b>חידון חדש בעיירת האגם!</b> אורי שואל החידון מחכה שם עם 5 שאלות על הטלטלים שלנו.</p><p>❓ איזה טלטל מסוג מים? מי מתחיל באות צ? מי מתפתח מטיפי? על כל תשובה נכונה מקבלים מטבעות - עד 2 חידונים עם פרס ביום, ולכיף גם אחרי.</p><p>📚 החידון מלמד על הסוגים, האותיות וההתפתחויות של הטלטלים שאתם פוגשים!</p></div><button class="btn grn" id="tlx617" style="width:100%">קדימה, לחידון!</button>`,mm=>mm.querySelector('#tlx617').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
