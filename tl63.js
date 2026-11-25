@@ -1580,3 +1580,95 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen617&&!F.seen618&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen618=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.18 - כל טלטל הברק מתפתח!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>⚡ <b>תיקון חשוב!</b> תשעה טלטלים מסוג ברק שלא יכלו להתפתח בכלל - תדרון, זוהרור, לילפז, כוכבון, ערפילי, סופטל, סערור, דמדומון וסופאל - מקבלים עכשיו צורות מפותחות חדשות!</p><p>✨ מעלים אותם רמה בקרבות, וברמה הנדרשת הם מתפתחים לצורה חזקה יותר, בדיוק כמו שאר הטלטלים.</p><p>🛒 וגם תיקנו את התקיעה במכולת - עכשיו אפשר לקנות בלי שהמשחק נתקע!</p></div><button class="btn grn" id="tlx618" style="width:100%">קדימה, לאמן!</button>`,mm=>mm.querySelector('#tlx618').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.19 wandering NPCs: דמויות מהלכות עם תפקיד ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ // walker spec: battle = trainer (Ha entry + npc), talk = info npc. walk:{axis,a,b} corridor, ms step time.
+ const WLK=[
+  {id:'wlk-mt', kind:'battle', map:'meadow-town', n:'יוני מאמן השכונה', pal:'t', axis:'y', fix:13, a:2, b:8, start:8, d:-1, ms:800,
+   team:[[125,8],[130,7]], reward:120, txt:'אני מטייל בשכונה כל היום ומחפש יריב לקרב! אין לי מנוחה עד שאנצח מישהו חדש. מוכנים?'},
+  {id:'wlk-mt2', kind:'talk', map:'meadow-town', n:'דוד נחום', pal:'b', axis:'x', fix:14, a:11, b:16, start:11, d:1, ms:650,
+   txt:'שמעתם את החדשות? תשעה טלטלי ברק שלא יכלו להתפתח קיבלו צורות מפותחות! תדרון, זוהרור, לילפז, כוכבון, ערפילי, סופטל, סערור, דמדומון וסופאל. מעלים אותם רמה בקרבות, וברמה הנדרשת הם מתפתחים!'},
+  {id:'wlk-lt', kind:'battle', map:'lake-town', n:'מאיה רצת האגם', pal:'t', axis:'x', fix:14, a:12, b:16, start:16, d:-1, ms:800,
+   team:[[128,12],[81,13]], reward:195, txt:'אני רצה סביב האגם כל בוקר עם הטלטלים שלי! ריצה מחזקת גם מאמנים וגם טלטלים. רוצים לראות כמה חזקים הפכנו?'},
+  {id:'wlk-lt2', kind:'talk', map:'lake-town', n:'נעמה הדייגת', pal:'b', axis:'x', fix:9, a:9, b:17, start:17, d:-1, ms:650,
+   txt:'אני דגה כאן כל יום! אגב, אורי שואל החידון גר כאן בעיירה - יש לו חידון טלטלים עם פרסים של מטבעות. ואם תצפנו לשביל הכפור, קחו טלטלים חזקים!'},
+  {id:'wlk-fv', kind:'talk', map:'frost-village', n:'שלגית המטיילת', pal:'c', axis:'y', fix:10, a:10, b:15, start:15, d:-1, ms:700,
+   txt:'אני מטיילת בין הבתים ומחממת את הידיים! טיפ חם: בדרכים הקרות חיים טלטלים שלא תמצאו בשום מקום אחר. שווה לבקר בכל שביל!'},
+  {id:'wlk-dt', kind:'battle', map:'desert-town', n:'סאלח שומר המדבר', pal:'t', axis:'x', fix:13, a:9, b:15, start:9, d:1, ms:800,
+   team:[[47,30],[49,31]], reward:465, txt:'אני סורק את רחובות העיירה ושומר על הסדר! המדבר מחזק את מי שמכבד אותו. בואו נראה אם אתם מכבדים אותו - בקרב!'},
+  {id:'wlk-rf', kind:'battle', map:'route-flower', n:'ליאור מאמן השביל', pal:'t', axis:'x', fix:104, a:1, b:13, start:13, d:-1, ms:800,
+   team:[[5,9],[130,10]], reward:150, txt:'השביל הזה ארוך, אז אני מתאמן בדרך! מי שעובר כאן חייב להיות מוכן לקרב. יאללה, בואו נראה מה יש לכם!'},
+  {id:'wlk-rf2', kind:'talk', map:'route-flower', n:'פרחי המטיילת', pal:'c', axis:'x', fix:95, a:1, b:12, start:1, d:1, ms:700,
+   txt:'אני הולכת לבקר את נועה מארחת המשחקים בכפר הפרחים - יש לה משחק זיכרון עם פרסים! וטיפ: המתנות החבויות בשטח מתמלאות מחדש כל יום במשחק. שווה לחזור!'},
+  {id:'wlk-rfr', kind:'battle', map:'route-frost', n:'נופר מאמנת הקרח', pal:'t', axis:'x', fix:98, a:5, b:9, start:9, d:-1, ms:800,
+   team:[[25,15],[100,16]], reward:240, txt:'הקרח לא עוצר אותי! אני מתאמנת כאן כל יום עם הטלטלים שלי. בואו נראה אם אתם חזקים מספיק לשביל הכפור!'},
+  {id:'wlk-rs', kind:'battle', map:'route-storm', n:'טל מאמן הסופה', pal:'t', axis:'x', fix:98, a:1, b:16, start:16, d:-1, ms:800,
+   team:[[128,35],[64,36]], reward:540, txt:'הסופה הכי חזקה כאן! אני והטלטלים שלי רצים ברוח כל יום. רק מאמנים רציניים מגיעים לעיר הסופות - תוכיחו שאתם ראויים!'},
+  {id:'wlk-sc', kind:'battle', map:'storm-city', n:'אדר מאמן העיר', pal:'t', axis:'y', fix:14, a:3, b:14, start:3, d:1, ms:800,
+   team:[[55,41],[125,42]], reward:630, txt:'אני עושה סיבוב בוקר בעיר לפני האימון באצטדיון! הטלטלים שלי ברמה הכי גבוהה שתפגשו. רוצים טעימה?'},
+  {id:'wlk-sc2', kind:'talk', map:'storm-city', n:'גלי החלוצה', pal:'c', axis:'x', fix:14, a:1, b:21, start:1, d:1, ms:650,
+   txt:'אני הולכת לכל אירוע באצטדיון! טיפ של אלופים: לפני קרב אלוף שווה לטפל בצוות בבית החולים ולקנות שיקויים במכולת. ההכנות זה חצי מהניצחון!'},
+  {id:'wlk-rsw', kind:'talk', map:'route-swamp', n:'בוצי המדריך', pal:'b', axis:'x', fix:7, a:2, b:7, start:7, d:-1, ms:700,
+   txt:'אני מכיר כל אבן בביצה! בסוף השביל מחכה הביצה הגדולה, ושמעתי שבחורשה שלה מסתתר משהו נדיר מאוד... שווה לחקור כשתהיו חזקים!'},
+  {id:'wlk-sm', kind:'talk', map:'shop-meadow', n:'אבי הקונה', pal:'b', axis:'y', fix:5, a:4, b:9, start:9, d:-1, ms:900,
+   txt:'אני בודק את המדפים... סוכריית הדרגה הנדירה מעלה רמה מיד! אני חוסך מטבעות לקנות אחת לטלטל האהוב עליי. גם לכם שווה!'},
+  {id:'wlk-ss', kind:'talk', map:'shop-storm', n:'רונה האספנית', pal:'c', axis:'y', fix:5, a:4, b:9, start:9, d:-1, ms:900,
+   txt:'אספנים אמיתיים קונים כדורים לפני שהם נגמרים! בדרכים הרחוקות חיים טלטלים נדירים - בלי כדורים במלאי אי אפשר לתפוס אותם.'},
+  {id:'wlk-hl', kind:'talk', map:'hosp-lake', n:'רועי המתנדב', pal:'b', axis:'y', fix:4, a:4, b:8, start:8, d:-1, ms:900,
+   txt:'אני מתנדב כאן אחרי בית ספר! האחיות מרפאות את כל הצוות בחינם, אז אחרי קרב קשה תמיד חוזרים לכאן לפני שיוצאים שוב לדרך.'},
+ ];
+ const REG=[];
+ function freeTile(m,x,y,self){
+  if(x<0||y<0||x>=m.w||y>=m.h)return false;
+  const t=m.tiles[y][x]; if(K.ut.has(t)||t===29)return false;
+  if((m.npcs||[]).some(n=>n!==self&&n.x===x&&n.y===y))return false;
+  if((m.signs||[]).some(n=>n.x===x&&n.y===y)||(m.doors||[]).some(n=>n.x===x&&n.y===y)||(m.items||[]).some(n=>n.x===x&&n.y===y)||(m.links||[]).some(n=>n.x===x&&n.y===y)||(m.fields||[]).some(n=>n.x===x&&n.y===y))return false;
+  return true;
+ }
+ for(const s of WLK){
+  const m=K.ua[s.map]; if(!m){console.warn('walk619 skip (no map)',s.id);continue}
+  let ok=true;
+  for(let p=s.a;p<=s.b;p++){const x=s.axis==='x'?p:s.fix,y=s.axis==='x'?s.fix:p;
+   if(!freeTile(m,x,y,null)){ok=false;console.warn('walk619 skip (blocked)',s.id,x,y);break}}
+  if(!ok)continue;
+  const x=s.axis==='x'?s.start:s.fix, y=s.axis==='x'?s.fix:s.start;
+  let npc;
+  if(s.kind==='battle'){
+   K.Ha.push({id:s.id,n:s.n,map:s.map,x,y,team:s.team,reward:s.reward,txt:s.txt});
+   npc={kind:'trainer',ref:s.id,x,y,dir:'down',pal:s.pal};
+  }else{
+   npc={kind:'talk',id:s.id,n:s.n,x,y,dir:'down',pal:s.pal,txt:s.txt};
+  }
+  m.npcs.push(npc);
+  REG.push({s,npc,m,d:s.d,next:0});
+ }
+ function stepW(w){
+  const s=w.s,m=w.m,npc=w.npc;
+  const cur=s.axis==='x'?npc.x:npc.y; let d=w.d, np=cur+d;
+  if(np<s.a||np>s.b){d=-d;np=cur+d}
+  const nx=s.axis==='x'?np:s.fix, ny=s.axis==='x'?s.fix:np;
+  const R=K.Rt; if(R&&R.x===nx&&R.y===ny){w.next=Date.now()+400;return} // wait for player
+  if(!freeTile(m,nx,ny,npc)){
+   if(np===s.a||np===s.b){w.d=-d;return} // bounce at ends
+   return; // temporary block (someone stepped in)
+  }
+  w.d=d;
+  if(s.axis==='x'){npc.x=np;npc.dir=d>0?'right':'left'}else{npc.y=np;npc.dir=d>0?'down':'up'}
+ }
+ function drive(){
+  if(K.Et!=='map')return;
+  const en=K.en,R=K.Rt; if(R&&R.moving)return;
+  const now=Date.now();
+  for(const w of REG){ if(w.s.map!==en)continue; if(now<w.next)continue; w.next=now+w.s.ms; stepW(w); }
+ }
+ setInterval(()=>{try{drive()}catch(e){}},130);
+ window.TLWalk={list:REG,step:stepW,drive};
+ console.log('walk619 registered:',REG.length,'of',WLK.length);
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.19 whats-new: דמויות מהלכות ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen618&&!F.seen619&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen619=1;K._();K.Et='menu';
+  K.Ie(`<h2>🆕 גרסה 6.19 - העולם מתעורר לחיים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🚶 <b>דמויות מהלכות!</b> עכשיו יש דמויות שמטיילות ברחובות הערים, בשבילים, ואפילו בתוך חנויות ובתי חולים. תמיד יש מי שחולף לידך!</p><p>⚔️ <b>מאמנים נודדים:</b> חלק מהמטיילים הם מאמנים שמחפשים קרב - נצחו אותם וקבלו מטבעות!</p><p>💬 <b>סיפורים וטיפים:</b> אחרים יספרו לכם סודות על העולם, על התפתחויות חדשות של טלטלי ברק, ועל מקומות ששווה לבקר.</p></div><button class="btn grn" id="tlx619" style="width:100%">קדימה, לטייל!</button>`,mm=>mm.querySelector('#tlx619').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
