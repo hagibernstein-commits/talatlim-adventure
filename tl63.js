@@ -1727,3 +1727,14 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen619&&!F.seen620&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen620=1;K._();K.Et='menu';
   K.Ie(`<h2>🆕 גרסה 6.20 - עכשיו כולם מתפתחים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🌟 <b>כל טלטל יכול להתפתח!</b> שמענו שיש טלטלים שלא יכלו להתפתח, ותיקנו את זה: 30 טלטלים נוספים קיבלו צורות מפותחות חדשות!</p><p>💧🔥🌱 מים, אש, צמח, אדמה, קרח, אור ורגיל - מכל הסוגים! בועמון הופך לבועמלך, גמלה לגמלון, ואפילו יאראל האגדי ליארמלך!</p><p>✨ איך מפתחים? מעלים את הטלטל רמה בקרבות או עם סוכריית דרגה, וברמה הנדרשת הוא מתפתח לצורה חזקה יותר. האוגדן מראה את כולם!</p></div><button class="btn grn" id="tlx620" style="width:100%">קדימה, לפתח!</button>`,mm=>mm.querySelector('#tlx620').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.21 patch: swamp east exit path (post-scaler) ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ const sw=K.ua.swamp;if(sw&&sw.tiles[14]&&sw.tiles[14][110]!==undefined){sw.tiles[14][110]=1}
+}catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.21 whats-new: two new settlements ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen620&&!F.seen621&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen621=1;K._();K.Et='menu';
+  K.Ie('<h2>🆕 גרסה 6.21 - שני יישובים חדשים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🏘️ <b>כפר הטל</b> - כפר שקט וירוק ליד ברכה, מזרחית לביצה הירוקה! יש בו בית חולים, מכולת, בית סבתא דוה ונועה מאמנת הטל שמחכה לקרב.</p><p>🌅 <b>עיר השחר</b> - העיר הרחוקה ביותר בעולם, צפונית לעיר הסערה! במצפה השחר רואים את הזריחה הכי יפה בעולם, והמאמנים הכי חזקים מתאמנים שם.</p><p>✨ לכל יישוב חדש יש <b>שער קסום</b>: מספיק להגיע אליו פעם אחת, ואז אפשר לקפוץ אליו מיד דרך מפת המסע. צאו לגלות!</p></div><button class="btn grn" id="tlx621" style="width:100%">יוצאים לגלות!</button>',mm=>mm.querySelector('#tlx621').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
