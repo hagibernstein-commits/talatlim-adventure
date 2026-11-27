@@ -1738,3 +1738,9 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen620&&!F.seen621&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen621=1;K._();K.Et='menu';
   K.Ie('<h2>🆕 גרסה 6.21 - שני יישובים חדשים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🏘️ <b>כפר הטל</b> - כפר שקט וירוק ליד ברכה, מזרחית לביצה הירוקה! יש בו בית חולים, מכולת, בית סבתא דוה ונועה מאמנת הטל שמחכה לקרב.</p><p>🌅 <b>עיר השחר</b> - העיר הרחוקה ביותר בעולם, צפונית לעיר הסערה! במצפה השחר רואים את הזריחה הכי יפה בעולם, והמאמנים הכי חזקים מתאמנים שם.</p><p>✨ לכל יישוב חדש יש <b>שער קסום</b>: מספיק להגיע אליו פעם אחת, ואז אפשר לקפוץ אליו מיד דרך מפת המסע. צאו לגלות!</p></div><button class="btn grn" id="tlx621" style="width:100%">יוצאים לגלות!</button>',mm=>mm.querySelector('#tlx621').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+
+/* ---- 6.22 whats-new: quests + trades in the new villages ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen621&&!F.seen622&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen622=1;K._();K.Et='menu';
+  K.Ie('<h2>🆕 גרסה 6.22 - משימות והחלפות חדשות!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>❗ <b>שתי משימות חדשות:</b> נופרת הברכה בכפר הטל ושחרון הצייד בעיר השחר מחכים לכם עם אתגרי תפיסה ופרסים גדולים!</p><p>🔄 <b>שתי החלפות חדשות:</b> דוד חסון (בית סבתא דוה בכפר הטל) רוצה בצלחי ונותן כפורן מחזיק פרי, וניצנה הזרחנית (בית משפחת ניצן בעיר השחר) נותנת דרקוני אמיתי תמורת סערור!</p><p>💡 מחפשים את כל המשימות? פתחו את יומן המשימות בתפריט!</p></div><button class="btn grn" id="tlx622" style="width:100%">קדימה!</button>',mm=>mm.querySelector('#tlx622').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
