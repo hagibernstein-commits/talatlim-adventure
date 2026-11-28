@@ -1744,3 +1744,8 @@ window.TL63=(function(prev){return function(K){prev(K);try{
  setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen621&&!F.seen622&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen622=1;K._();K.Et='menu';
   K.Ie('<h2>🆕 גרסה 6.22 - משימות והחלפות חדשות!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>❗ <b>שתי משימות חדשות:</b> נופרת הברכה בכפר הטל ושחרון הצייד בעיר השחר מחכים לכם עם אתגרי תפיסה ופרסים גדולים!</p><p>🔄 <b>שתי החלפות חדשות:</b> דוד חסון (בית סבתא דוה בכפר הטל) רוצה בצלחי ונותן כפורן מחזיק פרי, וניצנה הזרחנית (בית משפחת ניצן בעיר השחר) נותנת דרקוני אמיתי תמורת סערור!</p><p>💡 מחפשים את כל המשימות? פתחו את יומן המשימות בתפריט!</p></div><button class="btn grn" id="tlx622" style="width:100%">קדימה!</button>',mm=>mm.querySelector('#tlx622').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
 }catch(e){console.error(e)}}})(window.TL63);
+/* ---- 6.23 whats-new: two more trades in the new villages ---- */
+window.TL63=(function(prev){return function(K){prev(K);try{
+ setInterval(()=>{try{const F=K.F;if(F&&F.started&&F.seen622&&!F.seen623&&K.Et==='map'&&document.querySelector('#modal').style.display!=='flex'){F.seen623=1;K._();K.Et='menu';
+  K.Ie('<h2>🆕 גרסה 6.23 - עוד החלפות בכפרים!</h2><div style="text-align:right;font-size:14px;line-height:1.55"><p>🔄 <b>שתי החלפות חדשות:</b> אמא טל (בית משפחת טל בכפר הטל) רוצה דמדומון ונותנת גלגלון, ושחרית (בית דודה שחר בעיר השחר) רוצה עננלו ונותנת צללון מאומן!</p><p>💡 טלטל שהתקבל בהחלפה מציית עד גבול התגים שלכם - שימו לב!</p></div><button class="btn grn" id="tlx623" style="width:100%">קדימה!</button>',mm=>mm.querySelector('#tlx623').onclick=()=>{K.He();K.Et='map'})}}catch(e){}},3600);
+}catch(e){console.error(e)}}})(window.TL63);
